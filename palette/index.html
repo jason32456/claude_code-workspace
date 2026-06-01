@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palette — Color Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="5" fill="#f87171"/>
+        <circle cx="15" cy="7" r="5" fill="#facc15"/>
+        <circle cx="11" cy="14" r="5" fill="#60a5fa"/>
+      </svg>
+      <span>Palette</span>
+    </div>
+    <div class="controls">
+      <button id="btn-export" class="btn btn-ghost">Export CSS</button>
+      <button id="btn-generate" class="btn btn-primary">
+        Generate
+        <kbd>Space</kbd>
+      </button>
+    </div>
+  </header>
+
+  <main id="swatches"></main>
+
+  <div id="toast" role="alert" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
