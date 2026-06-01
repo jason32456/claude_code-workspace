@@ -41,7 +41,11 @@ ES modules require an HTTP server — `file://` URLs will not work.
 
 ## Conventions
 
-- **Branch names** follow `claude/<feature>-<id>` — stay on the branch specified at session start.
+- **Branch names** follow `claude/<feature>-<id>` — develop on the branch specified at session start.
+- **Merge to `main` when done.** After work is complete and pushed, merge your feature branch into `main` and push `main`:
+  ```bash
+  git checkout main && git merge <your-branch> && git push origin main
+  ```
 - **Commit often** with short, descriptive messages.
 - **No secrets** — never commit `.env` files or API keys.
 - Code comments only where the *why* is non-obvious. No docblocks, no task references.
