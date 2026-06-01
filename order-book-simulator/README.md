@@ -74,10 +74,6 @@ Vanilla JS with ES modules, zero dependencies, Canvas 2D for the chart. Runs ent
 
 ## Screenshots
 
-**Early run — price chart with fair-value line, depth ladder, trade tape, and agent P&L:**
-
-![Overview](./screenshot-overview.png)
-
-**Live market — volatility clusters, momentum spikes, value traders anchoring:**
-
-![Running](./screenshot-running.png)
+| Early state — ~70 ticks in | Settled state — volatility clusters, momentum spikes |
+|:---:|:---:|
+| ![Early](screenshots/early.png) | ![Settled](screenshots/settled.png) |
