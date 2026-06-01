@@ -1,5 +1,11 @@
 # Focus Pet
 
+![Default state — Blobby the egg at rest](screenshots/default.png)
+
+*Left: Blobby in egg stage with full hunger and happiness bars. Right: 25-minute focus timer ticking down with the button toggled to Pause.*
+
+![Timer running](screenshots/timer-running.png)
+
 A Pomodoro-style focus timer fused with a virtual pet. Complete focus sessions to feed and cheer up your pet. Neglect it and it'll get a little droopy — but one session is always enough to perk it back up.
 
 ## How to run
