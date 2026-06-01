@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maze & Pathfinding Visualizer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Maze &amp; Pathfinding Visualizer</h1>
+</header>
+
+<div id="controls">
+  <div class="control-group">
+    <label>Maze</label>
+    <select id="generator">
+      <option value="recursive">Recursive Backtracker</option>
+      <option value="prims">Prim's Algorithm</option>
+    </select>
+    <button id="btn-generate">Generate</button>
+  </div>
+
+  <div class="control-group">
+    <label>Solver</label>
+    <select id="solver">
+      <option value="bfs">BFS</option>
+      <option value="dijkstra">Dijkstra</option>
+      <option value="astar">A*</option>
+    </select>
+    <button id="btn-solve">Solve</button>
+  </div>
+
+  <div class="control-group">
+    <label>Speed</label>
+    <input type="range" id="speed" min="1" max="100" value="50">
+    <span class="speed-label"><span id="speed-left">Fast</span></span>
+  </div>
+
+  <div class="control-group actions">
+    <button id="btn-clear-path">Clear Path</button>
+    <button id="btn-clear-walls">Clear Walls</button>
+    <button id="btn-reset">Reset</button>
+  </div>
+</div>
+
+<div id="stats-bar">
+  <span id="stats"></span>
+  <span id="weight-hint"></span>
+</div>
+
+<div id="legend">
+  <span class="legend-item"><span class="swatch start"></span>Start</span>
+  <span class="legend-item"><span class="swatch end"></span>End</span>
+  <span class="legend-item"><span class="swatch wall"></span>Wall</span>
+  <span class="legend-item"><span class="swatch visited"></span>Visited</span>
+  <span class="legend-item"><span class="swatch path"></span>Path</span>
+  <span class="legend-item"><span class="swatch weighted"></span>Weight ×5</span>
+</div>
+
+<main>
+  <div id="grid"></div>
+</main>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
