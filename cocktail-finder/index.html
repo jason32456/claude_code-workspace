@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mixologist — Cocktail Recipe Finder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🍹</span>
+      <span class="logo-text">Mixologist</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="discover">Discover</button>
+      <button class="tab" data-tab="favourites">Favourites <span id="fav-count" class="badge hidden">0</span></button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- DISCOVER TAB -->
+    <section id="tab-discover" class="tab-panel active">
+      <div class="search-bar-wrap">
+        <div class="search-mode-toggle">
+          <button class="mode-btn active" data-mode="name">By Name</button>
+          <button class="mode-btn" data-mode="ingredient">By Ingredient</button>
+        </div>
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search cocktails…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="clear-btn" class="clear-btn hidden" aria-label="Clear">✕</button>
+        </div>
+        <button id="random-btn" class="btn-primary" title="Get a random cocktail">
+          <span class="dice">🎲</span> Shake it up!
+        </button>
+      </div>
+
+      <!-- Search results grid -->
+      <div id="results-grid" class="results-grid hidden"></div>
+
+      <!-- Detail card -->
+      <div id="detail-card" class="detail-card">
+        <div id="skeleton" class="skeleton-wrap">
+          <div class="skeleton img-skeleton"></div>
+          <div class="skeleton-body">
+            <div class="skeleton line w-60"></div>
+            <div class="skeleton line w-40"></div>
+            <div class="skeleton line w-80"></div>
+            <div class="skeleton line w-80"></div>
+            <div class="skeleton line w-70"></div>
+          </div>
+        </div>
+        <div id="cocktail-detail" class="cocktail-detail hidden"></div>
+      </div>
+    </section>
+
+    <!-- FAVOURITES TAB -->
+    <section id="tab-favourites" class="tab-panel">
+      <div id="fav-empty" class="empty-state">
+        <p class="empty-icon">⭐</p>
+        <p>No favourites yet.</p>
+        <p class="empty-sub">Hit the star on any cocktail to save it here.</p>
+      </div>
+      <div id="fav-grid" class="results-grid"></div>
+    </section>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
