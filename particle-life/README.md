@@ -2,6 +2,10 @@
 
 A browser-based emergent particle simulation. A handful of "species" of colored particles obey pairwise attraction/repulsion rules, and from those rules alone complex lifelike behavior emerges — membranes, chasers, orbiting clusters, blobs that look like they're hunting or reproducing. None of that behavior is hand-authored; it all falls out of one little interaction matrix.
 
+| 2 seconds in | 6 seconds in |
+|:---:|:---:|
+| ![Particles starting to cluster](screenshots/early.png) | ![Structures emerged](screenshots/settled.png) |
+
 ## Running locally
 
 ```bash
