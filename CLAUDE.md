@@ -17,9 +17,41 @@ claude_code-workspace/
 
 1. **One folder per project.** Never mix source files from two projects in the same directory.
 2. **Always create a `README.md`** inside the project folder covering: what it does, how to run it, key parameters, and any dependencies.
-3. **Update the root `README.md`** by adding a row to the Projects table (name, description, stack, status).
-4. **No build tools required** unless the PRD explicitly calls for them. Vanilla HTML/CSS/JS with ES modules served by a simple static server (`python -m http.server`) is the default stack.
-5. **Self-contained.** Each project must run from its own folder. No shared `node_modules` at the repo root.
+3. **Take screenshots and embed them.** Once the project runs, capture at least one screenshot (two is better — e.g. an early state and a settled/interesting state) and embed them near the top of the project `README.md`. Store images in `<project-name>/screenshots/`. Use the Playwright-based approach documented below.
+4. **Update the root `README.md`** by adding a row to the Projects table (name, description, stack, status).
+5. **No build tools required** unless the PRD explicitly calls for them. Vanilla HTML/CSS/JS with ES modules served by a simple static server (`python -m http.server`) is the default stack.
+6. **Self-contained.** Each project must run from its own folder. No shared `node_modules` at the repo root.
+
+## Taking screenshots (browser projects)
+
+Start the server, then use Playwright via Node to capture:
+
+```bash
+# Start server in background
+cd <project-name> && python3 -m http.server 8080 &
+
+# Capture screenshots
+node - << 'EOF'
+import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+const browser = await chromium.launch({ args: ['--no-sandbox'] });
+const page = await browser.newPage();
+await page.setViewportSize({ width: 1440, height: 900 });
+await page.goto('http://localhost:8080/', { waitUntil: 'networkidle' });
+await page.waitForTimeout(2000);
+await page.screenshot({ path: 'screenshots/early.png' });
+await page.waitForTimeout(4000);
+await page.screenshot({ path: 'screenshots/settled.png' });
+await browser.close();
+EOF
+```
+
+Embed them in the project `README.md` as a side-by-side table right below the intro paragraph:
+
+```markdown
+| Early state | Settled state |
+|:---:|:---:|
+| ![Early](screenshots/early.png) | ![Settled](screenshots/settled.png) |
+```
 
 ## Running projects locally
 
