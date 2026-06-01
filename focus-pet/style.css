@@ -1,0 +1,338 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --surface2: #0f3460;
+  --accent: #e94560;
+  --accent2: #7b5ea7;
+  --text: #eaeaea;
+  --text-muted: #8892a4;
+  --green: #56c596;
+  --yellow: #f9c74f;
+  --radius: 16px;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.app-wrapper {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+/* ── Pet panel ── */
+.pet-panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 240px;
+  flex: 1;
+  position: relative;
+}
+
+#pet-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#mood-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+#pet-svg {
+  width: 200px;
+  height: 200px;
+  transition: transform 0.1s ease;
+}
+
+.pet-reward {
+  animation: reward-bounce 0.4s ease 3;
+}
+
+@keyframes reward-bounce {
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(-18px) scale(1.08); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* ── Stats ── */
+.stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.stat-bar-bg {
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+#hunger-bar    { background: linear-gradient(90deg, #f9844a, #f9c74f); }
+#happiness-bar { background: linear-gradient(90deg, #7b5ea7, #56c596); }
+#growth-progress { background: linear-gradient(90deg, #4cc9f0, #7b5ea7); }
+
+/* ── Timer panel ── */
+.timer-panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-width: 240px;
+  flex: 1;
+}
+
+.timer-ring-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.timer-ring-wrap svg {
+  position: absolute;
+  top: 0; left: 0;
+  transform: rotate(-90deg);
+}
+
+#timer-ring-bg {
+  fill: none;
+  stroke: var(--surface2);
+  stroke-width: 8;
+}
+
+#timer-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 565.5; /* 2π×90 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.9s linear, stroke 0.4s;
+}
+
+.timer-ring-wrap.phase-short_break #timer-ring,
+.timer-ring-wrap.phase-long_break  #timer-ring {
+  stroke: var(--green);
+}
+
+#timer-display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.phase-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.phase-focus       { background: rgba(233,69,96,0.2);  color: var(--accent); }
+.phase-short_break { background: rgba(86,197,150,0.2); color: var(--green); }
+.phase-long_break  { background: rgba(86,197,150,0.2); color: var(--green); }
+
+.session-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface2);
+  transition: background 0.3s;
+}
+
+.dot-done { background: var(--accent); }
+
+.timer-controls {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: opacity 0.15s, transform 0.1s;
+}
+button:active { transform: scale(0.96); }
+
+#btn-start {
+  background: var(--accent);
+  color: #fff;
+  min-width: 90px;
+}
+#btn-reset {
+  background: var(--surface2);
+  color: var(--text-muted);
+}
+#btn-settings {
+  background: transparent;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  font-size: 1.1rem;
+}
+#btn-settings:hover { color: var(--text); }
+
+/* ── Settings panel ── */
+.settings-panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.settings-panel.hidden { display: none; }
+
+.settings-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-box h2 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-row label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.settings-row input {
+  background: var(--surface2);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+}
+
+.settings-row input:focus {
+  box-shadow: 0 0 0 2px var(--accent2);
+}
+
+.settings-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+#btn-settings-save {
+  background: var(--accent);
+  color: #fff;
+}
+#btn-settings-cancel {
+  background: var(--surface2);
+  color: var(--text-muted);
+}
+
+/* ── Evolve flash ── */
+#evolve-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(123,94,167,0.6) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 200;
+}
+
+#evolve-flash.active {
+  animation: evolve-pulse 1.8s ease forwards;
+}
+
+@keyframes evolve-pulse {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+  .app-wrapper { flex-direction: column; }
+  .pet-panel, .timer-panel { min-width: unset; width: 100%; }
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Focus Pet</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <h1>🐾 Focus Pet</h1>
+
+  <div class="app-wrapper">
+
+    <!-- Pet panel -->
+    <div class="pet-panel">
+      <div id="pet-name">Blobby</div>
+
+      <svg id="pet-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <div id="mood-label">content</div>
+
+      <div class="stats">
+        <div class="stat-row">
+          <div class="stat-label">
+            <span>🍖 Hunger</span>
+            <span><span id="hunger-value">80</span>/100</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div class="stat-bar" id="hunger-bar" style="width:80%"></div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-label">
+            <span>✨ Happiness</span>
+            <span><span id="happiness-value">80</span>/100</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div class="stat-bar" id="happiness-bar" style="width:80%"></div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-label">
+            <span>🌱 Growth</span>
+            <span id="growth-label">egg · 0/60 min</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div class="stat-bar" id="growth-progress" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timer panel -->
+    <div class="timer-panel">
+      <div class="timer-ring-wrap" id="timer-ring-wrap">
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          <circle id="timer-ring-bg" cx="100" cy="100" r="90"/>
+          <circle id="timer-ring"    cx="100" cy="100" r="90"/>
+        </svg>
+        <div id="timer-display">25:00</div>
+      </div>
+
+      <div class="phase-label phase-focus" id="phase-label">Focus</div>
+
+      <div class="session-dots" id="session-dots"></div>
+
+      <div class="timer-controls">
+        <button id="btn-start">Start</button>
+        <button id="btn-reset">Reset</button>
+        <button id="btn-settings" title="Settings">⚙️</button>
+      </div>
+    </div>
+
+  </div><!-- .app-wrapper -->
+
+  <!-- Settings overlay -->
+  <div class="settings-panel hidden" id="settings-panel">
+    <div class="settings-box">
+      <h2>Settings</h2>
+
+      <div class="settings-row">
+        <label>Pet name</label>
+        <input id="input-name" type="text" maxlength="20" placeholder="Blobby"/>
+      </div>
+      <div class="settings-row">
+        <label>Focus duration (min)</label>
+        <input id="input-focus" type="number" min="1" max="90" value="25"/>
+      </div>
+      <div class="settings-row">
+        <label>Short break (min)</label>
+        <input id="input-short" type="number" min="1" max="30" value="5"/>
+      </div>
+      <div class="settings-row">
+        <label>Long break (min)</label>
+        <input id="input-long" type="number" min="1" max="60" value="15"/>
+      </div>
+
+      <div class="settings-buttons">
+        <button id="btn-settings-cancel">Cancel</button>
+        <button id="btn-settings-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evolve flash effect -->
+  <div id="evolve-flash"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

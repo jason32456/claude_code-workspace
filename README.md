@@ -7,6 +7,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
 | [particle-life](./particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
+| [focus-pet](./focus-pet/) | Pomodoro timer fused with a virtual pet — complete focus sessions to feed and evolve your blob creature, time-based decay keeps it real | Vanilla JS · SVG · CSS · localStorage | ✅ Complete |
 
 ## Running a project
 
@@ -26,12 +27,20 @@ See each project's `README.md` for details.
 claude_code-workspace/
 ├── README.md          ← this file
 ├── CLAUDE.md          ← guide for AI agents working in this repo
-└── particle-life/     ← project 1
+├── particle-life/     ← project 1
+│   ├── README.md
+│   ├── index.html
+│   ├── main.js
+│   ├── simulation.js
+│   ├── renderer.js
+│   ├── controls.js
+│   └── style.css
+└── focus-pet/         ← project 2
     ├── README.md
     ├── index.html
     ├── main.js
-    ├── simulation.js
-    ├── renderer.js
-    ├── controls.js
+    ├── pet.js
+    ├── timer.js
+    ├── ui.js
     └── style.css
 ```
