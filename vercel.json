@@ -1,23 +1,9 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "particle-life/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "palette/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/palette(.*)",
-      "dest": "/palette$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/particle-life/$1"
+      "source": "/((?!particle-life/|palette/).*)",
+      "destination": "/particle-life/$1"
     }
   ]
 }
