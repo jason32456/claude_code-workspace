@@ -2,6 +2,12 @@
 
 Interactive grid where you generate mazes and watch pathfinding algorithms explore them step by step.
 
+## Screenshots
+
+| Blank grid | Generated maze | A* solved |
+|---|---|---|
+| ![Blank grid](screenshot-initial.png) | ![Recursive backtracker maze](screenshot-generated.png) | ![A* solution](screenshot-solved.png) |
+
 ## How to run
 
 ```bash
