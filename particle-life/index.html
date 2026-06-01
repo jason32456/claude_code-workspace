@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Life</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="panel">
+  <h1>Particle Life</h1>
+
+  <div class="btn-row">
+    <button id="btn-pause">Pause</button>
+    <button id="btn-randomize">Randomize Rules</button>
+    <button id="btn-respawn">Respawn</button>
+  </div>
+
+  <div>
+    <p class="section-label">Parameters</p>
+    <div id="ctrl-sliders"></div>
+  </div>
+
+  <div id="matrix-wrap">
+    <p class="section-label">Interaction Matrix</p>
+    <p id="matrix-hint">Drag cells up/down &nbsp;·&nbsp; <span style="color:#c04040">■</span> attract &nbsp; <span style="color:#4040c0">■</span> repel</p>
+    <div id="matrix-grid"></div>
+  </div>
+
+  <div id="hud">
+    <span id="hud-fps">— fps</span>
+    <span id="hud-count">— particles</span>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

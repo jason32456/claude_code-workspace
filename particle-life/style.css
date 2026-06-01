@@ -1,0 +1,169 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0a0a0a;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #d0d0d8;
+  font-size: 13px;
+}
+
+/* ---- Canvas ---- */
+#canvas {
+  position: fixed;
+  inset: 0;
+  display: block;
+}
+
+/* ---- Side panel ---- */
+#panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: 270px;
+  height: 100vh;
+  background: rgba(8, 8, 16, 0.93);
+  border-left: 1px solid #1e1e2e;
+  overflow-y: auto;
+  padding: 14px 12px 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#panel h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+/* ---- Buttons ---- */
+.btn-row {
+  display: flex;
+  gap: 5px;
+}
+
+button {
+  flex: 1;
+  padding: 6px 4px;
+  background: #14142a;
+  color: #c0c0d0;
+  border: 1px solid #2a2a3e;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: background 0.12s, border-color 0.12s;
+}
+button:hover { background: #1e1e38; border-color: #3a3a55; }
+button.active { background: #28284a; border-color: #5050aa; color: #aaaaff; }
+
+/* ---- Section header ---- */
+.section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5a5a7a;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #1a1a2a;
+}
+
+/* ---- Sliders ---- */
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.ctrl-row label {
+  flex: 0 0 108px;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.ctrl-row input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 3px;
+  background: #2a2a3e;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.ctrl-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #6666cc;
+  cursor: pointer;
+}
+.ctrl-row input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #6666cc;
+  cursor: pointer;
+  border: none;
+}
+
+.ctrl-val {
+  flex: 0 0 38px;
+  font-size: 0.73rem;
+  color: #aaa;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Matrix editor ---- */
+#matrix-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#matrix-hint {
+  font-size: 0.68rem;
+  color: #4a4a66;
+  line-height: 1.4;
+}
+
+#matrix-grid {
+  display: grid;
+  gap: 2px;
+}
+
+.mx-corner {
+  /* empty top-left cell */
+}
+
+.mx-hdr {
+  border-radius: 3px;
+  aspect-ratio: 1;
+}
+
+.mx-cell {
+  border-radius: 3px;
+  aspect-ratio: 1;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7.5px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.65);
+  user-select: none;
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: border-color 0.1s;
+}
+.mx-cell:hover { border-color: rgba(255,255,255,0.2); }
+
+/* ---- HUD ---- */
+#hud {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #3a3a5a;
+  padding-top: 4px;
+  border-top: 1px solid #14141e;
+  margin-top: auto;
+}

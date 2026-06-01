@@ -1,1 +1,37 @@
 # claude_code-workspace
+
+A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
+
+## Projects
+
+| Project | Description | Stack | Status |
+|---------|-------------|-------|--------|
+| [particle-life](./particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
+
+## Running a project
+
+Each project is a static site served locally:
+
+```bash
+cd <project-name>
+python -m http.server 8080
+# open http://localhost:8080
+```
+
+See each project's `README.md` for details.
+
+## Repository layout
+
+```
+claude_code-workspace/
+├── README.md          ← this file
+├── CLAUDE.md          ← guide for AI agents working in this repo
+└── particle-life/     ← project 1
+    ├── README.md
+    ├── index.html
+    ├── main.js
+    ├── simulation.js
+    ├── renderer.js
+    ├── controls.js
+    └── style.css
+```
