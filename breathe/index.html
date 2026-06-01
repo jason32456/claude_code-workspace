@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Breathe</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Breathe</h1>
+      <p class="subtitle">A moment of calm, whenever you need it</p>
+    </header>
+
+    <div class="technique-selector">
+      <button class="technique-btn active" data-technique="box">Box Breathing</button>
+      <button class="technique-btn" data-technique="478">4-7-8</button>
+      <button class="technique-btn" data-technique="sigh">Physiological Sigh</button>
+    </div>
+
+    <div class="orb-container">
+      <div class="orb-ring outer"></div>
+      <div class="orb-ring middle"></div>
+      <div class="orb" id="orb"></div>
+      <div class="orb-label">
+        <div class="phase-text" id="phaseText">Ready</div>
+        <div class="countdown" id="countdown"></div>
+      </div>
+    </div>
+
+    <div class="round-display" id="roundDisplay">Round — of —</div>
+
+    <div class="controls">
+      <div class="rounds-selector">
+        <span class="rounds-label">Rounds:</span>
+        <button class="round-btn active" data-rounds="3">3</button>
+        <button class="round-btn" data-rounds="5">5</button>
+        <button class="round-btn" data-rounds="10">10</button>
+      </div>
+      <button class="start-btn" id="startBtn">Start</button>
+    </div>
+
+    <div class="technique-info" id="techniqueInfo"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

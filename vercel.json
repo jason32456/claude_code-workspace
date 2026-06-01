@@ -6,6 +6,8 @@
   "routes": [
     { "src": "/palette/?$", "dest": "/palette/index.html" },
     { "src": "/palette/(.*)", "dest": "/palette/$1" },
+    { "src": "/breathe/?$", "dest": "/breathe/index.html" },
+    { "src": "/breathe/(.*)", "dest": "/breathe/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
