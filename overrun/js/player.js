@@ -31,10 +31,12 @@ export function createPlayer() {
     if (keys['KeyA'] || keys['ArrowLeft'])  fx -= 1;
     if (keys['KeyD'] || keys['ArrowRight']) fx += 1;
 
-    // Rotate input by yaw
+    // Rotate input into world space to match the camera's yaw.
+    // Camera forward under Three's YXZ ordering is (-sin yaw, -cos yaw),
+    // so the input basis must rotate the same way (not its mirror).
     const s = Math.sin(yaw), c = Math.cos(yaw);
-    const wx = c * fx - s * fz;
-    const wz = s * fx + c * fz;
+    const wx =  c * fx + s * fz;
+    const wz = -s * fx + c * fz;
     const len = Math.sqrt(wx * wx + wz * wz);
     return len > 0 ? { x: wx / len, z: wz / len } : { x: 0, z: 0 };
   }
