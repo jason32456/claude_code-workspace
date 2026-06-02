@@ -19,7 +19,7 @@ claude_code-workspace/
 2. **Always create a `README.md`** inside the project folder covering: what it does, how to run it, key parameters, and any dependencies.
 3. **Take screenshots and embed them.** Once the project runs, capture at least one screenshot (two is better — e.g. an early state and a settled/interesting state) and embed them near the top of the project `README.md`. Store images in `<project-name>/screenshots/`. Use the Playwright-based approach documented below.
 4. **Update the root `README.md`** by adding a row to the Projects table (name, description, stack, status).
-5. **No build tools required** unless the PRD explicitly calls for them. Vanilla HTML/CSS/JS with ES modules served by a simple static server (`python -m http.server`) is the default stack.
+5. **Choose the right stack for the project.** Any stack is fair game — vanilla HTML/CSS/JS, React, Vue, Svelte, Node CLI, Python, etc. Use whatever fits the PRD best. Vanilla JS with ES modules served by `python -m http.server` is a reasonable default for simple browser projects, but don't default to it when a framework or build tool would be clearly better.
 6. **Self-contained.** Each project must run from its own folder. No shared `node_modules` at the repo root.
 
 ## Taking screenshots (browser projects)
