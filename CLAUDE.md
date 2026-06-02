@@ -70,6 +70,7 @@ ES modules require an HTTP server — `file://` URLs will not work.
 | Folder | Stack | How to run |
 |--------|-------|------------|
 | `particle-life` | Vanilla JS + Canvas 2D | `cd particle-life && python -m http.server 8080` |
+| `finance-dashboard` | Next.js 14 + TypeScript + Prisma + Auth.js (explicit-PRD build tooling) | `cd finance-dashboard && npm install && npm run db:push && npm run dev` |
 
 ## Conventions
 
