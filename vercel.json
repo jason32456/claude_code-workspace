@@ -14,6 +14,8 @@
     { "src": "/streaks/(.*)", "dest": "/streaks/$1" },
     { "src": "/ambient-noise/?$", "dest": "/ambient-noise/index.html" },
     { "src": "/ambient-noise/(.*)", "dest": "/ambient-noise/$1" },
+    { "src": "/typeblitz/?$", "dest": "/typeblitz/index.html" },
+    { "src": "/typeblitz/(.*)", "dest": "/typeblitz/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
