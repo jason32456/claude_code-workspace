@@ -2,6 +2,8 @@
 
 A low-budget, GTA-style open-world sandbox for the browser. Roam a procedurally generated city on foot, walk up to a parked car, get in, and drive anywhere you like. No missions. No fail state. Just freedom.
 
+https://github.com/jason32456/claude_code-workspace/raw/main/joyride/demo.webm
+
 | Start screen | On foot | Driving |
 |:---:|:---:|:---:|
 | ![Start](screenshots/start.png) | ![On foot](screenshots/early.png) | ![Driving](screenshots/settled.png) |
