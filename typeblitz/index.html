@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeBlitz — Typing Speed Test</title>
+  <style>
+    :root[data-theme="dark"] {
+      --bg: #0f0f13;
+      --surface: #1a1a24;
+      --border: #2a2a3a;
+      --text: #e2e2f0;
+      --subtext: #6e6e8a;
+      --correct: #43e97b;
+      --wrong: #f06292;
+      --cursor: #a78bfa;
+      --accent: #a78bfa;
+      --accent-soft: #2d2040;
+      --word-pending: #3a3a52;
+    }
+    :root[data-theme="light"] {
+      --bg: #f5f5fa;
+      --surface: #ffffff;
+      --border: #e0e0ee;
+      --text: #1a1a2e;
+      --subtext: #9090aa;
+      --correct: #22a85d;
+      --wrong: #e53935;
+      --cursor: #7c3aed;
+      --accent: #7c3aed;
+      --accent-soft: #ede9fe;
+      --word-pending: #d0d0e8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    header {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 0;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--accent);
+    }
+    .logo span { color: var(--text); }
+
+    .theme-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--subtext);
+      font-size: 1.1rem;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    main {
+      width: 100%;
+      max-width: 860px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 0 40px;
+    }
+
+    /* Mode selector */
+    .mode-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+    .mode-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--subtext);
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 7px 20px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .mode-btn.active, .mode-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 28px;
+      min-height: 48px;
+      align-items: center;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 3px;
+    }
+    .timer-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+    .timer-value.urgent { color: var(--wrong); }
+
+    /* Word display */
+    .word-display {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 32px;
+      width: 100%;
+      font-size: 1.35rem;
+      line-height: 2.1;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      cursor: text;
+      min-height: 160px;
+    }
+
+    .word-display:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .words-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .word {
+      display: inline-flex;
+    }
+
+    .char {
+      color: var(--word-pending);
+      position: relative;
+      transition: color 0.08s;
+    }
+    .char.correct { color: var(--correct); }
+    .char.wrong { color: var(--wrong); text-decoration: underline; text-decoration-color: var(--wrong); }
+    .char.cursor::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10%;
+      height: 80%;
+      width: 2px;
+      background: var(--cursor);
+      border-radius: 2px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Hidden input */
+    #hidden-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px;
+      height: 1px;
+    }
+
+    /* Hint */
+    .hint {
+      margin-top: 16px;
+      font-size: 0.82rem;
+      color: var(--subtext);
+      text-align: center;
+    }
+    .hint kbd {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: inherit;
+      font-size: 0.78rem;
+    }
+
+    /* Results overlay */
+    .results {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 24px;
+      padding: 20px;
+    }
+    .results.visible { display: flex; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 16px;
+    }
+    .result-card .big { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .result-card .label { font-size: 0.78rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+    .result-card.best-card { border-color: var(--accent); background: var(--accent-soft); }
+
+    .result-heading {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .pb-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .restart-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 12px 36px;
+      cursor: pointer;
+      transition: opacity 0.18s, transform 0.12s;
+    }
+    .restart-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .restart-btn:active { transform: translateY(0); }
+
+    footer {
+      padding: 20px 0 28px;
+      font-size: 0.8rem;
+      color: var(--subtext);
+      text-align: center;
+    }
+
+    /* Idle overlay */
+    .idle-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border-radius: 12px;
+      color: var(--subtext);
+      font-size: 1rem;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .idle-overlay.hidden { opacity: 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Type<span>Blitz</span></div>
+  <button class="theme-btn" id="themeToggle" title="Toggle theme">☀</button>
+</header>
+
+<main>
+  <div class="mode-bar" id="modeBar">
+    <button class="mode-btn" data-mode="15">15s</button>
+    <button class="mode-btn active" data-mode="30">30s</button>
+    <button class="mode-btn" data-mode="60">60s</button>
+  </div>
+
+  <!-- In-test stats -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat">
+      <div class="stat-value" id="liveWpm">0</div>
+      <div class="stat-label">WPM</div>
+    </div>
+    <div class="stat">
+      <div class="timer-value" id="timerDisplay">30</div>
+      <div class="stat-label">Seconds left</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="liveAcc">100</div>
+      <div class="stat-label">Accuracy %</div>
+    </div>
+  </div>
+
+  <!-- Typing area -->
+  <div class="word-display" id="wordDisplay" tabindex="0">
+    <div class="words-container" id="wordsContainer"></div>
+    <div class="idle-overlay" id="idleOverlay">Click here or start typing…</div>
+    <input id="hidden-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+  </div>
+
+  <p class="hint"><kbd>Tab</kbd> to restart &nbsp;·&nbsp; <kbd>Esc</kbd> to reset</p>
+
+  <!-- Results -->
+  <div class="results" id="resultsPanel">
+    <div class="result-heading">Test complete 🎉</div>
+    <div id="pbBadge" class="pb-badge" style="display:none">New Personal Best!</div>
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="big" id="resWpm">0</div>
+        <div class="label">WPM</div>
+      </div>
+      <div class="result-card">
+        <div class="big" id="resAcc">0</div>
+        <div class="label">Accuracy %</div>
+      </div>
+      <div class="result-card best-card">
+        <div class="big" id="resBest">0</div>
+        <div class="label">Best WPM</div>
+      </div>
+    </div>
+    <button class="restart-btn" id="restartBtn">Try Again</button>
+  </div>
+</main>
+
+<footer>TypeBlitz — tap <kbd>Tab</kbd> anytime to restart</footer>
+
+<script type="module">
+const WORDS = `the be to of and a in that have it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us`.split(' ').concat(`about above across act actually add after again age ago ahead air all allow almost alone along already also always among another answer any anybody anymore anyone anything anyway anywhere appear around arrive ask asleep away back bad ball be beat beautiful become before behind believe best better between big black blue book both boy bring build burn busy call care carry catch change cheap check choose city clear climb close cold come cool could count cover cut dark dead deal describe die different dinner dirty discover do does dog door down draw dream drink drive drop dry during each early easy eat either end enough enter even ever every everyone everything everywhere example fall false far fast feel few fight find fine first fit floor follow food for force forget friend from front full fun future game get give glass go good great green group grow guess hang happen happy hard hate have head hear heart heavy help her here high him hold home hope hot hour how however hundred idea important inside instead into jump just keep kind know land large last later lead learn least leave left less let level lie light like line little live long look lose love low lucky make many mean meet might mind miss money month most move name need never new next night no not now number off often once only open or other out outside own part past pay people pick plan play point possible practice present probably problem pull push put question quit race reach read ready really reason remember return right road rock round run safe same save say school see seem set show side simple since sky sleep slow small some sometimes soon sorry space stand start stay still stop study such sure table take talk tell than that the their them then there these think though time to today together too top travel true try turn type under until up use used usually various very visit voice walk want watch water way we well what when where while who whole why will with word world worry write wrong year yes yet young`.split(' '));
+
+const WORDS_POOL = [...new Set(WORDS)];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function generateWords(n = 120) {
+  const pool = shuffle(WORDS_POOL);
+  const out = [];
+  while (out.length < n) out.push(...pool);
+  return out.slice(0, n);
+}
+
+// State
+let mode = 30;
+let words = [];
+let charSpans = [];      // flat array of {span, wordIdx, charIdx}
+let wordBoundaries = []; // [{start, end}] indices into charSpans
+let cursorPos = 0;       // index in charSpans
+let typed = [];          // typed string so far
+let timer = null;
+let timeLeft = 30;
+let started = false;
+let finished = false;
+let totalTyped = 0;
+let correctTyped = 0;
+let bestWpm = {};        // keyed by mode
+
+const wordsContainer = document.getElementById('wordsContainer');
+const hiddenInput = document.getElementById('hidden-input');
+const wordDisplay = document.getElementById('wordDisplay');
+const idleOverlay = document.getElementById('idleOverlay');
+const timerDisplay = document.getElementById('timerDisplay');
+const liveWpm = document.getElementById('liveWpm');
+const liveAcc = document.getElementById('liveAcc');
+const statsBar = document.getElementById('statsBar');
+const resultsPanel = document.getElementById('resultsPanel');
+const resWpm = document.getElementById('resWpm');
+const resAcc = document.getElementById('resAcc');
+const resBest = document.getElementById('resBest');
+const pbBadge = document.getElementById('pbBadge');
+const restartBtn = document.getElementById('restartBtn');
+const modeBar = document.getElementById('modeBar');
+const themeToggle = document.getElementById('themeToggle');
+
+// Load personal bests
+try { bestWpm = JSON.parse(localStorage.getItem('typeblitz-best') || '{}'); } catch {}
+
+function buildDisplay() {
+  wordsContainer.innerHTML = '';
+  charSpans = [];
+  wordBoundaries = [];
+  words.forEach((word, wi) => {
+    const wordEl = document.createElement('span');
+    wordEl.className = 'word';
+    const start = charSpans.length;
+    word.split('').forEach((ch, ci) => {
+      const s = document.createElement('span');
+      s.className = 'char';
+      s.textContent = ch;
+      wordEl.appendChild(s);
+      charSpans.push({ span: s, wordIdx: wi, charIdx: ci });
+    });
+    // space after word (except last)
+    if (wi < words.length - 1) {
+      const sp = document.createElement('span');
+      sp.className = 'char space-char';
+      sp.textContent = ' ';
+      sp.style.marginRight = '2px';
+      wordEl.appendChild(sp);
+      charSpans.push({ span: sp, wordIdx: wi, charIdx: word.length });
+    }
+    wordBoundaries.push({ start, end: charSpans.length - 1 });
+    wordsContainer.appendChild(wordEl);
+  });
+  setCursor(0);
+}
+
+function setCursor(pos) {
+  charSpans.forEach(({ span }) => span.classList.remove('cursor'));
+  if (pos < charSpans.length) charSpans[pos].span.classList.add('cursor');
+  cursorPos = pos;
+  scrollToCursor(pos);
+}
+
+function scrollToCursor(pos) {
+  if (pos >= charSpans.length) return;
+  const span = charSpans[pos].span;
+  const container = wordDisplay;
+  const spanTop = span.offsetTop;
+  const spanBottom = spanTop + span.offsetHeight;
+  const containerHeight = container.clientHeight;
+  const scrollTop = container.scrollTop;
+  if (spanBottom > scrollTop + containerHeight - 20) {
+    container.scrollTop = spanTop - 20;
+  }
+}
+
+function calcWpm() {
+  const elapsed = (mode - timeLeft) / 60;
+  if (elapsed === 0) return 0;
+  return Math.round((correctTyped / 5) / elapsed);
+}
+
+function calcAcc() {
+  if (totalTyped === 0) return 100;
+  return Math.round((correctTyped / totalTyped) * 100);
+}
+
+function updateStats() {
+  liveWpm.textContent = calcWpm();
+  liveAcc.textContent = calcAcc();
+  timerDisplay.textContent = timeLeft;
+  timerDisplay.classList.toggle('urgent', timeLeft <= 5);
+}
+
+function startTimer() {
+  if (timer) return;
+  timer = setInterval(() => {
+    timeLeft--;
+    updateStats();
+    if (timeLeft <= 0) endTest();
+  }, 1000);
+}
+
+function endTest() {
+  clearInterval(timer);
+  timer = null;
+  finished = true;
+  hiddenInput.blur();
+
+  const wpm = calcWpm();
+  const acc = calcAcc();
+  const key = String(mode);
+  const prev = bestWpm[key] || 0;
+  const isNew = wpm > prev;
+  if (isNew) { bestWpm[key] = wpm; localStorage.setItem('typeblitz-best', JSON.stringify(bestWpm)); }
+
+  resWpm.textContent = wpm;
+  resAcc.textContent = acc;
+  resBest.textContent = bestWpm[key] || wpm;
+  pbBadge.style.display = isNew ? '' : 'none';
+
+  wordDisplay.style.display = 'none';
+  document.querySelector('.hint').style.display = 'none';
+  statsBar.style.display = 'none';
+  resultsPanel.classList.add('visible');
+}
+
+function reset() {
+  clearInterval(timer);
+  timer = null;
+  started = false;
+  finished = false;
+  timeLeft = mode;
+  typed = [];
+  totalTyped = 0;
+  correctTyped = 0;
+  words = generateWords(120);
+  buildDisplay();
+  updateStats();
+  liveWpm.textContent = '0';
+  liveAcc.textContent = '100';
+
+  wordDisplay.style.display = '';
+  wordDisplay.scrollTop = 0;
+  document.querySelector('.hint').style.display = '';
+  statsBar.style.display = '';
+  resultsPanel.classList.remove('visible');
+  idleOverlay.classList.remove('hidden');
+  hiddenInput.value = '';
+}
+
+hiddenInput.addEventListener('input', (e) => {
+  if (finished) return;
+  const val = hiddenInput.value;
+  hiddenInput.value = '';
+
+  if (!started) {
+    started = true;
+    idleOverlay.classList.add('hidden');
+    startTimer();
+  }
+
+  for (const ch of val) {
+    if (cursorPos >= charSpans.length) break;
+    const expected = charSpans[cursorPos].span.textContent;
+    const correct = ch === expected;
+    charSpans[cursorPos].span.classList.add(correct ? 'correct' : 'wrong');
+    typed.push(ch);
+    totalTyped++;
+    if (correct) correctTyped++;
+    setCursor(cursorPos + 1);
+    updateStats();
+  }
+});
+
+hiddenInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Backspace' && !finished) {
+    if (cursorPos > 0) {
+      cursorPos--;
+      charSpans[cursorPos].span.classList.remove('correct', 'wrong');
+      typed.pop();
+      if (totalTyped > 0) {
+        const wasCorrect = charSpans[cursorPos].span.classList.contains('correct');
+        // We already removed classes above, so check typed array logic
+      }
+      setCursor(cursorPos);
+      updateStats();
+    }
+    e.preventDefault();
+  }
+  if (e.key === 'Tab') { e.preventDefault(); reset(); }
+  if (e.key === 'Escape') { reset(); }
+});
+
+wordDisplay.addEventListener('click', () => { hiddenInput.focus(); });
+wordDisplay.addEventListener('focus', () => { hiddenInput.focus(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') { e.preventDefault(); reset(); }
+  if (!finished && e.key.length === 1 && !e.metaKey && !e.ctrlKey) hiddenInput.focus();
+});
+
+restartBtn.addEventListener('click', reset);
+
+modeBar.addEventListener('click', (e) => {
+  const btn = e.target.closest('.mode-btn');
+  if (!btn) return;
+  modeBar.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  mode = parseInt(btn.dataset.mode);
+  reset();
+});
+
+themeToggle.addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  html.dataset.theme = isDark ? 'light' : 'dark';
+  themeToggle.textContent = isDark ? '☾' : '☀';
+});
+
+// Init
+reset();
+</script>
+</body>
+</html>

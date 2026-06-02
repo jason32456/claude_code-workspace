@@ -19,6 +19,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [joyride](./joyride/) | GTA-style open-world sandbox — roam a procedurally generated city on foot, jack a parked car, drive anywhere; arcade driving model with push-out collision, ambient traffic, pedestrians, and minimap | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [overrun](./overrun/) | Browser FPS horde shooter — hold out against escalating waves of melee enemies in a single arena; hitscan shooting, view-model gun, screen shake, enemy AI with separation, health regen, and wave-scaling difficulty | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [finance-dashboard](./finance-dashboard/) | Personal finance dashboard — accounts, income/expense tracking, per-category budgets with over-budget warnings, charts, and bill splitting with who-owes-whom settlement | Next.js 14 · TypeScript · Prisma · Auth.js · Recharts | ✅ Complete |
+| [typeblitz](./typeblitz/) | Typing speed test — live WPM + accuracy, per-character color feedback, 15/30/60 s modes, personal best via localStorage, dark/light theme | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
 
 ## Running a project
 
