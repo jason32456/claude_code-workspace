@@ -12,6 +12,8 @@
     { "src": "/breathe/(.*)", "dest": "/breathe/$1" },
     { "src": "/streaks/?$", "dest": "/streaks/index.html" },
     { "src": "/streaks/(.*)", "dest": "/streaks/$1" },
+    { "src": "/ambient-noise/?$", "dest": "/ambient-noise/index.html" },
+    { "src": "/ambient-noise/(.*)", "dest": "/ambient-noise/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
