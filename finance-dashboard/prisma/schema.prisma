@@ -1,0 +1,101 @@
+// Personal Finance Dashboard — data model
+// Local dev uses SQLite. For production (e.g. Vercel) switch `provider` to
+// "postgresql" and point DATABASE_URL at a hosted Postgres instance.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  categories   Category[]
+  transactions Transaction[]
+  groups       Group[]
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         String // "income" | "expense"
+  color        String        @default("#6366f1")
+  monthlyBudget Float?
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type       String // "income" | "expense"
+  amount     Float
+  date       DateTime
+  note       String    @default("")
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([categoryId])
+}
+
+model Group {
+  id          String        @id @default(cuid())
+  ownerUserId String
+  owner       User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  name        String
+  createdAt   DateTime      @default(now())
+  members     GroupMember[]
+  bills       SharedBill[]
+
+  @@index([ownerUserId])
+}
+
+model GroupMember {
+  id      String       @id @default(cuid())
+  groupId String
+  group   Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name    String
+  paid    SharedBill[] @relation("PaidBy")
+  shares  BillShare[]
+
+  @@index([groupId])
+}
+
+model SharedBill {
+  id            String      @id @default(cuid())
+  groupId       String
+  group         Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  description   String
+  amount        Float
+  paidByMemberId String
+  paidBy        GroupMember @relation("PaidBy", fields: [paidByMemberId], references: [id], onDelete: Cascade)
+  date          DateTime    @default(now())
+  shares        BillShare[]
+
+  @@index([groupId])
+}
+
+model BillShare {
+  id           String      @id @default(cuid())
+  sharedBillId String
+  bill         SharedBill  @relation(fields: [sharedBillId], references: [id], onDelete: Cascade)
+  memberId     String
+  member       GroupMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  amount       Float
+
+  @@index([sharedBillId])
+  @@index([memberId])
+}
