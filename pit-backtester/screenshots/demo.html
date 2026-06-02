@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .title-bar {
+    width: 900px;
+    margin-bottom: 8px;
+    color: #58a6ff;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 6px 0;
+  }
+  .window {
+    width: 900px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    border: 1px solid #30363d;
+  }
+  .titlebar {
+    background: #21262d;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #30363d;
+  }
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .red { background: #ff5f57; }
+  .yellow { background: #ffbd2e; }
+  .green { background: #28c840; }
+  .tab-title {
+    margin-left: 12px;
+    color: #8b949e;
+    font-size: 12px;
+  }
+  .terminal {
+    background: #0d1117;
+    padding: 16px 20px;
+    min-height: 500px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #e6edf3;
+    white-space: pre;
+    overflow: hidden;
+  }
+  .line { display: block; min-height: 1.55em; }
+  .prompt { color: #58a6ff; }
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 14px;
+    background: #e6edf3;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 1px;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .badge {
+    display: inline-block;
+    background: #1f6feb;
+    color: #58a6ff;
+    border: 1px solid #1f6feb;
+    border-radius: 3px;
+    padding: 0 4px;
+    font-size: 11px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="title-bar">
+  IDX PIT Backtester — Point-in-Time Strategy Backtesting Engine
+  <span class="badge">Phase 0</span>
+</div>
+<div class="window">
+  <div class="titlebar">
+    <span class="dot red"></span>
+    <span class="dot yellow"></span>
+    <span class="dot green"></span>
+    <span class="tab-title">pit-backtester — python cli.py run --strategy golden_cross.json</span>
+  </div>
+  <div class="terminal" id="term">
+    <span class="line">
+      <span class="prompt">$</span> python cli.py run --strategy sample_data/strategies/golden_cross.json \<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;--prices sample_data/prices.csv --corporate-actions sample_data/corporate_actions.csv \<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;--universe sample_data/universe.csv
+    </span>
+    <span class="line">&nbsp;</span>
+  </div>
+</div>
+<script>
+const lines = ["\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e", "\u2502 PIT Backtester \u2014 Running Backtest                                            \u2502", "\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f", "", "Loading and validating data...", "  OK    prices.csv", "  OK    corporate_actions.csv", "  OK    universe.csv", "", "Parsing strategy config...", "  Strategy: Golden Cross + RSI Filter", "  Universe: ['BBCA', 'BBRI', 'TLKM']", "  Period: 2020-01-01 \u2192 2023-12-31", "  Capital: 100,000,000 IDR", "", "Running backtest...", "", "          Performance Metrics           ", "\u250f\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513", "\u2503 Metric                 \u2503       Value \u2503", "\u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529", "\u2502 Total Return           \u2502      10.40% \u2502", "\u2502 CAGR                   \u2502       2.42% \u2502", "\u2502 Volatility (ann.)      \u2502       7.93% \u2502", "\u2502 Sharpe Ratio           \u2502       0.341 \u2502", "\u2502 Sortino Ratio          \u2502       0.345 \u2502", "\u2502 Calmar Ratio           \u2502       0.111 \u2502", "\u2502 Max Drawdown           \u2502     -21.69% \u2502", "\u2502 Max DD Duration (days) \u2502         627 \u2502", "\u2502 Exposure               \u2502      47.08% \u2502", "\u2502 Annual Turnover        \u2502       1.678 \u2502", "\u2502 Number of Trades       \u2502          11 \u2502", "\u2502 Win Rate               \u2502      45.45% \u2502", "\u2502 Profit Factor          \u2502       1.639 \u2502", "\u2502 Avg Win                \u2502   5,597,055 \u2502", "\u2502 Avg Loss               \u2502  -2,845,558 \u2502", "\u2502 Win/Loss Ratio         \u2502       1.967 \u2502", "\u2502 Final Equity           \u2502 110,395,450 \u2502", "\u2502 Trading Days           \u2502        1043 \u2502", "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518", "", "                          Top 10 Trades (by |Net P&amp;L|)                          ", "\u250f\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513", "\u2503       \u2503 Entry \u2503 Exit  \u2503 Entry \u2503  Exit \u2503      \u2503   Net \u2503        \u2503      \u2503       \u2503", "\u2503 Tick\u2026 \u2503 Date  \u2503 Date  \u2503 Price \u2503 Price \u2503 Lots \u2503   P&amp;L \u2503 Return \u2503 Days \u2503 Reas\u2026 \u2503", "\u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529", "\u2502 TLKM  \u2502 2022\u2026 \u2502 2023\u2026 \u2502 2,571 \u2502 3,268 \u2502  114 \u2502 7,81\u2026 \u2502 26.67% \u2502  350 \u2502 take\u2026 \u2502", "\u2502 BBRI  \u2502 2022\u2026 \u2502 2022\u2026 \u2502 3,622 \u2502 4,528 \u2502   82 \u2502 7,29\u2026 \u2502 24.58% \u2502  178 \u2502 take\u2026 \u2502", "\u2502 BBCA  \u2502 2022\u2026 \u2502 2022\u2026 \u2502 7,384 \u2502 9,275 \u2502   39 \u2502 7,25\u2026 \u2502 25.18% \u2502  183 \u2502 take\u2026 \u2502", "\u2502 BBCA  \u2502 2020\u2026 \u2502 2020\u2026 \u2502 8,364 \u2502 9,495 \u2502   39 \u2502 4,28\u2026 \u2502 13.13% \u2502  203 \u2502 sma_\u2026 \u2502", "\u2502 BBRI  \u2502 2020\u2026 \u2502 2020\u2026 \u2502 4,832 \u2502 4,408 \u2502   70 \u2502 -3,0\u2026 \u2502 -9.11% \u2502   24 \u2502 stop\u2026 \u2502", "\u2502 BBRI  \u2502 2020\u2026 \u2502 2020\u2026 \u2502 4,442 \u2502 4,058 \u2502   75 \u2502 -2,9\u2026 \u2502 -8.97% \u2502  134 \u2502 stop\u2026 \u2502", "\u2502 TLKM  \u2502 2020\u2026 \u2502 2020\u2026 \u2502 3,722 \u2502 3,408 \u2502   91 \u2502 -2,9\u2026 \u2502 -8.75% \u2502   28 \u2502 stop\u2026 \u2502", "\u2502 TLKM  \u2502 2020\u2026 \u2502 2021\u2026 \u2502 3,512 \u2502 3,198 \u2502   87 \u2502 -2,8\u2026 \u2502 -9.24% \u2502   97 \u2502 stop\u2026 \u2502", "\u2502 BBCA  \u2502 2020\u2026 \u2502 2021\u2026 \u2502 9,495 \u2502 8,766 \u2502   35 \u2502 -2,6\u2026 \u2502 -8.00% \u2502   54 \u2502 stop\u2026 \u2502", "\u2502 BBRI  \u2502 2021\u2026 \u2502 2021\u2026 \u2502 3,412 \u2502 3,128 \u2502   87 \u2502 -2,5\u2026 \u2502 -8.62% \u2502   23 \u2502 stop\u2026 \u2502", "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518", "", "Results saved to: ", "/home/user/claude_code-workspace/pit-backtester/runs/20260602_235023_Golden_Cros", "s_+_RSI_F", ""];
+const term = document.getElementById('term');
+let idx = 0;
+
+// Colorize basic patterns
+function colorize(line) {
+  // Box-drawing and separators → dim
+  line = line.replace(/([─│╭╮╰╯├┤┬┴┼═╞╡╔╗╚╝║╠╣╦╩╬▓░])/g,
+    '<span style="color:#30363d">$1</span>');
+  // Green for positive numbers with %
+  line = line.replace(/\b([+]?[0-9]+\.?[0-9]*%)/g, (m) => {
+    if (m.startsWith('-')) return '<span style="color:#f85149">' + m + '</span>';
+    return '<span style="color:#3fb950">' + m + '</span>';
+  });
+  // Red for negative
+  line = line.replace(/(-[0-9]+\.?[0-9]*%)/g,
+    '<span style="color:#f85149">$1</span>');
+  // Highlight ticker symbols
+  line = line.replace(/\b(BBCA|BBRI|TLKM)\b/g,
+    '<span style="color:#d2a8ff; font-weight:bold">$1</span>');
+  // IDR amounts
+  line = line.replace(/(IDR|Rp)/g,
+    '<span style="color:#ffa657">$1</span>');
+  // Section headers
+  line = line.replace(/(PASS|WARN|OK|✓)/g,
+    '<span style="color:#3fb950; font-weight:bold">$1</span>');
+  line = line.replace(/(FAIL|ERROR|✗)/g,
+    '<span style="color:#f85149; font-weight:bold">$1</span>');
+  return line;
+}
+
+function addLine(text) {
+  const span = document.createElement('span');
+  span.className = 'line';
+  span.innerHTML = colorize(text);
+  term.appendChild(span);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+function run() {
+  if (idx >= lines.length) {
+    // Add blinking cursor at end
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    term.appendChild(cursor);
+    return;
+  }
+  addLine(lines[idx]);
+  idx++;
+  // Variable speed: slower for section headers, faster for data rows
+  const line = lines[idx - 1];
+  let delay = 35;
+  if (line.includes('──') || line.includes('══') || line.trim() === '') delay = 15;
+  else if (line.includes('Running') || line.includes('Loading') || line.includes('Backtest')) delay = 120;
+  else if (line.includes('│')) delay = 25;
+  setTimeout(run, delay);
+}
+
+// Start after short pause
+setTimeout(run, 800);
+</script>
+</body>
+</html>

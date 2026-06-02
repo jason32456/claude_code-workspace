@@ -1,0 +1,67 @@
+{
+  "name": "Golden Cross + RSI Filter",
+  "universe": [
+    "BBCA",
+    "BBRI",
+    "TLKM"
+  ],
+  "start_date": "2020-01-01",
+  "end_date": "2023-12-31",
+  "initial_capital": 100000000,
+  "currency": "IDR",
+  "entry": {
+    "all": [
+      {
+        "indicator": "sma",
+        "period": 50,
+        "op": "cross_above",
+        "target": {
+          "indicator": "sma",
+          "period": 200
+        }
+      },
+      {
+        "indicator": "rsi",
+        "period": 14,
+        "op": "<",
+        "value": 70
+      }
+    ]
+  },
+  "exit": {
+    "any": [
+      {
+        "indicator": "sma",
+        "period": 50,
+        "op": "cross_below",
+        "target": {
+          "indicator": "sma",
+          "period": 200
+        }
+      },
+      {
+        "type": "stop_loss",
+        "pct": 0.08
+      },
+      {
+        "type": "take_profit",
+        "pct": 0.25
+      }
+    ]
+  },
+  "sizing": {
+    "method": "equal_weight",
+    "max_positions": 3
+  },
+  "execution": {
+    "signal_on": "close",
+    "fill_on": "next_open"
+  },
+  "costs": {
+    "commission_buy_pct": 0.0015,
+    "commission_sell_pct": 0.0025,
+    "sell_tax_pct": 0.001,
+    "slippage_bps": 5
+  },
+  "lot_size": 100
+}
