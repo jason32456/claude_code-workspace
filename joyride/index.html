@@ -100,7 +100,7 @@
   }
   .vignette {
     position: fixed; inset: 0; pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.28) 100%);
     z-index: 5;
   }
   #mode-badge {
@@ -219,17 +219,18 @@ renderer.shadowMap.enabled = false;
 document.body.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1a1a2e);
-scene.fog = new THREE.Fog(0x1a1a2e, 80, 260);
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0xa9d4ec, 120, 320);
 
 const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 400);
 camera.position.set(0, 20, 40);
 
-// Lights
-const sun = new THREE.DirectionalLight(0xfff5e0, 1.2);
-sun.position.set(60, 120, 40);
+// Lights — bright midday sun + soft sky fill
+const sun = new THREE.DirectionalLight(0xfff6e0, 1.5);
+sun.position.set(80, 140, 60);
 scene.add(sun);
-scene.add(new THREE.HemisphereLight(0x334466, 0x221133, 0.7));
+scene.add(new THREE.HemisphereLight(0xbfe0ff, 0x9a8c78, 0.85));
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
 
 window.addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
@@ -244,13 +245,13 @@ const buildings = []; // {minX, maxX, minZ, maxZ}
 function buildCity() {
   // Ground
   const gGeo = new THREE.PlaneGeometry(GRID * CELL * 2, GRID * CELL * 2);
-  const gMat = new THREE.MeshLambertMaterial({ color: 0x2a2a2a });
+  const gMat = new THREE.MeshLambertMaterial({ color: 0xc2bdb0 });
   const ground = new THREE.Mesh(gGeo, gMat);
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
 
-  // Road grid (darker strips)
-  const roadMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+  // Road grid (darker asphalt strips)
+  const roadMat = new THREE.MeshLambertMaterial({ color: 0x55585c });
 
   // Horizontal roads (along X) — one for each grid line 0..GRID
   for (let i = 0; i <= GRID; i++) {
@@ -272,8 +273,9 @@ function buildCity() {
   }
 
   // Lane markings (dashed center lines)
-  const lineMat = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+  const lineMat = new THREE.MeshLambertMaterial({ color: 0xf2e85c });
   const dashGeo = new THREE.PlaneGeometry(3.5, 0.18);
+  const dashGeo2 = new THREE.PlaneGeometry(0.18, 3.5);
   for (let i = 0; i <= GRID; i++) {
     const rz = roadCenter(i);
     for (let d = -GRID * CELL / 2; d < GRID * CELL / 2; d += 9) {
@@ -284,7 +286,6 @@ function buildCity() {
     }
     const rx = roadCenter(i);
     for (let d = -GRID * CELL / 2; d < GRID * CELL / 2; d += 9) {
-      const dashGeo2 = new THREE.PlaneGeometry(0.18, 3.5);
       const dash2 = new THREE.Mesh(dashGeo2, lineMat);
       dash2.rotation.x = -Math.PI / 2;
       dash2.position.set(rx, 0.03, d + 4.5);
@@ -293,7 +294,7 @@ function buildCity() {
   }
 
   // Buildings — clustered inside each block
-  const palette = [0x3d5a7a, 0x7a3d5a, 0x5a7a3d, 0x7a6a3d, 0x3d4a7a, 0x6a3d7a, 0x3d7a6a, 0x7a4a3d];
+  const palette = [0x9fb0c8, 0xc89faf, 0xa9c89f, 0xc8bd9f, 0x9fa6c8, 0xba9fc8, 0x9fc8bb, 0xc8a89f];
 
   for (let bx = 0; bx < GRID; bx++) {
     for (let bz = 0; bz < GRID; bz++) {
@@ -321,7 +322,7 @@ function buildCity() {
 
         // Darker roof strip
         const roofGeo = new THREE.BoxGeometry(bw, 0.5, bd);
-        const roofMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+        const roofMat = new THREE.MeshLambertMaterial({ color: 0x6b6f76 });
         const roof = new THREE.Mesh(roofGeo, roofMat);
         roof.position.set(x, bh + 0.25, z);
         scene.add(roof);
@@ -401,8 +402,6 @@ scene.add(playerGroup);
 
 let playerPos = { x: 0, z: 0 };
 let playerAngle = 0;
-let playerYVel = 0;
-const GRAVITY = -20;
 let playerY = 0;
 let walkBob = 0;
 
@@ -422,7 +421,7 @@ function makeCar(color) {
   const cabinG = new THREE.BoxGeometry(3.4, 1.0, 4.5);
   const cabinM = new THREE.MeshLambertMaterial({ color: new THREE.Color(color).multiplyScalar(0.7) });
   const cabin = new THREE.Mesh(cabinG, cabinM);
-  cabin.position.set(0, 1.8, -0.5);
+  cabin.position.set(0, 1.8, 0.6);
   g.add(cabin);
   // Wheels x4
   const wGeo = new THREE.CylinderGeometry(0.62, 0.62, 0.55, 10);
@@ -434,19 +433,19 @@ function makeCar(color) {
     w.position.set(wx, wy, wz);
     g.add(w);
   }
-  // Headlights
+  // Headlights — front of the car is -z (the travel direction)
   const hlGeo = new THREE.BoxGeometry(0.8, 0.4, 0.15);
   const hlMat = new THREE.MeshLambertMaterial({ color: 0xffffcc });
   [-1.2, 1.2].forEach(hx => {
     const hl = new THREE.Mesh(hlGeo, hlMat);
-    hl.position.set(hx, 0.85, 4.5);
+    hl.position.set(hx, 0.85, -4.5);
     g.add(hl);
   });
-  // Taillights
+  // Taillights at +z (rear)
   const tlMat = new THREE.MeshLambertMaterial({ color: 0xff2200 });
   [-1.2, 1.2].forEach(hx => {
     const tl = new THREE.Mesh(hlGeo, tlMat);
-    tl.position.set(hx, 0.85, -4.5);
+    tl.position.set(hx, 0.85, 4.5);
     g.add(tl);
   });
   return g;
@@ -502,10 +501,11 @@ function spawnTraffic() {
     const dir = (i % 2 === 0) ? 1 : -1;
     const car = makeCar(0x888888 + i * 0x111);
     const startX = dir > 0 ? -HALF : HALF;
+    const rotX = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
     car.position.set(startX + dir * seededRng(i * 7) * CELL, 0, rz + (dir > 0 ? -1.8 : 1.8));
-    car.rotation.y = dir > 0 ? Math.PI : 0;
+    car.rotation.y = rotX;
     scene.add(car);
-    trafficCars.push({ mesh: car, x: car.position.x, z: rz + (dir>0?-1.8:1.8), angle: dir>0?Math.PI:0, speed: TRAFFIC_SPEED * (0.7 + seededRng(i)*0.5), dir, axis: 'x', lane: rz });
+    trafficCars.push({ mesh: car, x: car.position.x, z: rz + (dir>0?-1.8:1.8), angle: rotX, speed: TRAFFIC_SPEED * (0.7 + seededRng(i)*0.5), dir, axis: 'x', lane: rz });
   }
   // Cars cruising on vertical roads
   for (let i = 1; i < GRID; i++) {
@@ -513,10 +513,11 @@ function spawnTraffic() {
     const dir = (i % 2 === 0) ? 1 : -1;
     const car = makeCar(0x666666 + i * 0x090909);
     const startZ = dir > 0 ? -HALF : HALF;
+    const rotZ = dir > 0 ? Math.PI : 0;
     car.position.set(rx + (dir>0?1.8:-1.8), 0, startZ + dir * seededRng(i * 11) * CELL);
-    car.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+    car.rotation.y = rotZ;
     scene.add(car);
-    trafficCars.push({ mesh: car, x: rx+(dir>0?1.8:-1.8), z: car.position.z, angle: dir>0?Math.PI/2:-Math.PI/2, speed: TRAFFIC_SPEED*(0.7+seededRng(i+100)*0.5), dir, axis: 'z', lane: rx });
+    trafficCars.push({ mesh: car, x: rx+(dir>0?1.8:-1.8), z: car.position.z, angle: rotZ, speed: TRAFFIC_SPEED*(0.7+seededRng(i+100)*0.5), dir, axis: 'z', lane: rx });
   }
 }
 
@@ -552,19 +553,22 @@ function spawnPedestrians() {
     h.position.y = 1.38;
     g.add(h);
 
-    // Start on a random road
+    // Place on a road and walk along it (the cross-axis stays pinned to the lane)
+    const alongX = seededRng(p * 53) > 0.5;
     const ri = Math.floor(seededRng(p * 37) * (GRID + 1));
-    const rz = roadCenter(ri);
-    const startX = (seededRng(p * 41) - 0.5) * GRID * CELL;
-    g.position.set(startX, 0, rz + (seededRng(p*43)-0.5)*3);
+    const lane = roadCenter(ri);
+    const offset = (seededRng(p * 43) - 0.5) * (ROAD_W - 2);
+    let px, pz;
+    if (alongX) { px = (seededRng(p * 41) - 0.5) * GRID * CELL; pz = lane + offset; }
+    else        { pz = (seededRng(p * 41) - 0.5) * GRID * CELL; px = lane + offset; }
+    g.position.set(px, 0, pz);
     scene.add(g);
 
-    const dir = seededRng(p * 47) > 0.5 ? 1 : -1;
     pedestrians.push({
-      mesh: g, x: startX, z: rz + (seededRng(p*43)-0.5)*3,
-      axis: seededRng(p*53) > 0.5 ? 'x' : 'z',
-      dir, speed: 1.5 + seededRng(p*59) * 2,
-      lane: seededRng(p*53) > 0.5 ? rz : roadCenter(Math.floor(seededRng(p*61)*(GRID+1))),
+      mesh: g, x: px, z: pz,
+      axis: alongX ? 'x' : 'z',
+      dir: seededRng(p * 47) > 0.5 ? 1 : -1,
+      speed: 1.5 + seededRng(p * 59) * 2,
       timer: 0,
     });
   }
@@ -643,8 +647,11 @@ function updateCamera(dt) {
   } else {
     tx = activeCar.x; ty = 1.2; tz = activeCar.z;
     dist = CAR_CAM_DIST; height = CAR_CAM_H;
-    // In drive mode, camera chases behind car heading
-    camAngleH += (activeCar.angle - Math.PI - camAngleH) * Math.min(1, dt * 2.5);
+    // In drive mode, camera chases behind the car heading (shortest-arc lerp)
+    let dA = activeCar.angle - camAngleH;
+    while (dA >  Math.PI) dA -= Math.PI * 2;
+    while (dA < -Math.PI) dA += Math.PI * 2;
+    camAngleH += dA * Math.min(1, dt * 2.5);
   }
   camTarget.lerp(new THREE.Vector3(tx, ty, tz), Math.min(1, dt * 8));
 
@@ -721,6 +728,7 @@ document.getElementById('btn-enter').addEventListener('touchend', () => { mobile
 
 // ─── Enter/exit car ───────────────────────────────────────────────────────
 let enterCooldown = 0;
+let enterWasDown = false;
 
 function tryEnterCar() {
   if (enterCooldown > 0) return;
@@ -737,7 +745,7 @@ function tryEnterCar() {
     best.driven = true;
     playerGroup.visible = false;
     carSpeed = 0;
-    camAngleH = best.angle - Math.PI;
+    camAngleH = best.angle;
     enterCooldown = 0.5;
   }
 }
@@ -842,12 +850,13 @@ function update(timestamp) {
 
   enterCooldown = Math.max(0, enterCooldown - dt);
 
-  // Enter / exit key
-  const wantsEnter = key('KeyF', 'Enter') || mobileEnter;
-  if (wantsEnter && enterCooldown <= 0) {
+  // Enter / exit key — trigger once per press (edge), not every frame held
+  const enterDown = key('KeyF', 'Enter') || mobileEnter;
+  if (enterDown && !enterWasDown && enterCooldown <= 0) {
     if (mode === 'foot') tryEnterCar();
     else exitCar();
   }
+  enterWasDown = enterDown;
 
   // Respawn
   if (key('KeyR') && mode === 'foot') {
@@ -895,7 +904,8 @@ function updateOnFoot(dt) {
     const nz = playerPos.z + moveZ * speed * dt;
     const pushed = pushOutOfBuildings(nx, nz, PLAYER_RADIUS);
     playerPos.x = pushed.x; playerPos.z = pushed.z;
-    playerAngle = Math.atan2(moveX, moveZ);
+    // Face the movement direction (model front is local -z, like the cars)
+    playerAngle = Math.atan2(-moveX, -moveZ);
     // Walk bob
     walkBob += dt * (running ? 12 : 7);
   }
