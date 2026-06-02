@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OVERRUN</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Courier New', Courier, monospace;
+  user-select: none;
+}
+
+#canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  cursor: crosshair;
+}
+
+/* ── HUD ───────────────────────────────────────────────────────────────── */
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Crosshair */
+#crosshair {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 20px;
+  pointer-events: none;
+}
+#crosshair::before, #crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgba(255,255,255,0.85);
+}
+#crosshair::before {
+  width: 2px; height: 10px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+#crosshair::after {
+  width: 10px; height: 2px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Hit marker */
+#hitmarker {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  font-size: 22px;
+  font-weight: bold;
+  color: #f80;
+  opacity: 0;
+  transition: opacity 0.05s;
+  pointer-events: none;
+  text-shadow: 0 0 6px #f80;
+  letter-spacing: -2px;
+}
+
+/* Vignette (damage) */
+#vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(200,0,0,0.55) 100%);
+  opacity: 0;
+  transition: opacity 0.08s ease-out;
+  pointer-events: none;
+}
+
+/* Low health persistent vignette is handled by #vignette opacity */
+
+/* ── Bottom HUD bar ─────────────────────────────────────────────────────── */
+#hud-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 12px 20px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* Health */
+#health-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+#health-label {
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#health-bar-bg {
+  width: 180px;
+  height: 6px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+#hud-health-fill {
+  height: 100%;
+  width: 100%;
+  background: #3af;
+  border-radius: 3px;
+  transition: width 0.1s, background 0.3s;
+}
+#hud-health-num {
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(50,170,255,0.6);
+}
+
+/* Reload bar */
+#reload-bar-wrap {
+  position: absolute;
+  bottom: 70px; left: 20px;
+  width: 180px;
+  display: none;
+}
+#reload-bar-label {
+  color: rgba(255,200,0,0.8);
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 3px;
+}
+#reload-bar-bg {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+#reload-bar {
+  height: 100%;
+  width: 0;
+  background: #ffd700;
+  border-radius: 2px;
+  transition: width 0.05s linear;
+}
+
+/* Ammo */
+#ammo-wrap {
+  text-align: right;
+  min-width: 120px;
+}
+#ammo-label {
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+#hud-ammo {
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* ── Top HUD bar ──────────────────────────────────────────────────────── */
+#hud-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 14px 20px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+#hud-score {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255,180,0,0.5);
+}
+#score-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+#hud-wave {
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.7);
+  text-align: right;
+  text-shadow: 0 0 8px rgba(100,180,255,0.4);
+}
+
+/* ── Wave banner ─────────────────────────────────────────────────────── */
+#wave-banner {
+  display: none;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: bold;
+  letter-spacing: 6px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 30px rgba(100,200,255,0.8), 0 0 60px rgba(100,200,255,0.4);
+  pointer-events: none;
+  z-index: 15;
+  transition: opacity 0.4s;
+  white-space: nowrap;
+}
+
+/* ── Overlays ─────────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(3px);
+}
+
+#menu-overlay h1, #gameover-overlay h1 {
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 900;
+  letter-spacing: 10px;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(255, 80, 0, 0.8), 0 0 80px rgba(255, 80, 0, 0.4);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.click-prompt {
+  font-size: 15px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 20px;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.controls-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 30px;
+}
+.controls-table td {
+  padding: 4px 16px;
+}
+.controls-table td:first-child {
+  color: rgba(255,150,50,0.9);
+  font-weight: bold;
+  text-align: right;
+  letter-spacing: 1px;
+}
+
+#hs-display {
+  font-size: 13px;
+  color: rgba(255, 200, 50, 0.7);
+  letter-spacing: 3px;
+  margin-bottom: 18px;
+}
+
+/* Game over */
+.go-scores {
+  display: flex;
+  gap: 40px;
+  margin: 20px 0 36px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 2px;
+}
+
+.go-scores span:first-child {
+  color: #ffd700;
+  text-shadow: 0 0 12px rgba(255,215,0,0.5);
+}
+
+.btn {
+  padding: 12px 36px;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 4px;
+  font-weight: bold;
+  background: transparent;
+  border: 2px solid rgba(255,80,0,0.7);
+  color: rgba(255,150,80,0.9);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-transform: uppercase;
+}
+.btn:hover {
+  background: rgba(255,80,0,0.2);
+  color: #fff;
+  border-color: rgba(255,80,0,1);
+}
+
+.press-r {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 3px;
+  margin-top: 14px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- HUD (hidden until game starts) -->
+<div id="hud" style="display:none">
+  <div id="crosshair"></div>
+  <div id="hitmarker">✕</div>
+  <div id="vignette"></div>
+
+  <!-- Top bar -->
+  <div id="hud-top">
+    <div>
+      <div id="score-label">SCORE</div>
+      <div id="hud-score">0</div>
+    </div>
+    <div id="hud-wave">WAVE 1</div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div id="hud-bottom">
+    <div id="health-wrap">
+      <div id="health-label">HEALTH</div>
+      <div id="health-bar-bg"><div id="hud-health-fill"></div></div>
+      <div id="hud-health-num">100</div>
+      <!-- Reload bar -->
+      <div id="reload-bar-wrap">
+        <div id="reload-bar-label">RELOADING</div>
+        <div id="reload-bar-bg"><div id="reload-bar"></div></div>
+      </div>
+    </div>
+    <div id="ammo-wrap">
+      <div id="ammo-label">AMMO</div>
+      <div id="hud-ammo">30 / 30</div>
+    </div>
+  </div>
+</div>
+
+<!-- Wave banner -->
+<div id="wave-banner"></div>
+
+<!-- Menu overlay -->
+<div id="menu-overlay" class="overlay">
+  <h1>OVERRUN</h1>
+  <div class="subtitle">Horde Shooter — Survive the waves</div>
+  <div id="hs-display">BEST: 0</div>
+  <button id="play-btn" class="btn" style="margin-bottom:16px">CLICK TO PLAY</button>
+  <table class="controls-table">
+    <tr><td>WASD</td><td>Move</td></tr>
+    <tr><td>MOUSE</td><td>Look &amp; Aim</td></tr>
+    <tr><td>CLICK</td><td>Fire</td></tr>
+    <tr><td>R</td><td>Reload</td></tr>
+    <tr><td>SHIFT</td><td>Sprint</td></tr>
+    <tr><td>SPACE</td><td>Jump</td></tr>
+    <tr><td>ESC</td><td>Release mouse</td></tr>
+  </table>
+</div>
+
+<!-- Game over overlay -->
+<div id="gameover-overlay" class="overlay" style="display:none">
+  <h1>GAME OVER</h1>
+  <div class="go-scores">
+    <span id="go-score">SCORE: 0</span>
+    <span id="go-best">BEST: 0</span>
+  </div>
+  <button id="restart-btn" class="btn">PLAY AGAIN</button>
+  <div class="press-r">OR PRESS R</div>
+</div>
+
+<script type="module" src="js/game.js"></script>
+</body>
+</html>
