@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Streaks — Habit Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Streaks</h1>
+      <p class="subtitle">Build habits one day at a time</p>
+    </header>
+
+    <div id="habits-grid" class="habits-grid"></div>
+
+    <div id="add-section" class="add-section">
+      <button id="add-btn" class="add-btn" aria-label="Add habit">
+        <span class="plus">+</span> Add Habit
+      </button>
+      <div id="add-form" class="add-form hidden">
+        <div class="emoji-row" id="emoji-row"></div>
+        <div class="input-row">
+          <input id="habit-input" type="text" placeholder="e.g. Morning Run" maxlength="30" autocomplete="off" />
+          <button id="save-btn" class="save-btn">Add</button>
+          <button id="cancel-btn" class="cancel-btn">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-icon">🌱</div>
+      <p>No habits yet. Add one to start your streak!</p>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

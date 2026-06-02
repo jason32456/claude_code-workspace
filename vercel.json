@@ -10,6 +10,8 @@
     { "src": "/palette/(.*)", "dest": "/palette/$1" },
     { "src": "/breathe/?$", "dest": "/breathe/index.html" },
     { "src": "/breathe/(.*)", "dest": "/breathe/$1" },
+    { "src": "/streaks/?$", "dest": "/streaks/index.html" },
+    { "src": "/streaks/(.*)", "dest": "/streaks/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
