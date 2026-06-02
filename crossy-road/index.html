@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Crossy Road</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #87CEEB; font-family: 'Arial Rounded MT Bold', 'Arial Black', Arial, sans-serif; }
+    canvas { display: block; position: fixed; top: 0; left: 0; }
+
+    #hud {
+      position: fixed; top: 16px; left: 0; right: 0;
+      text-align: center; pointer-events: none; z-index: 10;
+    }
+    #score {
+      font-size: 52px; font-weight: 900; color: #fff;
+      text-shadow: 0 3px 0 #333, 0 -1px 0 #333, 1px 0 0 #333, -1px 0 0 #333;
+      line-height: 1;
+    }
+    #best {
+      font-size: 18px; color: #FFD700;
+      text-shadow: 0 2px 0 #333;
+      margin-top: 2px;
+    }
+
+    #overlay {
+      position: fixed; inset: 0; z-index: 20;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      transition: opacity 0.2s;
+    }
+    #overlay.hidden { display: none; }
+
+    #overlay-title {
+      font-size: 64px; font-weight: 900; color: #fff;
+      text-shadow: 0 4px 0 #222, 0 -2px 0 #222, 2px 0 0 #222, -2px 0 0 #222;
+      margin-bottom: 8px;
+    }
+    #overlay-subtitle {
+      font-size: 22px; color: #FFD700;
+      text-shadow: 0 2px 0 #333;
+      margin-bottom: 32px;
+      min-height: 28px;
+    }
+    #play-btn {
+      font-size: 22px; font-family: inherit; font-weight: 900;
+      padding: 14px 52px; border: none; border-radius: 14px;
+      background: #4CAF50; color: #fff; cursor: pointer;
+      box-shadow: 0 6px 0 #2E7D32;
+      transition: transform 0.08s, box-shadow 0.08s;
+      outline: none;
+    }
+    #play-btn:hover { background: #66BB6A; }
+    #play-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #2E7D32; }
+
+    #controls-hint {
+      position: fixed; bottom: 16px; left: 0; right: 0;
+      text-align: center; font-size: 14px; color: rgba(255,255,255,0.7);
+      pointer-events: none; z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="hud">
+    <div id="score">0</div>
+    <div id="best"></div>
+  </div>
+
+  <div id="overlay">
+    <div id="overlay-title">Crossy Road</div>
+    <div id="overlay-subtitle"></div>
+    <button id="play-btn">Play</button>
+  </div>
+
+  <div id="controls-hint">Arrow keys / WASD to hop</div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
