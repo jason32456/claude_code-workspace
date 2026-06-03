@@ -4,9 +4,26 @@ const overlayEl  = document.getElementById('overlay');
 const titleEl    = document.getElementById('overlay-title');
 const subtitleEl = document.getElementById('overlay-subtitle');
 const playBtn    = document.getElementById('play-btn');
+const diffBtns   = Array.from(document.querySelectorAll('.diff-btn'));
 
-export function createHUD(onPlay) {
+export function createHUD(onPlay, onDifficultyChange) {
   playBtn.addEventListener('click', onPlay);
+
+  let difficulty = localStorage.getItem('crossyDifficulty') || 'normal';
+  applyDifficultySelection(difficulty);
+
+  diffBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      difficulty = btn.dataset.diff;
+      localStorage.setItem('crossyDifficulty', difficulty);
+      applyDifficultySelection(difficulty);
+      if (onDifficultyChange) onDifficultyChange(difficulty);
+    });
+  });
+
+  function applyDifficultySelection(key) {
+    diffBtns.forEach((b) => b.classList.toggle('selected', b.dataset.diff === key));
+  }
 
   function setScore(n) {
     scoreEl.textContent = n;
@@ -37,5 +54,9 @@ export function createHUD(onPlay) {
     overlayEl.classList.add('hidden');
   }
 
-  return { setScore, setBest, showMenu, showGameOver, hideOverlay };
+  function getDifficulty() {
+    return difficulty;
+  }
+
+  return { setScore, setBest, showMenu, showGameOver, hideOverlay, getDifficulty };
 }

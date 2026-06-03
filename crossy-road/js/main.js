@@ -7,8 +7,9 @@ import { createHUD }        from './hud.js';
 const CELL           = 1;
 const SPAWN_AHEAD    = 22;   // generate this many rows ahead of player
 const RECYCLE_BEHIND = 10;   // recycle rows this far behind player
-const AUTO_ADVANCE   = 0.35; // camera auto-advance speed (rows/sec) — idle death
 const KILL_BEHIND    = 4;    // rows behind camera before death
+
+let autoAdvance = 0.35;      // camera auto-advance speed (rows/sec) — set per difficulty
 
 // ── Smooth lerp for camera ───────────────────────────────────────────────────
 function lerp(a, b, t) { return a + (b - a) * t; }
@@ -29,7 +30,14 @@ let cameraRow  = 0;   // the row the camera is currently locked to
 const { renderer, camera, scene, updateCamera } = createScene();
 const player  = createPlayer(scene);
 const lanes   = createLaneManager(scene);
-const hud     = createHUD(onPlay);
+const hud     = createHUD(onPlay, applyDifficulty);
+
+function applyDifficulty(key) {
+  lanes.setDifficulty(key);
+}
+
+// Apply the persisted difficulty selection on load
+applyDifficulty(hud.getDifficulty());
 
 // Initial render so the scene isn't blank before "Play"
 updateCamera(0, 0);
@@ -63,6 +71,9 @@ function startGame() {
   autoRow = 0;
   cameraRow = 0;
   camFocusZ = 0;
+
+  lanes.setDifficulty(hud.getDifficulty());
+  autoAdvance = lanes.getConfig().autoAdvance;
 
   player.reset();
   lanes.reset();
@@ -100,7 +111,7 @@ function gameLoop(timestamp) {
 
   // ── Camera follow ──────────────────────────────────────────────────────────
   // auto-advance slowly pushes camera forward
-  autoRow += dt * AUTO_ADVANCE;
+  autoRow += dt * autoAdvance;
   // camera row = further of: player's max progress, or auto advance
   const targetRow = Math.max(player.maxRow, Math.floor(autoRow));
   cameraRow = Math.max(cameraRow, targetRow);
