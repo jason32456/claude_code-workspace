@@ -1,0 +1,140 @@
+:root {
+  --ink: #2b1d12;
+  --paper: #fdf6e3;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #1b2330;
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#stage {
+  position: relative;
+  width: 420px;
+  max-width: 100vw;
+  aspect-ratio: 420 / 720;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 22, 33, 0.55);
+  backdrop-filter: blur(3px);
+  transition: opacity 0.2s ease;
+}
+
+.overlay.hidden { display: none; }
+
+.card {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 32px 30px;
+  width: 320px;
+  max-width: 86%;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  border: 4px solid var(--ink);
+}
+
+h1 {
+  font-size: 52px;
+  letter-spacing: 2px;
+  color: var(--ink);
+}
+
+h1 .bang { color: #e0533d; }
+
+h2 {
+  font-size: 38px;
+  letter-spacing: 2px;
+  color: #e0533d;
+}
+
+.tag {
+  margin: 8px 0 18px;
+  font-size: 15px;
+  color: #6b5642;
+}
+
+.how {
+  display: grid;
+  gap: 6px;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.how .muted { margin-top: 4px; }
+
+.muted {
+  color: #9a886f;
+  font-size: 13px;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 2px 7px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+button {
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--paper);
+  background: #3aa757;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 12px 36px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #207a3a;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #207a3a;
+}
+
+.score-line {
+  font-size: 22px;
+  margin: 14px 0 6px;
+}
+
+.score-line span { font-weight: bold; color: #3aa757; }
+
+.best {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #6b5642;
+}
