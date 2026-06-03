@@ -26,6 +26,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [penumbra](./penumbra/) | Calm microlearning app that brackets sleep with a short wind-down review and a morning recall check — FSRS-5 scheduler with sleep-bracket bias, overnight retention metric, audio/eyes-closed mode, dim warm UI designed to help you sleep | Vanilla JS · IndexedDB · Web Speech API · ES Modules | ✅ Complete |
 | [snake-3d](./snake-3d/) | Neon Snake in true 3D — guide a glowing snake through a 25³ wireframe cube, eat pulsing magenta orbs, grow and speed up; particle bursts on eat, orbiting camera, game over on wall or self-collision | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [color-palette-gen](./color-palette-gen/) | Instant color palette generator — press Space to generate 5 vibrant colors, lock favorites, click to copy hex codes, export as CSS variables | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
+| [asteroid-storm](./asteroid-storm/) | Neon arcade space shooter — blast through endless asteroid waves, collect shield and triple-shot power-ups, screen-wrapping physics with particle explosions and high-score persistence | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 
 ## Running a project
 
