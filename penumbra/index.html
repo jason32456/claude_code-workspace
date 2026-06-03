@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c0a08" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <title>Penumbra</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+  <!-- ===================== ONBOARDING ===================== -->
+  <div id="view-onboarding" class="view">
+    <div class="onboarding-logo">
+      <div class="glyph">🌒</div>
+      <h1>Penumbra</h1>
+      <p>Learn at the edge of sleep</p>
+    </div>
+
+    <form id="onboarding-form">
+      <div class="field">
+        <label for="ob-name">Your name (optional)</label>
+        <input id="ob-name" type="text" placeholder="e.g. Alex" autocomplete="given-name" />
+      </div>
+      <div class="field">
+        <label for="ob-bedtime">Bedtime</label>
+        <input id="ob-bedtime" type="time" value="22:30" />
+      </div>
+      <div class="field">
+        <label for="ob-waketime">Wake time</label>
+        <input id="ob-waketime" type="time" value="07:00" />
+      </div>
+      <button type="submit" class="btn btn-primary mt-6">Get started</button>
+    </form>
+  </div>
+
+  <!-- ===================== HOME ===================== -->
+  <div id="view-home" class="view">
+    <div class="home-greeting mb-6">
+      <div class="label">Penumbra</div>
+      <h1 id="home-greeting">Good evening</h1>
+      <p class="text-dim text-sm" id="home-time"></p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row mb-6">
+      <div class="stat-chip">
+        <span class="value" id="stat-retention">—</span>
+        <span class="label">Overnight</span>
+      </div>
+      <div class="stat-chip">
+        <span class="value" id="stat-streak">0</span>
+        <span class="label">Streak</span>
+      </div>
+      <div class="stat-chip">
+        <span class="value" id="stat-learned">0</span>
+        <span class="label">Learned</span>
+      </div>
+    </div>
+
+    <!-- Wind-down session card -->
+    <div id="session-wind-down" class="session-card mb-4">
+      <div class="session-icon moon">🌙</div>
+      <h3>Wind-down review</h3>
+      <p class="session-sub">Review cards before sleep</p>
+      <button class="btn btn-primary">Begin wind-down</button>
+    </div>
+
+    <!-- Wake-up session card -->
+    <div id="session-wake-up" class="session-card">
+      <div class="session-icon sun">☀️</div>
+      <h3>Morning recall</h3>
+      <p class="session-sub">Check what consolidated overnight</p>
+      <button class="btn btn-ghost">Morning recall</button>
+    </div>
+  </div>
+
+  <!-- ===================== SESSION ===================== -->
+  <div id="view-session" class="view">
+    <div class="session-header">
+      <div id="session-dots" class="session-progress"></div>
+      <span id="session-timer" class="session-timer">—</span>
+    </div>
+    <p class="text-xs text-faint mb-4" id="session-progress-label">1 / 10</p>
+
+    <div class="flashcard">
+      <div class="flashcard-body">
+        <span class="flashcard-deck-label" id="card-deck-label"></span>
+        <div class="flashcard-front" id="card-front"></div>
+        <div class="flashcard-divider" id="card-divider"></div>
+        <div class="flashcard-back" id="card-back"></div>
+      </div>
+
+      <!-- Audio mode overlay -->
+      <div class="audio-only">
+        <div class="audio-waveform">
+          <div class="audio-bar" style="height:50%"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+        </div>
+        <p class="text-dim text-sm">Listening…</p>
+      </div>
+    </div>
+
+    <button id="reveal-btn" class="btn btn-ghost reveal-btn mt-4">Show answer</button>
+
+    <!-- Wind-down ratings -->
+    <div id="rating-buttons" class="rating-buttons">
+      <button class="rating-btn again" data-rating="again">
+        <strong>Again</strong><br><span style="font-size:12px;opacity:0.7">Forgot</span>
+      </button>
+      <button class="rating-btn hard" data-rating="hard">
+        <strong>Hard</strong><br><span style="font-size:12px;opacity:0.7">Difficult</span>
+      </button>
+      <button class="rating-btn good" data-rating="good">
+        <strong>Good</strong><br><span style="font-size:12px;opacity:0.7">Got it</span>
+      </button>
+      <button class="rating-btn easy" data-rating="easy">
+        <strong>Easy</strong><br><span style="font-size:12px;opacity:0.7">Too easy</span>
+      </button>
+    </div>
+
+    <!-- Morning ratings (2-button) -->
+    <div id="morning-rating" class="morning-rating">
+      <button class="morning-btn no" data-morning="no">Not quite</button>
+      <button class="morning-btn yes" data-morning="yes">Yes, I know it</button>
+    </div>
+  </div>
+
+  <!-- ===================== DONE ===================== -->
+  <div id="view-done" class="view">
+    <div class="done-icon" id="done-icon">🌙</div>
+    <h1 class="done-title" id="done-title">That's enough — goodnight.</h1>
+    <p class="done-sub" id="done-sub">Put the phone down.</p>
+
+    <div class="done-stats">
+      <div class="done-stat">
+        <span class="value" id="done-count">0</span>
+        <span class="label">Cards</span>
+      </div>
+      <div class="done-stat" id="done-retention-stat">
+        <span class="value" id="done-retention">—</span>
+        <span class="label">Recalled</span>
+      </div>
+    </div>
+
+    <button id="done-home-btn" class="btn btn-ghost mt-auto">Back to home</button>
+  </div>
+
+  <!-- ===================== DECKS ===================== -->
+  <div id="view-decks" class="view">
+    <div class="flex justify-between items-center mb-6">
+      <h1>Decks</h1>
+      <button id="new-deck-btn" class="btn btn-primary btn-sm">+ New deck</button>
+    </div>
+    <div id="deck-list"></div>
+  </div>
+
+  <!-- ===================== DECK DETAIL ===================== -->
+  <div id="view-deck-detail" class="view">
+    <div class="flex items-center mb-4" style="gap:12px">
+      <button id="deck-back-btn" class="btn btn-ghost btn-sm" style="width:auto;padding:8px 14px">‹ Back</button>
+      <h2 id="deck-detail-name" style="flex:1"></h2>
+    </div>
+    <p id="deck-detail-desc" class="text-dim text-sm mb-4"></p>
+
+    <div class="flex gap-2 mb-6">
+      <button id="deck-add-card-btn" class="btn btn-primary btn-sm">+ Add card</button>
+      <button id="deck-delete-btn" class="btn btn-danger btn-sm">Delete deck</button>
+    </div>
+
+    <div id="deck-cards-list"></div>
+  </div>
+
+  <!-- ===================== CARD EDITOR ===================== -->
+  <div id="view-card-editor" class="view">
+    <div class="flex items-center mb-6" style="gap:12px">
+      <button id="card-cancel-btn" class="btn btn-ghost btn-sm" style="width:auto">‹ Back</button>
+      <h2 id="card-editor-title">Add card</h2>
+    </div>
+
+    <form id="card-editor-form">
+      <div class="field">
+        <label for="card-front-input">Front (question / prompt)</label>
+        <textarea id="card-front-input" placeholder="e.g. What does 'effortless' mean?" required></textarea>
+      </div>
+      <div class="field">
+        <label for="card-back-input">Back (answer)</label>
+        <textarea id="card-back-input" placeholder="e.g. Done without effort; requiring no exertion" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Save card</button>
+      <button type="button" id="card-delete-btn" class="btn btn-danger mt-4" style="display:none">Delete card</button>
+    </form>
+  </div>
+
+  <!-- ===================== NEW DECK ===================== -->
+  <div id="view-new-deck" class="view">
+    <div class="flex items-center mb-6" style="gap:12px">
+      <button id="new-deck-cancel" class="btn btn-ghost btn-sm" style="width:auto">‹ Back</button>
+      <h2>New deck</h2>
+    </div>
+
+    <form id="new-deck-form">
+      <div class="field">
+        <label for="new-deck-name">Deck name</label>
+        <input id="new-deck-name" type="text" placeholder="e.g. Medical Terminology" required />
+      </div>
+      <div class="field">
+        <label for="new-deck-desc">Description (optional)</label>
+        <input id="new-deck-desc" type="text" placeholder="Brief description" />
+      </div>
+      <button type="submit" class="btn btn-primary">Create deck</button>
+    </form>
+  </div>
+
+  <!-- ===================== SETTINGS ===================== -->
+  <div id="view-settings" class="view">
+    <h1 class="mb-6">Settings</h1>
+
+    <div class="settings-section">
+      <h2>Schedule</h2>
+      <div class="settings-row">
+        <label for="set-bedtime">Bedtime</label>
+        <input id="set-bedtime" type="time" />
+      </div>
+      <div class="settings-row">
+        <label for="set-waketime">Wake time</label>
+        <input id="set-waketime" type="time" />
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>Session limits</h2>
+      <div class="settings-row">
+        <label for="set-cap-cards">Max cards per session</label>
+        <select id="set-cap-cards">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15" selected>15</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label for="set-cap-minutes">Time cap (minutes)</label>
+        <select id="set-cap-minutes">
+          <option value="5">5</option>
+          <option value="8">8</option>
+          <option value="12" selected>12</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>Review mode</h2>
+      <div class="settings-row">
+        <label for="set-audio">Audio mode (eyes-closed)</label>
+        <label class="toggle">
+          <input id="set-audio" type="checkbox" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>Profile</h2>
+      <div class="settings-row">
+        <label for="set-name">Your name</label>
+        <input id="set-name" type="text" placeholder="Name" style="width:140px;background:var(--bg3)" />
+      </div>
+    </div>
+
+    <button id="settings-save-btn" class="btn btn-primary mt-4">Save settings</button>
+
+    <div class="mt-8" style="text-align:center">
+      <p class="text-xs text-faint">
+        Penumbra uses sleep's natural memory consolidation to help what you study stick.<br>
+        Sessions are capped and designed to end — not to keep you up.
+      </p>
+      <p class="text-xs text-faint mt-4">
+        <strong>What the science supports:</strong> studying close to sleep improves retention
+        because there's no subsequent waking activity to interfere. We use FSRS spaced repetition
+        with a sleep-bracket bias. We don't claim learning happens during sleep itself.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="nav">
+    <button class="nav-btn active" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
+      </svg>
+      Home
+    </button>
+    <button class="nav-btn" data-view="decks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+        <line x1="12" y1="12" x2="12" y2="16"/>
+        <line x1="10" y1="14" x2="14" y2="14"/>
+      </svg>
+      Decks
+    </button>
+    <button class="nav-btn" data-view="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+      Settings
+    </button>
+  </nav>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
