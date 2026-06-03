@@ -22,6 +22,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [typeblitz](./typeblitz/) | Typing speed test — live WPM + accuracy, per-character color feedback, 15/30/60 s modes, personal best via localStorage, dark/light theme | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
 | [timber](./timber/) | One-more-go arcade chopper — tap left/right to chop an endless tree, dodge branches, beat a draining timer; wood-chip particles, screen shake, and a flying-log effect, with best score saved locally | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [pit-backtester](./pit-backtester/) | Point-in-time strategy backtesting engine for IDX equities — makes look-ahead bias structurally impossible via a clock-bound PIT data layer; full IDX market mechanics (100-lot sizes, broker commissions, sell tax, slippage), 15-test leakage suite | Python · pandas · pydantic v2 · rich · click | ✅ Complete |
+| [apex-riders](./apex-riders/) | 3D arcade motorcycle racing game — lean through corners, drift to fill a boost meter, and chase lap times on a hand-designed circuit; WebGL2, arcade physics with drift-angle model, chase cam with FOV widening and camera shake | Three.js · TypeScript · Vite | ✅ Complete |
 
 ## Running a project
 

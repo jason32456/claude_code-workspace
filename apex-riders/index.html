@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apex Riders</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+
+    #game-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    #hud {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #fff;
+    }
+
+    #speed-panel {
+      position: absolute; bottom: 32px; left: 40px;
+    }
+    #speed-value {
+      font-size: 52px; font-weight: 900; letter-spacing: -2px;
+      text-shadow: 0 0 20px rgba(0,180,255,0.8);
+      line-height: 1;
+    }
+    #speed-unit {
+      font-size: 14px; color: #aaa; letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    #boost-panel {
+      position: absolute; bottom: 32px; right: 40px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+    }
+    #boost-label {
+      font-size: 11px; letter-spacing: 3px; color: #aaa; text-transform: uppercase;
+    }
+    #boost-track {
+      width: 160px; height: 14px; background: rgba(255,255,255,0.1);
+      border-radius: 7px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    #boost-fill {
+      height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b00, #ffcc00);
+      border-radius: 7px;
+      transition: width 0.05s linear;
+      box-shadow: 0 0 12px rgba(255,150,0,0.6);
+    }
+    #boost-fill.full { background: linear-gradient(90deg, #00e5ff, #7b2ff7); box-shadow: 0 0 18px rgba(0,229,255,0.8); }
+
+    #timer-panel {
+      position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+      text-align: center;
+    }
+    #lap-time {
+      font-size: 38px; font-weight: 700; letter-spacing: 1px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+      font-variant-numeric: tabular-nums;
+    }
+    #best-time {
+      font-size: 14px; color: #aaa; margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+    #lap-counter {
+      font-size: 13px; color: #ccc; letter-spacing: 2px; text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    #drift-indicator {
+      position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+      font-size: 16px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+      color: #ffcc00; text-shadow: 0 0 20px rgba(255,204,0,0.8);
+      opacity: 0; transition: opacity 0.1s;
+    }
+    #drift-indicator.visible { opacity: 1; }
+
+    #minimap {
+      position: absolute; top: 20px; right: 20px;
+      width: 120px; height: 120px;
+    }
+    #minimap canvas {
+      border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    /* Overlays */
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75);
+      pointer-events: all;
+    }
+    .overlay.hidden { display: none; }
+
+    #menu-screen {
+      background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(10,10,30,0.95) 100%);
+    }
+    .game-title {
+      font-size: 72px; font-weight: 900; letter-spacing: -2px;
+      background: linear-gradient(135deg, #00e5ff, #7b2ff7, #ff6b00);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .game-subtitle {
+      font-size: 16px; color: #aaa; letter-spacing: 4px; text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    .controls-grid {
+      display: grid; grid-template-columns: auto auto; gap: 8px 24px;
+      font-size: 14px; margin-bottom: 48px;
+      background: rgba(255,255,255,0.05); padding: 20px 32px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .key-label { color: #aaa; }
+    .key-value { color: #fff; font-weight: 600; }
+    kbd {
+      background: rgba(255,255,255,0.12); padding: 2px 8px; border-radius: 4px;
+      font-family: inherit; font-size: 13px; border: 1px solid rgba(255,255,255,0.2);
+    }
+    .press-start {
+      font-size: 20px; color: #fff; letter-spacing: 3px;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    #countdown-screen { background: transparent; pointer-events: none; }
+    #countdown-number {
+      font-size: 160px; font-weight: 900;
+      color: #fff; text-shadow: 0 0 60px rgba(255,255,255,0.5);
+      animation: countBounce 0.8s ease-out;
+    }
+    @keyframes countBounce {
+      0%  { transform: scale(1.4); opacity: 0.5; }
+      60% { transform: scale(0.92); }
+      100%{ transform: scale(1); opacity: 1; }
+    }
+
+    #finish-screen {}
+    .finish-title {
+      font-size: 52px; font-weight: 900; color: #ffcc00;
+      text-shadow: 0 0 30px rgba(255,204,0,0.6);
+      margin-bottom: 12px;
+    }
+    .finish-time {
+      font-size: 72px; font-weight: 900; color: #fff;
+      font-variant-numeric: tabular-nums; margin-bottom: 8px;
+    }
+    .finish-best {
+      font-size: 18px; color: #aaa; margin-bottom: 48px;
+    }
+    .finish-best.new-record { color: #00e5ff; }
+    .btn {
+      font-size: 18px; letter-spacing: 3px; color: #fff;
+      background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
+      padding: 14px 40px; border-radius: 8px; cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    #speed-lines {
+      position: fixed; inset: 0; pointer-events: none;
+      opacity: 0; transition: opacity 0.1s;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.4) 100%);
+    }
+    #speed-lines.active { opacity: 1; }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Speed vignette -->
+  <div id="speed-lines"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="speed-panel">
+      <div id="speed-value">0</div>
+      <div id="speed-unit">km/h</div>
+    </div>
+
+    <div id="boost-panel">
+      <div id="boost-label">⚡ Boost</div>
+      <div id="boost-track">
+        <div id="boost-fill"></div>
+      </div>
+    </div>
+
+    <div id="timer-panel">
+      <div id="lap-time">0:00.000</div>
+      <div id="best-time">Best: --:--.---</div>
+      <div id="lap-counter">LAP 1</div>
+    </div>
+
+    <div id="drift-indicator">DRIFT</div>
+
+    <div id="minimap">
+      <canvas id="minimap-canvas" width="120" height="120"></canvas>
+    </div>
+  </div>
+
+  <!-- Overlays -->
+  <div id="menu-screen" class="overlay">
+    <div class="game-title">APEX RIDERS</div>
+    <div class="game-subtitle">3D Arcade Racing</div>
+    <div class="controls-grid">
+      <span class="key-label">Steer</span>
+      <span class="key-value"><kbd>A</kbd> / <kbd>D</kbd> or <kbd>←</kbd> / <kbd>→</kbd></span>
+      <span class="key-label">Brake</span>
+      <span class="key-value"><kbd>S</kbd> or <kbd>↓</kbd></span>
+      <span class="key-label">Boost</span>
+      <span class="key-value"><kbd>Shift</kbd></span>
+      <span class="key-label">Camera</span>
+      <span class="key-value"><kbd>C</kbd></span>
+      <span class="key-label">Pause</span>
+      <span class="key-value"><kbd>Esc</kbd></span>
+    </div>
+    <div class="press-start">PRESS ENTER TO RACE</div>
+  </div>
+
+  <div id="countdown-screen" class="overlay hidden">
+    <div id="countdown-number">3</div>
+  </div>
+
+  <div id="finish-screen" class="overlay hidden">
+    <div class="finish-title">LAP COMPLETE</div>
+    <div class="finish-time" id="finish-lap-time">0:00.000</div>
+    <div class="finish-best" id="finish-best-label">Best: --:--.---</div>
+    <button class="btn" id="race-again-btn">RACE AGAIN</button>
+  </div>
+
+  <div id="pause-screen" class="overlay hidden">
+    <div class="game-title" style="font-size:48px; margin-bottom:32px;">PAUSED</div>
+    <button class="btn" id="resume-btn" style="margin-bottom:16px;">RESUME</button>
+    <button class="btn" id="restart-btn">RESTART</button>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
