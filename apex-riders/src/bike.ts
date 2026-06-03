@@ -56,9 +56,9 @@ export class Bike {
       onTrack: true,
       prevLapDot: 0,
     };
-    const { group, body } = buildBikeModel();
+    const { group, leanGroup } = buildBikeModel();
     this.model = group;
-    this.bikeBody = body;
+    this.bikeBody = leanGroup;
     this.smokeSystem = new SmokeSystem();
   }
 
@@ -106,10 +106,12 @@ export class Bike {
     }
 
     // ── Steering ───────────────────────────────────────────────
+    // +steer = right. Forward is (sin h, cos h); decreasing heading
+    // rotates forward toward the bike's right, so steer subtracts.
     if (s.speed > 0.5) {
       const sf = Math.min(s.speed / P.TOP_SPEED, 1);
       const turnRate = lerp(P.MAX_TURN_SLOW, P.MAX_TURN_FAST, sf);
-      s.heading += input.steer * turnRate * dt;
+      s.heading -= input.steer * turnRate * dt;
     }
 
     // ── Drift ──────────────────────────────────────────────────
@@ -134,8 +136,9 @@ export class Bike {
     s.position.y = 0.3;
 
     // ── Lean ───────────────────────────────────────────────────
+    // +steer (right) rolls the bike into the corner (positive lean).
     const speedFactor = Math.min(s.speed / P.TOP_SPEED, 1);
-    const targetLean = -input.steer * speedFactor * P.MAX_LEAN;
+    const targetLean = input.steer * speedFactor * P.MAX_LEAN;
     s.leanAngle += (targetLean - s.leanAngle) * P.LEAN_SPEED * dt;
 
     // ── Track query ────────────────────────────────────────────
@@ -178,10 +181,15 @@ export class Bike {
 
 // ── Bike mesh builder ─────────────────────────────────────────────────────────
 
-function buildBikeModel(): { group: THREE.Group; body: THREE.Group } {
+function buildBikeModel(): { group: THREE.Group; leanGroup: THREE.Group } {
   const group = new THREE.Group();
+  // leanGroup rolls about the travel axis (lean). body is flipped 180° so the
+  // authored nose (local -Z) points along the direction of travel (+Z).
+  const leanGroup = new THREE.Group();
+  group.add(leanGroup);
   const body = new THREE.Group();
-  group.add(body);
+  body.rotation.y = Math.PI;
+  leanGroup.add(body);
 
   const matBody = new THREE.MeshLambertMaterial({ color: 0x0055ff });
   const matAccent = new THREE.MeshLambertMaterial({ color: 0x00ccff });
@@ -227,7 +235,7 @@ function buildBikeModel(): { group: THREE.Group; body: THREE.Group } {
   rb.rotation.x = -0.25;
   addMesh(body, new THREE.SphereGeometry(0.22, 10, 8), matHelmet, 0, 1.52, 0.05);
 
-  return { group, body };
+  return { group, leanGroup };
 }
 
 function addMesh(
