@@ -24,6 +24,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [pit-backtester](./pit-backtester/) | Point-in-time strategy backtesting engine for IDX equities — makes look-ahead bias structurally impossible via a clock-bound PIT data layer; full IDX market mechanics (100-lot sizes, broker commissions, sell tax, slippage), 15-test leakage suite | Python · pandas · pydantic v2 · rich · click | ✅ Complete |
 | [apex-riders](./apex-riders/) | 3D arcade motorcycle racing game — lean through corners, drift to fill a boost meter, and chase lap times on a hand-designed circuit; WebGL2, arcade physics with drift-angle model, chase cam with FOV widening and camera shake | Three.js · TypeScript · Vite | ✅ Complete |
 | [penumbra](./penumbra/) | Calm microlearning app that brackets sleep with a short wind-down review and a morning recall check — FSRS-5 scheduler with sleep-bracket bias, overnight retention metric, audio/eyes-closed mode, dim warm UI designed to help you sleep | Vanilla JS · IndexedDB · Web Speech API · ES Modules | ✅ Complete |
+| [snake-3d](./snake-3d/) | Neon Snake in true 3D — guide a glowing snake through a 25³ wireframe cube, eat pulsing magenta orbs, grow and speed up; particle bursts on eat, orbiting camera, game over on wall or self-collision | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 
 ## Running a project
 
