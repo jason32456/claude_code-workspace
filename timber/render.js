@@ -33,6 +33,8 @@ export class Renderer {
     this.chopAnim = 0;   // 1 -> 0, axe swing
     this.dropAnim = 0;   // 1 -> 0, stack settling down one notch
     this.deathFlash = 0; // 1 -> 0
+    this.comboPop = 0;   // 1 -> 0, multiplier "punch" when it climbs
+    this.lastMult = 1;
     this.facing = SIDE.LEFT;
     this.log = null;     // flying chopped log
     this.clouds = [
@@ -43,11 +45,13 @@ export class Renderer {
   }
 
   // Fired by the game on every chop.
-  onChop(side, ok) {
+  onChop(side, ok, mult = 1) {
     this.facing = side;
     this.chopAnim = 1;
     this.shake = ok ? 6 : 16;
     if (!ok) this.deathFlash = 1;
+    if (ok && mult > this.lastMult) { this.comboPop = 1; this.shake = 9; }
+    if (ok) this.lastMult = mult;
 
     // Wood chips spray out from the cut, away from the lumberjack.
     const dir = side === SIDE.LEFT ? 1 : -1;
@@ -82,6 +86,7 @@ export class Renderer {
     this.chopAnim = Math.max(0, this.chopAnim - dt * 6);
     this.dropAnim = Math.max(0, this.dropAnim - dt * 7);
     this.deathFlash = Math.max(0, this.deathFlash - dt * 2);
+    this.comboPop = Math.max(0, this.comboPop - dt * 2.5);
 
     for (const c of this.clouds) {
       c.x += c.v * dt;
@@ -322,9 +327,24 @@ export class Renderer {
       ctx.restore();
     }
 
+    // combo multiplier
+    if (game.state === 'playing') {
+      const mult = game.multiplier();
+      if (mult > 1) {
+        const pop = 1 + this.comboPop * 0.5;
+        ctx.save();
+        ctx.translate(CX, 100);
+        ctx.scale(pop, pop);
+        ctx.fillStyle = mult >= 4 ? '#e0533d' : mult >= 3 ? '#e6a52e' : '#3aa757';
+        ctx.font = 'bold 26px "Trebuchet MS", system-ui, sans-serif';
+        ctx.fillText('×' + mult, 0, 0);
+        ctx.restore();
+      }
+    }
+
     // timer bar (only while playing)
     if (game.state === 'playing') {
-      const bw = 260, bh = 18, bx = CX - bw / 2, by = 120;
+      const bw = 260, bh = 18, bx = CX - bw / 2, by = 150;
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
       this._roundRect(ctx, bx - 3, by - 3, bw + 6, bh + 6, 10);
       ctx.fill();

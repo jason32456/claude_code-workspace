@@ -18,7 +18,10 @@ chop, so hesitation kills as surely as a misjudged branch.
 | Chop right | `D` / `→` | tap the right half of the screen |
 | Start / retry | `Space` / `Enter` / click | tap |
 
-- **+1** per chop, and the timer refills a little.
+- Each chop scores points and refills the timer a little.
+- **Combo multiplier:** keep chopping in a steady rhythm to build a streak —
+  the multiplier climbs to **×5**, so points come fastest when you stay calm and
+  keep the axe swinging. Pause too long and the streak resets.
 - A branch on **your** side when you chop = **squashed**.
 - Let the timer empty = **time's up**.
 - Difficulty ramps with your score: the timer drains faster, refills less, and

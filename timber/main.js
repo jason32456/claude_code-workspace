@@ -29,6 +29,8 @@ function startGame() {
   game.start();
   renderer.log = null;
   renderer.chips = [];
+  renderer.lastMult = 1;
+  renderer.comboPop = 0;
   overlay.classList.add('hidden');
   gameover.classList.add('hidden');
 }
