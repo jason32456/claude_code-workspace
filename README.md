@@ -16,6 +16,11 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [streaks](./streaks/) | Daily habit streak tracker — add up to 6 habits, check them off each day, watch streaks grow with a 30-day heatmap and confetti celebrations | Vanilla JS · CSS3 · localStorage · ES Modules | ✅ Complete |
 | [ambient-noise](./ambient-noise/) | Browser soundscape mixer — blend White Noise, Brown Noise, Rain, Ocean, Café, and Fireplace channels with independent volume sliders, a sleep timer, and a live frequency visualizer | Vanilla JS · Web Audio API · Canvas 2D | ✅ Complete |
 | [crossy-road](./crossy-road/) | 3D endless hopper — guide a blocky chicken across infinite grass and road lanes, dodge traffic, beat your high score; runs fully offline with Three.js bundled locally | Three.js · Vanilla JS · ES Modules | ✅ Complete |
+| [joyride](./joyride/) | GTA-style open-world sandbox — roam a procedurally generated city on foot, jack a parked car, drive anywhere; arcade driving model with push-out collision, ambient traffic, pedestrians, and minimap | Three.js · Vanilla JS · ES Modules | ✅ Complete |
+| [overrun](./overrun/) | Browser FPS horde shooter — hold out against escalating waves of melee enemies in a single arena; hitscan shooting, view-model gun, screen shake, enemy AI with separation, health regen, and wave-scaling difficulty | Three.js · Vanilla JS · ES Modules | ✅ Complete |
+| [finance-dashboard](./finance-dashboard/) | Personal finance dashboard — accounts, income/expense tracking, per-category budgets with over-budget warnings, charts, and bill splitting with who-owes-whom settlement | Next.js 14 · TypeScript · Prisma · Auth.js · Recharts | ✅ Complete |
+| [typeblitz](./typeblitz/) | Typing speed test — live WPM + accuracy, per-character color feedback, 15/30/60 s modes, personal best via localStorage, dark/light theme | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
+| [pit-backtester](./pit-backtester/) | Point-in-time strategy backtesting engine for IDX equities — makes look-ahead bias structurally impossible via a clock-bound PIT data layer; full IDX market mechanics (100-lot sizes, broker commissions, sell tax, slippage), 15-test leakage suite | Python · pandas · pydantic v2 · rich · click | ✅ Complete |
 
 ## Running a project
 
@@ -27,7 +32,8 @@ python -m http.server 8080
 # open http://localhost:8080
 ```
 
-See each project's `README.md` for details.
+See each project's `README.md` for details. (Exception: `finance-dashboard` is a
+full-stack Next.js app — `cd finance-dashboard && npm install && npm run db:push && npm run dev`.)
 
 ## Repository layout
 
