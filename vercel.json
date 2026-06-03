@@ -16,6 +16,8 @@
     { "src": "/ambient-noise/(.*)", "dest": "/ambient-noise/$1" },
     { "src": "/typeblitz/?$", "dest": "/typeblitz/index.html" },
     { "src": "/typeblitz/(.*)", "dest": "/typeblitz/$1" },
+    { "src": "/color-palette-gen/?$", "dest": "/color-palette-gen/index.html" },
+    { "src": "/color-palette-gen/(.*)", "dest": "/color-palette-gen/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
