@@ -40,8 +40,26 @@
     #overlay-subtitle {
       font-size: 22px; color: #FFD700;
       text-shadow: 0 2px 0 #333;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       min-height: 28px;
+    }
+
+    #difficulty {
+      display: flex; gap: 10px; margin-bottom: 28px;
+    }
+    .diff-btn {
+      font-family: inherit; font-size: 16px; font-weight: 900;
+      padding: 10px 22px; border: none; border-radius: 11px;
+      background: rgba(255,255,255,0.18); color: #fff; cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.35);
+      transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
+      outline: none;
+    }
+    .diff-btn:hover { background: rgba(255,255,255,0.30); }
+    .diff-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+    .diff-btn.selected {
+      background: #FF9800; color: #fff;
+      box-shadow: 0 4px 0 #E65100;
     }
     #play-btn {
       font-size: 22px; font-family: inherit; font-weight: 900;
@@ -70,6 +88,11 @@
   <div id="overlay">
     <div id="overlay-title">Crossy Road</div>
     <div id="overlay-subtitle"></div>
+    <div id="difficulty">
+      <button class="diff-btn" data-diff="easy">Easy</button>
+      <button class="diff-btn selected" data-diff="normal">Normal</button>
+      <button class="diff-btn" data-diff="hard">Hard</button>
+    </div>
     <button id="play-btn">Play</button>
   </div>
 

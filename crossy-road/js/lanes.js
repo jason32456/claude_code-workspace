@@ -111,24 +111,56 @@ function darken(color, factor) {
   return c.getHex();
 }
 
+// ─── Difficulty presets ───────────────────────────────────────────────────────
+// Road-heavy by design: even Easy is mostly traffic after the safe start.
+export const DIFFICULTIES = {
+  easy: {
+    label: 'Easy',
+    safeRows: 4,
+    roadBase: 0.45, roadRamp: 0.020, roadMax: 0.75,
+    speedBase: 2.2, speedRamp: 0.060, speedMax: 6.0,
+    countMin: 1, countMax: 3, countRamp: 12,
+    truckChance: 0.20, autoAdvance: 0.22,
+  },
+  normal: {
+    label: 'Normal',
+    safeRows: 3,
+    roadBase: 0.65, roadRamp: 0.025, roadMax: 0.85,
+    speedBase: 2.8, speedRamp: 0.090, speedMax: 7.5,
+    countMin: 2, countMax: 4, countRamp: 8,
+    truckChance: 0.25, autoAdvance: 0.35,
+  },
+  hard: {
+    label: 'Hard',
+    safeRows: 2,
+    roadBase: 0.82, roadRamp: 0.020, roadMax: 0.94,
+    speedBase: 3.6, speedRamp: 0.120, speedMax: 9.5,
+    countMin: 3, countMax: 5, countRamp: 6,
+    truckChance: 0.32, autoAdvance: 0.50,
+  },
+};
+
 // ─── Lane difficulty helpers ──────────────────────────────────────────────────
-function getLaneType(row, rng) {
-  if (row <= 3) return 'grass';
-  const roadChance = Math.min(0.65, 0.15 + row * 0.02);
-  return rng() < roadChance ? 'road' : 'grass';
+function getLaneType(row, cfg) {
+  if (row <= cfg.safeRows) return 'grass';
+  const ramp = (row - cfg.safeRows) * cfg.roadRamp;
+  const roadChance = Math.min(cfg.roadMax, cfg.roadBase + ramp);
+  return Math.random() < roadChance ? 'road' : 'grass';
 }
 
-function getVehicleSpeed(row) {
-  const base = 2.5 + Math.min(row * 0.08, 5.0);
-  return rand(base * 0.8, base * 1.2);
+function getVehicleSpeed(row, cfg) {
+  const base = cfg.speedBase + Math.min(row * cfg.speedRamp, cfg.speedMax - cfg.speedBase);
+  return rand(base * 0.85, base * 1.15);
 }
 
-function getVehicleCount(row) {
-  return randInt(2, Math.min(4, 2 + Math.floor(row / 8)));
+function getVehicleCount(row, cfg) {
+  const cap = Math.min(cfg.countMax, cfg.countMin + Math.floor(row / cfg.countRamp));
+  return randInt(cfg.countMin, cap);
 }
 
 // ─── Lane manager ─────────────────────────────────────────────────────────────
 export function createLaneManager(scene) {
+  let cfg = DIFFICULTIES.normal;
   const activeLanes = new Map(); // row -> laneData
   // Pools (recycled lane components)
   const groundPool = [];
@@ -152,7 +184,7 @@ export function createLaneManager(scene) {
   function setupLane(row) {
     if (activeLanes.has(row)) return;
 
-    const type = getLaneType(row, Math.random.bind(Math));
+    const type = getLaneType(row, cfg);
     const worldZ = -row * CELL;
 
     const ground = getFromPool(groundPool, makeGround);
@@ -206,11 +238,11 @@ export function createLaneManager(scene) {
   function setupRoadLane(lane, row) {
     lane.occupiedCols = new Set();
     const dir = Math.random() < 0.5 ? 1 : -1;
-    const speed = getVehicleSpeed(row);
-    const count = getVehicleCount(row);
+    const speed = getVehicleSpeed(row, cfg);
+    const count = getVehicleCount(row, cfg);
 
     for (let i = 0; i < count; i++) {
-      const isLong = Math.random() < 0.25 && row > 8;
+      const isLong = Math.random() < cfg.truckChance && row > 8;
       const color = isLong ? pick(TRUCK_COLORS) : pick(CAR_COLORS);
       const mesh = isLong
         ? getFromPool(truckPool, (s) => makeTruck(s, color))
@@ -302,7 +334,15 @@ export function createLaneManager(scene) {
     for (const row of activeLanes.keys()) recycleLane(row);
   }
 
-  return { ensureRow, recycleBehind, update, isCellBlocked, getLane, reset };
+  function setDifficulty(key) {
+    cfg = DIFFICULTIES[key] || DIFFICULTIES.normal;
+  }
+
+  function getConfig() {
+    return cfg;
+  }
+
+  return { ensureRow, recycleBehind, update, isCellBlocked, getLane, reset, setDifficulty, getConfig };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

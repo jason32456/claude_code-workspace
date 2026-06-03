@@ -36,8 +36,22 @@ One input is queued while a hop is mid-animation so the game feels snappy withou
 - **Best score** is persisted in `localStorage` and survives refreshes
 - **Grass lanes** — safe, may contain trees or rocks that block movement
 - **Road lanes** — vehicles move left or right; overlap = instant death
+- **Road-heavy by design** — after a short safe start, most lanes are traffic
 - **Difficulty** ramps as you advance: more roads, faster and denser traffic
 - **Fall-behind death** — an auto-advancing camera slowly pushes forward; idle too long and you're gone
+
+## Difficulty
+
+Pick **Easy**, **Normal**, or **Hard** from the menu — your choice is saved to
+`localStorage`. Each preset tunes how road-heavy and fast the world is:
+
+| Setting | Safe rows | Road chance (base → max) | Top speed | Max cars/lane | Camera push |
+|---------|:---:|:---:|:---:|:---:|:---:|
+| **Easy** | 4 | 45% → 75% | 6.0 | 3 | slow |
+| **Normal** | 3 | 65% → 85% | 7.5 | 4 | medium |
+| **Hard** | 2 | 82% → 94% | 9.5 | 5 | fast |
+
+All presets live in `DIFFICULTIES` in `js/lanes.js` — tweak any value to taste.
 
 ## Tech stack
 
@@ -50,7 +64,7 @@ One input is queued while a hop is mid-animation so the game feels snappy withou
 
 | Constant | Default | Effect |
 |----------|---------|--------|
-| `AUTO_ADVANCE` | `0.35` rows/sec | Camera push speed — lower = more forgiving idle time |
+| `DIFFICULTIES.*.autoAdvance` | `0.22`–`0.50` rows/sec | Camera push speed per difficulty — lower = more forgiving idle time |
 | `KILL_BEHIND` | `4` rows | How far behind camera before death |
 | `HOP_DURATION` | `0.13` s | Hop animation speed |
 | `ARC_HEIGHT` | `0.55` | Jump arc height |
