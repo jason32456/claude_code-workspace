@@ -17,6 +17,8 @@
     { "src": "/color-palette-gen/(.*)", "dest": "/color-palette-gen/$1" },
     { "src": "/asteroid-storm/?$", "dest": "/asteroid-storm/index.html" },
     { "src": "/asteroid-storm/(.*)", "dest": "/asteroid-storm/$1" },
+    { "src": "/trivia-sprint/?$", "dest": "/trivia-sprint/index.html" },
+    { "src": "/trivia-sprint/(.*)", "dest": "/trivia-sprint/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
