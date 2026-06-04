@@ -27,6 +27,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [snake-3d](./snake-3d/) | Neon Snake in true 3D — guide a glowing snake through a 25³ wireframe cube, eat pulsing magenta orbs, grow and speed up; particle bursts on eat, orbiting camera, game over on wall or self-collision | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [color-palette-gen](./color-palette-gen/) | Instant color palette generator — press Space to generate 5 vibrant colors, lock favorites, click to copy hex codes, export as CSS variables | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
 | [asteroid-storm](./asteroid-storm/) | Neon arcade space shooter — blast through endless asteroid waves, collect shield and triple-shot power-ups, screen-wrapping physics with particle explosions and high-score persistence | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
+| [asteroids-evolved](./asteroids-evolved/) | Modern neon take on the Asteroids classic — rotate, thrust, and fire through escalating waves, asteroids split on hit, screen-wrap physics, particle explosions, and localStorage high score | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 
 ## Running a project
 
