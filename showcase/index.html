@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arcade — Project Showcase</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <header class="hero">
+      <div class="hero-inner">
+        <h1 class="logo">
+          <span class="logo-arcade">ARCADE</span>
+          <span class="logo-sub">project showcase</span>
+        </h1>
+        <p class="tagline">
+          A cabinet for every build in this workspace — games, simulations, tools and more.
+          <span class="count" id="count"></span>
+        </p>
+      </div>
+    </header>
+
+    <nav class="controls">
+      <div class="filters" id="filters" role="tablist" aria-label="Filter by category"></div>
+      <div class="search-wrap">
+        <input
+          id="search"
+          class="search"
+          type="search"
+          placeholder="Search apps, stacks…"
+          autocomplete="off"
+          aria-label="Search projects"
+        />
+        <label class="launch-toggle">
+          <input type="checkbox" id="launchableOnly" />
+          <span>Launchable only</span>
+        </label>
+      </div>
+    </nav>
+
+    <main>
+      <section id="grid" class="grid" aria-live="polite"></section>
+      <p id="empty" class="empty" hidden>No cabinets match that filter.</p>
+    </main>
+
+    <footer class="foot">
+      <span>Insert coin · built in the open</span>
+    </footer>
+
+    <div id="modal-root"></div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

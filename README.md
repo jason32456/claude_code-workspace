@@ -6,6 +6,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
+| [showcase](./showcase/) | Arcade-style launcher for every app in this repo — neon cabinet cards, category filters and search, a screenshot-gallery modal, and live "Launch" buttons for the runnable projects | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
 | [particle-life](./particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [focus-pet](./focus-pet/) | Pomodoro timer fused with a virtual pet — complete focus sessions to feed and evolve your blob creature, time-based decay keeps it real | Vanilla JS · SVG · CSS · localStorage | ✅ Complete |
 | [maze-pathfinder](./maze-pathfinder/) | Interactive maze generator and pathfinding visualizer — watch BFS, Dijkstra, and A* explore mazes step by step, paint walls and weights, compare algorithms | Vanilla JS · CSS Grid · ES Modules | ✅ Complete |
@@ -37,6 +38,11 @@ python -m http.server 8080
 
 See each project's `README.md` for details. (Exception: `finance-dashboard` is a
 full-stack Next.js app — `cd finance-dashboard && npm install && npm run db:push && npm run dev`.)
+
+To browse everything at once, run the **[showcase](./showcase/)** launcher — serve
+the repo from its **root** (`python -m http.server 8080`) and open
+`http://localhost:8080/showcase/`. Its live "Launch" buttons need the root as the
+document root, so don't serve from inside `showcase/`.
 
 ## Repository layout
 

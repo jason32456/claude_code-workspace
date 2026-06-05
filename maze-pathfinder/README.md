@@ -4,9 +4,9 @@ Interactive grid where you generate mazes and watch pathfinding algorithms explo
 
 ## Screenshots
 
-| Blank grid | Generated maze | A* solved |
+| Blank grid | Generated maze | BFS solved |
 |---|---|---|
-| ![Blank grid](screenshot-initial.png) | ![Recursive backtracker maze](screenshot-generated.png) | ![A* solution](screenshot-solved.png) |
+| ![Blank grid](screenshots/initial.png) | ![Recursive backtracker maze](screenshots/generated.png) | ![Solved path](screenshots/solved.png) |
 
 ## How to run
 
