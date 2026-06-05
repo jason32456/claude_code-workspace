@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palettify — Color Palette Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --chrome: #1a1a2e;
+      --chrome-light: #16213e;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --radius: 12px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--chrome);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── Layout ── */
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      background: var(--chrome-light);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: conic-gradient(from 0deg, #f43f5e, #f97316, #eab308, #22c55e, #3b82f6, #a855f7, #f43f5e);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), transform 0.1s;
+    }
+
+    .btn:hover { background: var(--accent-hover); }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.12); }
+
+    /* ── Palette ── */
+    .palette {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .swatch {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 32px;
+      cursor: pointer;
+      transition: flex var(--transition);
+      overflow: hidden;
+    }
+
+    .swatch:hover { flex: 1.18; }
+
+    .swatch-bg {
+      position: absolute;
+      inset: 0;
+      transition: background-color var(--transition);
+    }
+
+    .swatch-info {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .swatch:hover .swatch-info,
+    .swatch.touch .swatch-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hex-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      letter-spacing: 0.05em;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(4px);
+      transition: background 0.15s;
+      user-select: none;
+    }
+
+    .swatch:hover .hex-label { background: rgba(0,0,0,0.35); }
+
+    .copy-hint {
+      font-size: 0.7rem;
+      font-weight: 500;
+      opacity: 0.7;
+      padding: 3px 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    /* Lock button */
+    .lock-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 3;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.15s, transform 0.15s;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .swatch:hover .lock-btn,
+    .swatch.locked .lock-btn {
+      opacity: 1;
+    }
+
+    .lock-btn:hover { background: rgba(0,0,0,0.5); transform: scale(1.1); }
+    .lock-btn.active { background: rgba(255,255,255,0.25); }
+
+    .lock-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* Locked indicator */
+    .swatch.locked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(255,255,255,0.4);
+      border-radius: 0;
+      pointer-events: none;
+    }
+
+    /* ── CSS Export panel ── */
+    .export-panel {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      width: min(560px, 90vw);
+      background: var(--chrome-light);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 20px 24px;
+      z-index: 100;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .export-panel.open { transform: translateX(-50%) translateY(0); }
+
+    .export-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .export-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+    .css-code {
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #a5f3fc;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .copy-css-btn {
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-12px);
+      background: #1e293b;
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.1);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Swatch enter animation ── */
+    @keyframes swatchIn {
+      from { opacity: 0; transform: scaleY(0.88); }
+      to   { opacity: 1; transform: scaleY(1); }
+    }
+
+    .swatch.animating .swatch-bg {
+      animation: swatchIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      header { padding: 14px 20px; }
+      .hint { display: none; }
+      .btn { padding: 9px 16px; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon"></div>
+      Palettify
+    </div>
+    <div class="controls">
+      <span class="hint">
+        Press <span class="kbd">Space</span> to generate
+      </span>
+      <button class="btn btn-ghost" id="exportBtn">Export CSS</button>
+      <button class="btn" id="generateBtn">Generate</button>
+    </div>
+  </header>
+
+  <div class="palette" id="palette"></div>
+</div>
+
+<!-- Export panel -->
+<div class="export-panel" id="exportPanel">
+  <div class="export-header">
+    <span class="export-title">CSS Variables</span>
+    <button class="close-btn" id="closeExport">✕</button>
+  </div>
+  <div class="css-code" id="cssCode"></div>
+  <button class="btn copy-css-btn" id="copyCssBtn">Copy to Clipboard</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  // ── State ──────────────────────────────────────────────────────────────────
+  const PALETTE_SIZE = 5;
+  let colors = [];
+  let locked = Array(PALETTE_SIZE).fill(false);
+
+  // ── Color utilities ────────────────────────────────────────────────────────
+  function randomHex() {
+    // Bias toward saturated, mid-brightness colors
+    const h = Math.random() * 360;
+    const s = 45 + Math.random() * 50;      // 45–95%
+    const l = 35 + Math.random() * 35;      // 35–70%
+    return hslToHex(h, s, l);
+  }
+
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return { r, g, b };
+  }
+
+  function relativeLuminance({ r, g, b }) {
+    const toLinear = c => {
+      c /= 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  }
+
+  function contrastColor(hex) {
+    const lum = relativeLuminance(hexToRgb(hex));
+    return lum > 0.35 ? '#1a1a2e' : '#ffffff';
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function render(animate = false) {
+    const palette = document.getElementById('palette');
+    palette.innerHTML = '';
+
+    colors.forEach((hex, i) => {
+      const swatch = document.createElement('div');
+      swatch.className = 'swatch' + (locked[i] ? ' locked' : '') + (animate ? ' animating' : '');
+      if (animate) setTimeout(() => swatch.classList.remove('animating'), 400);
+
+      const bg = document.createElement('div');
+      bg.className = 'swatch-bg';
+      bg.style.backgroundColor = hex;
+
+      const labelColor = contrastColor(hex);
+
+      const info = document.createElement('div');
+      info.className = 'swatch-info';
+      info.innerHTML = `
+        <div class="hex-label" style="color:${labelColor}">${hex.toUpperCase()}</div>
+        <div class="copy-hint" style="color:${labelColor}">Click to copy</div>
+      `;
+
+      const lockBtn = document.createElement('button');
+      lockBtn.className = 'lock-btn' + (locked[i] ? ' active' : '');
+      lockBtn.setAttribute('aria-label', locked[i] ? 'Unlock color' : 'Lock color');
+      lockBtn.innerHTML = locked[i]
+        ? `<svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`
+        : `<svg viewBox="0 0 24 24"><path d="M12 1C9.24 1 7 3.24 7 6v1H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2h-1V6c0-2.76-2.24-5-5-5zm6 18H6V9h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.1-9h6.2V6c0-1.71-1.39-3.1-3.1-3.1S8.9 4.29 8.9 6v1z"/></svg>`;
+
+      lockBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        locked[i] = !locked[i];
+        render(false);
+      });
+
+      swatch.appendChild(bg);
+      swatch.appendChild(info);
+      swatch.appendChild(lockBtn);
+
+      swatch.addEventListener('click', () => copyColor(hex, swatch));
+
+      // Touch support: toggle info visibility
+      swatch.addEventListener('touchstart', e => {
+        e.preventDefault();
+        document.querySelectorAll('.swatch.touch').forEach(s => { if (s !== swatch) s.classList.remove('touch'); });
+        swatch.classList.toggle('touch');
+      }, { passive: false });
+
+      palette.appendChild(swatch);
+    });
+
+    updateCssCode();
+  }
+
+  // ── Generate ───────────────────────────────────────────────────────────────
+  function generate() {
+    colors = colors.map((c, i) => locked[i] ? c : randomHex());
+    render(true);
+  }
+
+  function initPalette() {
+    colors = Array.from({ length: PALETTE_SIZE }, randomHex);
+    render(true);
+  }
+
+  // ── Copy ───────────────────────────────────────────────────────────────────
+  async function copyColor(hex, swatch) {
+    try {
+      await navigator.clipboard.writeText(hex.toUpperCase());
+      showToast(`${hex.toUpperCase()} copied!`);
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = hex;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      showToast(`${hex.toUpperCase()} copied!`);
+    }
+  }
+
+  // ── CSS Export ─────────────────────────────────────────────────────────────
+  function updateCssCode() {
+    const lines = [':root {', ...colors.map((c, i) => `  --color-${i + 1}: ${c.toUpperCase()};`), '}'];
+    document.getElementById('cssCode').textContent = lines.join('\n');
+  }
+
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  // ── Events ─────────────────────────────────────────────────────────────────
+  document.getElementById('generateBtn').addEventListener('click', generate);
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    document.getElementById('exportPanel').classList.toggle('open');
+  });
+
+  document.getElementById('closeExport').addEventListener('click', () => {
+    document.getElementById('exportPanel').classList.remove('open');
+  });
+
+  document.getElementById('copyCssBtn').addEventListener('click', async () => {
+    const code = document.getElementById('cssCode').textContent;
+    try { await navigator.clipboard.writeText(code); } catch { /* ignore */ }
+    showToast('CSS copied!');
+    document.getElementById('exportPanel').classList.remove('open');
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && e.target === document.body) {
+      e.preventDefault();
+      generate();
+    }
+  });
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  initPalette();
+</script>
+</body>
+</html>

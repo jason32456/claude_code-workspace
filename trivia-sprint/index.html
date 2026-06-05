@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trivia Sprint</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Start ──────────────────────────────────────────────────────────── -->
+  <div id="screen-start" class="card">
+    <div class="logo-ring">⚡</div>
+    <h1>Trivia <span>Sprint</span></h1>
+    <p class="tagline">10 questions · 10 seconds each · how fast are you?</p>
+
+    <div class="field">
+      <label for="category-select">Category</label>
+      <select id="category-select">
+        <option value="any">🎲 Any Category</option>
+        <option value="general">🌍 General Knowledge</option>
+        <option value="science">🔬 Science &amp; Nature</option>
+        <option value="computers">💻 Computers</option>
+        <option value="history">📜 History</option>
+        <option value="geography">🗺️ Geography</option>
+        <option value="film">🎬 Film</option>
+        <option value="music">🎵 Music</option>
+        <option value="videogames">🎮 Video Games</option>
+        <option value="sports">⚽ Sports</option>
+        <option value="anime">🌸 Anime &amp; Manga</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Difficulty</label>
+      <div class="pill-group">
+        <button class="diff-pill" data-diff="easy">Easy</button>
+        <button class="diff-pill active" data-diff="medium">Medium</button>
+        <button class="diff-pill" data-diff="hard">Hard</button>
+      </div>
+    </div>
+
+    <button id="play-btn" class="btn-primary">Play Now →</button>
+  </div>
+
+  <!-- ── Loading ────────────────────────────────────────────────────────── -->
+  <div id="screen-loading" class="card hidden">
+    <div class="spinner"></div>
+    <p>Loading questions…</p>
+  </div>
+
+  <!-- ── Error ──────────────────────────────────────────────────────────── -->
+  <div id="screen-error" class="card hidden">
+    <h2>Oops!</h2>
+    <p id="error-msg"></p>
+    <button id="retry-btn" class="btn-primary">Try Again</button>
+  </div>
+
+  <!-- ── Game ───────────────────────────────────────────────────────────── -->
+  <div id="screen-game" class="card hidden">
+    <div class="game-header">
+      <div class="score-area">
+        <div>
+          <div class="score-label">Score</div>
+          <div id="score-live">0</div>
+        </div>
+        <div id="streak-badge" class="streak-badge hidden">
+          🔥 <span id="streak-count">0</span>
+        </div>
+      </div>
+
+      <div class="timer-wrap">
+        <svg width="72" height="72" viewBox="0 0 100 100">
+          <circle class="timer-bg" cx="50" cy="50" r="45" fill="none" stroke-width="8"/>
+          <circle id="timer-ring"  cx="50" cy="50" r="45" fill="none" stroke-width="8"/>
+        </svg>
+        <div id="timer-text">10</div>
+      </div>
+    </div>
+
+    <div id="q-number">Question 1 / 10</div>
+    <div id="q-text"></div>
+
+    <div class="answers-grid">
+      <button class="answer-btn" id="ans-0"></button>
+      <button class="answer-btn" id="ans-1"></button>
+      <button class="answer-btn" id="ans-2"></button>
+      <button class="answer-btn" id="ans-3"></button>
+    </div>
+  </div>
+
+  <!-- ── Results ────────────────────────────────────────────────────────── -->
+  <div id="screen-results" class="card hidden">
+    <h2>Game Over!</h2>
+
+    <div class="score-big">
+      <div class="num" id="final-score">0</div>
+      <div class="denom">points</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-chip">
+        <strong id="final-correct">—</strong>
+        Accuracy
+      </div>
+      <div class="stat-chip">
+        <strong id="final-streak-val">—</strong>
+        Best Streak
+      </div>
+      <div class="stat-chip">
+        <strong id="final-pb-val">—</strong>
+        Personal Best
+      </div>
+    </div>
+
+    <div id="new-best-banner" class="new-best hidden">🏆 New Personal Best!</div>
+
+    <p class="review-title">Answer Review</p>
+    <ul id="review-list"></ul>
+
+    <button id="play-again-btn" class="btn-primary">Play Again</button>
+    <button id="change-settings-btn" class="btn-secondary">Change Settings</button>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

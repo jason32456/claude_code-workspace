@@ -1,8 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "**/*.{html,css,js,png,svg,ico,json,woff,woff2}", "use": "@vercel/static" }
-  ],
   "routes": [
     { "src": "/cocktail-finder/?$", "dest": "/cocktail-finder/index.html" },
     { "src": "/cocktail-finder/(.*)", "dest": "/cocktail-finder/$1" },
@@ -16,6 +13,12 @@
     { "src": "/ambient-noise/(.*)", "dest": "/ambient-noise/$1" },
     { "src": "/typeblitz/?$", "dest": "/typeblitz/index.html" },
     { "src": "/typeblitz/(.*)", "dest": "/typeblitz/$1" },
+    { "src": "/color-palette-gen/?$", "dest": "/color-palette-gen/index.html" },
+    { "src": "/color-palette-gen/(.*)", "dest": "/color-palette-gen/$1" },
+    { "src": "/asteroid-storm/?$", "dest": "/asteroid-storm/index.html" },
+    { "src": "/asteroid-storm/(.*)", "dest": "/asteroid-storm/$1" },
+    { "src": "/trivia-sprint/?$", "dest": "/trivia-sprint/index.html" },
+    { "src": "/trivia-sprint/(.*)", "dest": "/trivia-sprint/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }

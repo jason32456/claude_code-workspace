@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asteroid Storm</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; }
+    canvas { display: block; }
+
+    #overlay {
+      position: fixed; inset: 0;
+      display: flex; justify-content: center; align-items: center;
+      pointer-events: none;
+      font-family: 'Courier New', monospace;
+      color: #fff;
+    }
+    #overlay.hidden { display: none; }
+
+    .screen { text-align: center; }
+    .screen.hidden { display: none; }
+
+    h1 {
+      font-size: 72px;
+      letter-spacing: 8px;
+      color: #00ffff;
+      text-shadow: 0 0 40px #00ffff, 0 0 80px #0088ff;
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+    .tagline { color: #ff6600; font-size: 22px; margin-bottom: 26px; text-shadow: 0 0 20px #ff4400; }
+    .hint { color: #888; font-size: 17px; margin: 5px 0; }
+    .hi-row { color: #ffff00; font-size: 20px; margin: 14px 0 22px; text-shadow: 0 0 12px #aaaa00; }
+    .cta {
+      animation: blink 1.2s step-end infinite;
+      color: #00ff88;
+      font-size: 26px;
+      margin-top: 24px;
+      text-shadow: 0 0 20px #00ff88;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    #gameover-title { color: #ff3333; text-shadow: 0 0 40px #ff1111, 0 0 80px #aa0000; }
+    .go-stat { font-size: 24px; margin: 8px 0; color: #00ffff; }
+
+    #pause h1 { font-size: 56px; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <div id="overlay">
+    <!-- Menu -->
+    <div id="menu" class="screen">
+      <h1>ASTEROID<br>STORM</h1>
+      <p class="tagline">Survive the endless void</p>
+      <p class="hint">↑ / W &nbsp; Thrust &nbsp;&nbsp;&nbsp; ← → / A D &nbsp; Rotate</p>
+      <p class="hint">SPACE &nbsp; Fire &nbsp;&nbsp;&nbsp; P &nbsp; Pause</p>
+      <div class="hi-row">BEST: <span id="hi-disp">0</span></div>
+      <p class="cta">PRESS SPACE TO START</p>
+    </div>
+
+    <!-- Game Over -->
+    <div id="gameover" class="screen hidden">
+      <h1 id="gameover-title">GAME<br>OVER</h1>
+      <p class="go-stat">SCORE: <span id="final-score">0</span></p>
+      <p class="go-stat" style="color:#ffff00">BEST: <span id="final-hi">0</span></p>
+      <p class="cta">PRESS SPACE TO PLAY AGAIN</p>
+    </div>
+
+    <!-- Pause -->
+    <div id="pause" class="screen hidden">
+      <h1>PAUSED</h1>
+      <p class="hint" style="margin-top:18px">PRESS P TO RESUME</p>
+    </div>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>
