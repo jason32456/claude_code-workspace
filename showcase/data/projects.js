@@ -101,6 +101,21 @@ export const projects = [
     screenshots: ['menu', 'racing', 'drifting'].map((f) => shot('apex-riders', `${f}.png`)),
   },
   {
+    slug: 'trivia-sprint',
+    name: 'Trivia Sprint',
+    tagline: 'Beat-the-clock trivia game',
+    description:
+      'A fast-paced trivia game — 10 questions, 10 seconds each. Pick a category and difficulty, race an animated ring timer, and beat your personal best. Questions come live from the Open Trivia DB, with a built-in fallback bank when the API is unreachable.',
+    stack: ['Vanilla JS', 'CSS3', 'Open Trivia DB API'],
+    category: 'Games',
+    status: 'complete',
+    runType: 'static',
+    launchable: true,
+    runCommand: 'cd trivia-sprint && python -m http.server 8080',
+    sourceHref: '../trivia-sprint/',
+    screenshots: ['start', 'game', 'streak', 'after-play'].map((f) => shot('trivia-sprint', `${f}.png`)),
+  },
+  {
     slug: 'particle-life',
     name: 'Particle Life',
     tagline: 'Emergent particle simulation',
