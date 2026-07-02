@@ -71,6 +71,21 @@ export const projects = [
     screenshots: ['title', 'play'].map((f) => shot('timber', `${f}.png`)),
   },
   {
+    slug: 'neon-flap',
+    name: 'Neon Flap',
+    tagline: 'One-button neon arcade flyer',
+    description:
+      'Flap a glowing comet through scrolling neon gates — gravity pulls it down constantly, tap to fight back and thread each gap. Particle trail, screen shake, ramping difficulty, and a localStorage best score.',
+    stack: ['Vanilla JS', 'Canvas 2D', 'ES Modules'],
+    category: 'Games',
+    status: 'complete',
+    runType: 'static',
+    launchable: true,
+    runCommand: 'cd neon-flap && python -m http.server 8080',
+    sourceHref: '../neon-flap/',
+    screenshots: ['title', 'play'].map((f) => shot('neon-flap', `${f}.png`)),
+  },
+  {
     slug: 'typeblitz',
     name: 'TypeBlitz',
     tagline: 'Typing speed test with live WPM',

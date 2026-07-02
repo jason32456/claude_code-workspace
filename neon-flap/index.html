@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Neon Flap</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="stage">
+    <canvas id="game" width="480" height="720"></canvas>
+
+    <div id="hud">
+      <span id="score">0</span>
+    </div>
+
+    <div id="overlay" class="overlay">
+      <div class="card">
+        <h1>NEON<span class="accent">FLAP</span></h1>
+        <p class="tag">Flap through the gates. Don't clip a bar.</p>
+        <div class="how">
+          <div><kbd>Space</kbd> / <kbd>&uarr;</kbd> flap</div>
+          <div class="muted">or click / tap anywhere</div>
+        </div>
+        <button id="startBtn">PLAY</button>
+        <p class="best" id="bestLine"></p>
+      </div>
+    </div>
+
+    <div id="gameover" class="overlay hidden">
+      <div class="card">
+        <h2 id="goTitle">WIPEOUT</h2>
+        <p class="score-line">Score <span id="finalScore">0</span></p>
+        <p id="newBest" class="new-best hidden">NEW BEST!</p>
+        <p class="best" id="finalBest"></p>
+        <button id="retryBtn">GO AGAIN</button>
+        <p class="muted">Space / tap to retry</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
