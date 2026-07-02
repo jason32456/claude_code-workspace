@@ -30,6 +30,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [asteroid-storm](./asteroid-storm/) | Neon arcade space shooter — blast through endless asteroid waves, collect shield and triple-shot power-ups, screen-wrapping physics with particle explosions and high-score persistence | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [asteroids-evolved](./asteroids-evolved/) | Modern neon take on the Asteroids classic — rotate, thrust, and fire through escalating waves, asteroids split on hit, screen-wrap physics, particle explosions, and localStorage high score | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [trivia-sprint](./trivia-sprint/) | Fast-paced trivia game — 10 questions, 10 seconds each, pick category and difficulty, race the clock; live questions from Open Trivia DB with built-in fallback bank, streak badge, time bonus scoring, personal best | Vanilla JS · CSS3 · Open Trivia DB API · ES Modules | ✅ Complete |
+| [decision-wheel](./decision-wheel/) | Colorful spinning decision wheel — type any list of options, spin to pick one with eased physics, tick/ding sound effects, and confetti; elimination mode, saved presets, and spin history via localStorage | Vanilla JS · Canvas 2D · Web Audio API · ES Modules | ✅ Complete |
 
 ## Running a project
 

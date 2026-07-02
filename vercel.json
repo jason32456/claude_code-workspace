@@ -19,6 +19,8 @@
     { "src": "/asteroid-storm/(.*)", "dest": "/asteroid-storm/$1" },
     { "src": "/trivia-sprint/?$", "dest": "/trivia-sprint/index.html" },
     { "src": "/trivia-sprint/(.*)", "dest": "/trivia-sprint/$1" },
+    { "src": "/decision-wheel/?$", "dest": "/decision-wheel/index.html" },
+    { "src": "/decision-wheel/(.*)", "dest": "/decision-wheel/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }
