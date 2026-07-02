@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spin &amp; Decide — Decision Wheel</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>🎡 Spin &amp; Decide</h1>
+      <p class="subtitle">Type your options, spin the wheel, let it decide.</p>
+    </header>
+
+    <main class="layout">
+      <section class="wheel-section">
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheel" width="520" height="520" aria-label="Decision wheel"></canvas>
+        </div>
+        <button id="spinBtn" class="spin-btn">Spin (Space)</button>
+        <label class="elim-toggle">
+          <input type="checkbox" id="eliminationToggle" />
+          Elimination mode — remove winner after each spin
+        </label>
+      </section>
+
+      <section class="controls-section">
+        <div class="panel">
+          <h2>Options</h2>
+          <textarea id="optionsInput" rows="8" placeholder="One option per line&#10;e.g.&#10;Pizza&#10;Sushi&#10;Tacos&#10;Burgers"></textarea>
+          <p class="hint" id="optionCount">0 options</p>
+        </div>
+
+        <div class="panel">
+          <h2>Presets</h2>
+          <div class="preset-row">
+            <select id="presetSelect"><option value="">— Load a preset —</option></select>
+            <button id="loadPresetBtn" class="btn-secondary">Load</button>
+          </div>
+          <div class="preset-row">
+            <input id="presetName" type="text" placeholder="Preset name" />
+            <button id="savePresetBtn" class="btn-secondary">Save</button>
+          </div>
+          <button id="deletePresetBtn" class="btn-danger">Delete selected preset</button>
+        </div>
+
+        <div class="panel">
+          <h2>History</h2>
+          <ul id="historyList" class="history-list"></ul>
+          <button id="clearHistoryBtn" class="btn-secondary">Clear history</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="resultModal" class="modal hidden">
+    <div class="modal-card">
+      <p class="modal-label">The wheel says</p>
+      <p id="resultText" class="modal-result"></p>
+      <button id="closeModalBtn" class="btn-primary">Nice</button>
+    </div>
+  </div>
+
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
