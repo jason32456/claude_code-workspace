@@ -21,6 +21,8 @@
     { "src": "/trivia-sprint/(.*)", "dest": "/trivia-sprint/$1" },
     { "src": "/decision-wheel/?$", "dest": "/decision-wheel/index.html" },
     { "src": "/decision-wheel/(.*)", "dest": "/decision-wheel/$1" },
+    { "src": "/gravitee/?$", "dest": "/gravitee/index.html" },
+    { "src": "/gravitee/(.*)", "dest": "/gravitee/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gravitee</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="stage">
+    <canvas id="game" width="900" height="600"></canvas>
+
+    <div id="hud">
+      <div class="hud-item"><span class="label">Level</span><span id="levelNum">1</span>/<span id="levelTotal">8</span></div>
+      <div class="hud-item"><span class="label">Strokes</span><span id="strokes">0</span></div>
+      <div class="hud-item"><span class="label">Par</span><span id="par">3</span></div>
+      <button id="restartBtn" title="Restart level (R)">&#8635;</button>
+    </div>
+
+    <div id="title" class="overlay">
+      <div class="card">
+        <h1>GRAVI<span class="accent">TEE</span></h1>
+        <p class="tag">Space golf. Gravity bends every shot.</p>
+        <div class="how">
+          <div>Drag back from the ball to aim &amp; set power</div>
+          <div>Release to putt &mdash; planets curve the path</div>
+          <div class="muted">Sink the hole in as few strokes as possible</div>
+          <div class="muted warn">Avoid black holes &mdash; they reset your shot</div>
+        </div>
+        <button id="startBtn">TEE OFF</button>
+        <p class="best" id="bestLine"></p>
+      </div>
+    </div>
+
+    <div id="levelComplete" class="overlay hidden">
+      <div class="card">
+        <h2 id="ratingText">BIRDIE</h2>
+        <p id="levelStrokesLine"></p>
+        <button id="nextBtn">NEXT LEVEL</button>
+      </div>
+    </div>
+
+    <div id="runComplete" class="overlay hidden">
+      <div class="card">
+        <h1>ROUND<span class="accent"> COMPLETE</span></h1>
+        <p id="runSummaryLine"></p>
+        <p class="best" id="runBestLine"></p>
+        <button id="replayBtn">PLAY AGAIN</button>
+      </div>
+    </div>
+
+    <button id="nudgeBtn" class="hidden">Ball stuck? Give it a nudge</button>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
