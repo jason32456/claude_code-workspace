@@ -33,6 +33,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [decision-wheel](./decision-wheel/) | Colorful spinning decision wheel — type any list of options, spin to pick one with eased physics, tick/ding sound effects, and confetti; elimination mode, saved presets, and spin history via localStorage | Vanilla JS · Canvas 2D · Web Audio API · ES Modules | ✅ Complete |
 | [neon-flap](./neon-flap/) | One-button neon arcade flyer — flap a glowing comet through scrolling gates, thread the gap or wipe out; particle trail, screen shake, ramping difficulty, and a localStorage best score | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [gravitee](./gravitee/) | Physics-based space-golf puzzle — drag back to aim, gravity wells bend every shot in flight; slingshot around planets, avoid black holes (instant reset), sink 8 hand-built levels in as few strokes as possible | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
+| [ambient-mix](./ambient-mix/) | Interactive ambient sound mixer — blend 10 pre-loaded sounds with independent volume sliders, save custom mixes to localStorage, and quick-access presets for focus, relax, sleep, and work modes | Vanilla JS · Web Audio API · localStorage | ✅ Complete |
 
 ## Running a project
 

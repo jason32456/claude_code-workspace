@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambient Mix</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 Ambient Mix</h1>
+      <p class="subtitle">Create your perfect soundscape</p>
+    </header>
+
+    <div class="main-content">
+      <div class="left-panel">
+        <section class="sound-library">
+          <h2>Sound Library</h2>
+          <div class="sounds-grid" id="soundsGrid"></div>
+        </section>
+      </div>
+
+      <div class="right-panel">
+        <section class="mixer-section">
+          <div class="mixer-header">
+            <h2>Your Mix</h2>
+            <div class="mixer-controls">
+              <button id="playBtn" class="btn-primary">▶ Play</button>
+              <button id="stopBtn" class="btn-secondary" disabled>⏸ Stop</button>
+            </div>
+          </div>
+
+          <div class="mixer-panel" id="mixerPanel">
+            <p class="empty-state">Drag sounds here to create your mix</p>
+          </div>
+
+          <div class="master-control">
+            <label>Master Volume</label>
+            <div class="slider-container">
+              <input type="range" id="masterVolume" min="0" max="100" value="70">
+              <span id="masterLabel">70%</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <input type="text" id="mixName" placeholder="Mix name..." maxlength="30">
+            <button id="saveMixBtn" class="btn-secondary">💾 Save Mix</button>
+          </div>
+        </section>
+
+        <section class="presets-section">
+          <h2>Saved Mixes</h2>
+          <div id="savedMixes" class="saved-mixes-list">
+            <p class="empty-state">No saved mixes yet</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
