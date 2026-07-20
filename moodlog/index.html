@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoodLog — Daily Mood Journal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">☀️</span>
+        <span class="logo-text">MoodLog</span>
+      </div>
+      <div class="header-date" id="today-date"></div>
+    </header>
+
+    <main class="main">
+
+      <!-- ── Check-in card (shown when today has no entry yet) ── -->
+      <section class="card checkin-card" id="checkin-section">
+        <h2 class="checkin-title">How are you feeling today?</h2>
+        <div class="mood-picker" id="mood-picker" role="group" aria-label="Select your mood"></div>
+        <div class="note-section" id="note-section">
+          <textarea
+            id="note-input"
+            class="note-input"
+            placeholder="Add a note… (optional)"
+            maxlength="280"
+            aria-label="Today's note"
+          ></textarea>
+          <div class="note-footer">
+            <span class="char-count" id="char-count">0 / 280</span>
+            <button class="btn btn-primary" id="save-btn">Save Entry</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Today's logged entry (shown when today already has an entry) ── -->
+      <section class="card entry-summary" id="entry-summary" hidden>
+        <div class="entry-emoji" id="entry-emoji"></div>
+        <div class="entry-details">
+          <div class="entry-label-row">
+            <span class="entry-mood-label" id="entry-mood-label"></span>
+            <span class="entry-badge">Today</span>
+          </div>
+          <p class="entry-note" id="entry-note"></p>
+        </div>
+        <button class="btn btn-ghost" id="edit-btn" aria-label="Edit today's entry">Edit</button>
+      </section>
+
+      <!-- ── Stats row ── -->
+      <section class="stats-row">
+        <div class="stat">
+          <div class="stat-value" id="streak-val">—</div>
+          <div class="stat-label">day streak 🔥</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-value" id="best-streak-val">—</div>
+          <div class="stat-label">best streak</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-value" id="top-mood-val">—</div>
+          <div class="stat-label">top mood</div>
+        </div>
+      </section>
+
+      <!-- ── Calendar ── -->
+      <section class="card calendar-card">
+        <div class="calendar-nav">
+          <button class="cal-nav-btn" id="prev-month" aria-label="Previous month">‹</button>
+          <h3 class="cal-month-title" id="cal-title"></h3>
+          <button class="cal-nav-btn" id="next-month" aria-label="Next month">›</button>
+        </div>
+        <div class="weekday-labels" aria-hidden="true">
+          <span>Sun</span><span>Mon</span><span>Tue</span>
+          <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </section>
+
+      <!-- ── Legend ── -->
+      <div class="legend" id="legend" aria-label="Mood legend"></div>
+
+    </main>
+
+    <!-- Tooltip (portal-style, positioned by JS) -->
+    <div class="day-tooltip" id="day-tooltip" role="tooltip" hidden></div>
+
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
