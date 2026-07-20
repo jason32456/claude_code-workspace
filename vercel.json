@@ -23,6 +23,8 @@
     { "src": "/decision-wheel/(.*)", "dest": "/decision-wheel/$1" },
     { "src": "/gravitee/?$", "dest": "/gravitee/index.html" },
     { "src": "/gravitee/(.*)", "dest": "/gravitee/$1" },
+    { "src": "/sonar/?$", "dest": "/sonar/index.html" },
+    { "src": "/sonar/(.*)", "dest": "/sonar/$1" },
     { "src": "/(.*)", "dest": "/particle-life/$1" }
   ]
 }

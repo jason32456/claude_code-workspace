@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SONAR — Echoes in the Dark</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <span id="hearts"></span>
+    </div>
+    <div class="hud-center">
+      <span id="level-label">DEPTH 1</span>
+      <span id="shard-label">◆ 0/3</span>
+    </div>
+    <div class="hud-right">
+      <span id="score-label">0</span>
+      <div id="ping-meter"><div id="ping-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div class="panel" id="title-panel">
+      <h1>SONAR</h1>
+      <p class="subtitle">echoes in the dark</p>
+      <p class="body">
+        You are blind. <span class="cyan">Ping</span> to see — but everything
+        that hears you will come looking.<br />
+        Collect every <span class="teal">◆ shard</span>, then escape through the
+        <span class="gold">exit gate</span>.
+      </p>
+      <p class="keys">
+        <kbd>WASD</kbd>/<kbd>↑↓←→</kbd> move &nbsp;·&nbsp; <kbd>Space</kbd> ping
+      </p>
+      <p class="prompt">press <kbd>Space</kbd> to descend</p>
+    </div>
+    <div class="panel hidden" id="clear-panel">
+      <h1 class="gold">DEPTH CLEARED</h1>
+      <p class="body" id="clear-stats"></p>
+      <p class="prompt">press <kbd>Space</kbd> to descend deeper</p>
+    </div>
+    <div class="panel hidden" id="over-panel">
+      <h1 class="red">CONSUMED</h1>
+      <p class="body" id="over-stats"></p>
+      <p class="prompt">press <kbd>Space</kbd> to try again</p>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
