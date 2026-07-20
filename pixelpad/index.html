@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pixelpad — tiny pixel art editor</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='1' y='1' width='6' height='6' fill='%23e43b44'/><rect x='9' y='1' width='6' height='6' fill='%23feae34'/><rect x='1' y='9' width='6' height='6' fill='%230099db'/><rect x='9' y='9' width='6' height='6' fill='%2363c74d'/></svg>" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <h1>pixelpad</h1>
+    </div>
+    <div class="topbar-controls">
+      <label class="control">
+        <span>Canvas</span>
+        <select id="size-select">
+          <option value="16">16 × 16</option>
+          <option value="32" selected>32 × 32</option>
+          <option value="64">64 × 64</option>
+        </select>
+      </label>
+      <button id="grid-toggle" class="chip" aria-pressed="true" title="Toggle grid lines">Grid</button>
+      <div class="divider"></div>
+      <button id="undo-btn" class="chip" title="Undo (Ctrl+Z)">↩ Undo</button>
+      <button id="redo-btn" class="chip" title="Redo (Ctrl+Y)">↪ Redo</button>
+      <div class="divider"></div>
+      <label class="control">
+        <span>Export</span>
+        <select id="export-scale">
+          <option value="1">1×</option>
+          <option value="4">4×</option>
+          <option value="8" selected>8×</option>
+          <option value="16">16×</option>
+          <option value="32">32×</option>
+        </select>
+      </label>
+      <button id="export-btn" class="chip chip-accent" title="Download as PNG">Export PNG</button>
+      <button id="clear-btn" class="chip chip-danger" title="Clear canvas">Clear</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="toolbar" role="toolbar" aria-label="Drawing tools">
+      <button class="tool" data-tool="pencil" aria-pressed="true" title="Pencil (B)">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        <span>B</span>
+      </button>
+      <button class="tool" data-tool="eraser" title="Eraser (E)">
+        <svg viewBox="0 0 24 24"><path d="M16.24 3.56l4.2 4.2a2 2 0 0 1 0 2.83l-9.9 9.9H4.9l-2.12-2.12a2 2 0 0 1 0-2.83l10.6-10.6a2 2 0 0 1 2.86.62zM5.9 13.16l-1.7 1.7 1.54 1.54h2.34l1.06-1.06-3.24-2.18z"/><rect x="13" y="18.5" width="9" height="2"/></svg>
+        <span>E</span>
+      </button>
+      <button class="tool" data-tool="fill" title="Fill (G)">
+        <svg viewBox="0 0 24 24"><path d="M19 11l-8-8-1.4 1.4 2.1 2.1-5.2 5.2a1.5 1.5 0 0 0 0 2.1l4.6 4.6a1.5 1.5 0 0 0 2.1 0L19 11zm-10.9 1.6L12.7 8l4.2 4.2H8.1zM20.5 15s-1.5 2.2-1.5 3.4a1.5 1.5 0 0 0 3 0c0-1.2-1.5-3.4-1.5-3.4z"/></svg>
+        <span>G</span>
+      </button>
+      <button class="tool" data-tool="eyedropper" title="Eyedropper (I) — or right-click canvas">
+        <svg viewBox="0 0 24 24"><path d="M20.71 5.63l-2.34-2.34a1 1 0 0 0-1.41 0l-2.68 2.68-1.42-1.42-1.41 1.42 1.06 1.06-8.08 8.08a1 1 0 0 0-.29.7V19a1 1 0 0 0 1 1h3.19a1 1 0 0 0 .7-.29l8.09-8.09 1.06 1.06 1.41-1.41-1.41-1.42 2.53-2.81a1 1 0 0 0 0-1.41zM8.9 18H6v-2.9l7.95-7.95 2.9 2.9L8.9 18z"/></svg>
+        <span>I</span>
+      </button>
+      <div class="tool-sep"></div>
+      <button class="tool" id="mirror-toggle" aria-pressed="false" title="Mirror X (M)">
+        <svg viewBox="0 0 24 24"><path d="M11 2h2v20h-2zM3 6l5 6-5 6V6zm18 0v12l-5-6 5-6z"/></svg>
+        <span>M</span>
+      </button>
+    </aside>
+
+    <section class="stage">
+      <div class="canvas-frame" id="canvas-frame">
+        <canvas id="art-canvas"></canvas>
+        <canvas id="grid-canvas"></canvas>
+      </div>
+      <p class="hint">Draw with click &amp; drag · right-click picks a color · <kbd>M</kbd> for mirror mode</p>
+    </section>
+
+    <aside class="palette-panel">
+      <h2>Palette</h2>
+      <div id="palette" class="swatch-grid"></div>
+      <h2>Custom</h2>
+      <div class="custom-row">
+        <label class="picker-wrap" title="Pick a custom color">
+          <input type="color" id="color-picker" value="#e43b44" />
+        </label>
+        <div id="active-swatch" class="active-swatch" title="Active color"></div>
+      </div>
+      <div id="recent-colors" class="swatch-grid swatch-grid-small"></div>
+    </aside>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
