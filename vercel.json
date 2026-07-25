@@ -106,6 +106,14 @@
       "dest": "/pixelpad/$1"
     },
     {
+      "src": "/snapframe/?$",
+      "dest": "/snapframe/index.html"
+    },
+    {
+      "src": "/snapframe/(.*)",
+      "dest": "/snapframe/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/particle-life/$1"
     }

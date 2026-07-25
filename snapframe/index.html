@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SnapFrame — make screenshots look good</title>
+    <meta
+      name="description"
+      content="Paste a screenshot, wrap it in a gradient background, shadow and window frame, export a PNG. Runs entirely in your browser."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237f5af0'/><rect x='8' y='9' width='16' height='14' rx='3' fill='%23fff'/></svg>"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <h1>SnapFrame</h1>
+          <p>Paste a screenshot. Get something postable.</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="open-btn" class="btn">Open image</button>
+        <button id="demo-btn" class="btn">Demo shot</button>
+        <select id="scale" class="select" aria-label="Export scale">
+          <option value="1">1×</option>
+          <option value="2" selected>2×</option>
+        </select>
+        <button id="copy-btn" class="btn">Copy</button>
+        <button id="download-btn" class="btn btn-primary">Download PNG</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section id="stage" class="stage">
+        <canvas id="preview" class="preview" aria-label="Framed screenshot preview"></canvas>
+        <div id="empty" class="empty">
+          <div class="empty-icon" aria-hidden="true"></div>
+          <h2>Drop a screenshot here</h2>
+          <p>
+            or press <kbd>⌘</kbd><kbd>V</kbd> to paste · <button id="empty-open" class="link">open a
+            file</button> · <button id="empty-demo" class="link">try the demo shot</button>
+          </p>
+        </div>
+        <div id="dropzone" class="dropzone"><span>Drop to frame it</span></div>
+        <p class="stage-meta"><span id="size-label">No image loaded</span></p>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Background</h2>
+          <button id="random-btn" class="chip" title="Randomize (R)">Randomize</button>
+        </div>
+        <div class="seg" role="tablist" id="bg-mode">
+          <button class="seg-btn is-active" data-mode="gradient">Gradient</button>
+          <button class="seg-btn" data-mode="solid">Solid</button>
+          <button class="seg-btn" data-mode="transparent">None</button>
+        </div>
+
+        <div id="gradient-group">
+          <div class="swatches" id="swatches"></div>
+          <label class="field">
+            <span>Angle <em id="angle-val">135°</em></span>
+            <input type="range" id="angle" min="0" max="360" step="1" value="135" />
+          </label>
+        </div>
+
+        <label class="field" id="solid-group" hidden>
+          <span>Colour</span>
+          <input type="color" id="solid" value="#1e293b" class="color" />
+        </label>
+
+        <h2 class="panel-head">Frame</h2>
+        <label class="field">
+          <span>Padding <em id="padding-val">12%</em></span>
+          <input type="range" id="padding" min="0" max="30" step="1" value="12" />
+        </label>
+        <label class="field">
+          <span>Corner radius <em id="radius-val">16px</em></span>
+          <input type="range" id="radius" min="0" max="48" step="1" value="16" />
+        </label>
+        <label class="field">
+          <span>Shadow <em id="shadow-val">45</em></span>
+          <input type="range" id="shadow" min="0" max="100" step="1" value="45" />
+        </label>
+        <label class="field">
+          <span>Tilt <em id="tilt-val">0°</em></span>
+          <input type="range" id="tilt" min="-12" max="12" step="1" value="0" />
+        </label>
+        <label class="check">
+          <input type="checkbox" id="border" checked />
+          <span>Inset border</span>
+        </label>
+
+        <h2 class="panel-head">Window</h2>
+        <div class="seg" id="frame-mode"></div>
+
+        <h2 class="panel-head">Canvas ratio</h2>
+        <div class="seg seg-wrap" id="ratio-mode"></div>
+
+        <button id="reset-btn" class="btn btn-ghost">Reset all</button>
+        <p class="note">Nothing is uploaded — every pixel is rendered in this tab.</p>
+      </aside>
+    </main>
+
+    <input type="file" id="file-input" accept="image/*" hidden />
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
