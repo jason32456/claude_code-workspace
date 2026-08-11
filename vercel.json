@@ -130,6 +130,14 @@
       "dest": "/afterimage/$1"
     },
     {
+      "src": "/windward/?$",
+      "dest": "/windward/index.html"
+    },
+    {
+      "src": "/windward/(.*)",
+      "dest": "/windward/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/particle-life/$1"
     }

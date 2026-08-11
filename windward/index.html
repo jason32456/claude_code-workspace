@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WINDWARD — there is no throttle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<!-- ── In-race instruments ─────────────────────────────────────────────── -->
+<div id="hud" class="hidden">
+
+  <div id="hud-tl" class="panel">
+    <div class="row">
+      <div class="stat big">
+        <span id="speed-val">0.0</span><em>kn</em>
+      </div>
+      <div class="stat">
+        <span id="wind-val">0</span><em>kn wind</em>
+      </div>
+      <div class="stat">
+        <span id="heel-val">0°</span><em>heel</em>
+      </div>
+    </div>
+    <div id="pos-label">CLOSE HAULED</div>
+    <div id="stamina"><i id="stamina-fill"></i><b>HIKE</b></div>
+  </div>
+
+  <div id="hud-tr" class="panel">
+    <div class="race-row"><span>LAP</span><b id="lap-val">1/3</b></div>
+    <div class="race-row"><span>PLACE</span><b id="place-val">1/4</b></div>
+    <div class="race-row"><span>TIME</span><b id="time-val">0:00.0</b></div>
+    <div class="race-row dim"><span>BEST</span><b id="best-val">--:--.-</b></div>
+    <div class="race-row next"><span>NEXT</span><b id="mark-val">WINDWARD 0m</b></div>
+    <canvas id="minimap"></canvas>
+  </div>
+
+  <div id="hud-bl">
+    <div class="panel dial">
+      <canvas id="compass"></canvas>
+      <div class="cap">WIND</div>
+    </div>
+    <div class="panel dial wide">
+      <canvas id="trim-dial"></canvas>
+      <div class="cap">SHEET · <span id="assist">AUTO</span></div>
+    </div>
+  </div>
+
+  <div id="gust"></div>
+  <div id="msg"></div>
+
+  <div id="keys">
+    <span><b>A</b>/<b>D</b> helm</span>
+    <span><b>W</b>/<b>S</b> sheet</span>
+    <span><b>SPACE</b> hike</span>
+    <span><b>T</b> auto-trim</span>
+    <span><b>C</b> camera</span>
+    <span><b>R</b> restart</span>
+  </div>
+</div>
+
+<!-- ── Title ───────────────────────────────────────────────────────────── -->
+<div id="menu" class="overlay">
+  <div class="sheet">
+    <div class="brand">
+      <h1>WIND<span>WARD</span></h1>
+      <p class="tag">There is no throttle. You steer, you trim — the wind decides.</p>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <h3>You cannot sail at it</h3>
+        <p>A 36° cone dead upwind makes no drive at all. The mark is <em>inside</em>
+           that cone. Zig-zag across the wind and pick the side that pays.</p>
+      </div>
+      <div class="col">
+        <h3>Trim or crawl</h3>
+        <p>Angle of attack peaks 20° off the sail. Hold the green band on the
+           sheet gauge — every turn changes where that band sits.</p>
+      </div>
+      <div class="col">
+        <h3>Read the water</h3>
+        <p>Dark ruffled patches are more breeze, and they drift. Sailing to a
+           gust beats sailing straight. Glassy patches are holes — avoid them.</p>
+      </div>
+    </div>
+
+    <div class="keyrow">
+      <span><b>A</b> <b>D</b> helm</span>
+      <span><b>W</b> <b>S</b> sheet in / out</span>
+      <span><b>SPACE</b> hike out</span>
+      <span><b>T</b> auto-trim</span>
+      <span><b>C</b> camera</span>
+      <span><b>M</b> sound</span>
+    </div>
+
+    <button id="btn-start" class="btn">START THE RACE</button>
+    <p class="foot">3 laps · windward, wing, leeward · 3 rivals sailing the same physics you are</p>
+  </div>
+</div>
+
+<!-- ── Pause ───────────────────────────────────────────────────────────── -->
+<div id="pause" class="overlay hidden">
+  <div class="sheet small">
+    <h2>PAUSED</h2>
+    <button id="btn-resume" class="btn">Resume</button>
+    <button id="btn-restart" class="btn ghost">Restart race</button>
+    <button id="btn-quit" class="btn ghost">Back to title</button>
+  </div>
+</div>
+
+<!-- ── Results ─────────────────────────────────────────────────────────── -->
+<div id="results" class="overlay hidden">
+  <div class="sheet small">
+    <div id="result-place">1st</div>
+    <div id="result-time">0:00.0</div>
+    <div id="result-flag"></div>
+    <div class="split">
+      <ul id="result-laps"></ul>
+      <ul id="result-fleet"></ul>
+    </div>
+    <div class="race-row dim"><span>PERSONAL BEST</span><b id="result-best">--:--.-</b></div>
+    <button id="btn-again" class="btn">Race again</button>
+    <button id="btn-menu" class="btn ghost">Title</button>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

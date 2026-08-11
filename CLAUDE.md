@@ -74,6 +74,7 @@ ES modules require an HTTP server — `file://` URLs will not work.
 | `finance-dashboard` | Next.js 14 + TypeScript + Prisma + Auth.js (explicit-PRD build tooling) | `cd finance-dashboard && npm install && npm run db:push && npm run dev` |
 | `pulse` | Vanilla JS + Web Audio API | `cd pulse && python -m http.server 8080` |
 | `afterimage` | Three.js + Vanilla JS (vendored, no build) | `cd afterimage && python -m http.server 8080` |
+| `windward` | Three.js + Vanilla JS + GLSL (vendored, no build) | `cd windward && python -m http.server 8080` |
 
 ## Conventions
 
