@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIGHTSIDE — defend a planet that keeps turning</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<!-- ── Top status strip ──────────────────────────────────────────────── -->
+<header id="topbar" class="hidden">
+  <div class="pod">
+    <span class="glyph alloy">◈</span>
+    <div class="col">
+      <b id="alloy-val">0</b>
+      <em>ALLOY <i id="alloy-rate">+0.0/s</i></em>
+    </div>
+  </div>
+
+  <div class="pod wide">
+    <span class="glyph power">⚡</span>
+    <div class="col grow">
+      <div class="bar power"><i id="power-fill"></i><u id="power-ghost"></u></div>
+      <em><b id="power-val">0</b> / <span id="power-cap">0</span> PW
+        · <i id="power-flow" class="flow">+0.0</i> PW/s</em>
+    </div>
+  </div>
+
+  <div class="pod wide">
+    <span class="glyph core">◉</span>
+    <div class="col grow">
+      <div class="bar core"><i id="core-fill"></i></div>
+      <em>CORE INTEGRITY <b id="core-val">100</b>%</em>
+    </div>
+  </div>
+
+  <div class="pod">
+    <div class="col">
+      <b id="wave-val">1 / 12</b>
+      <em id="wave-state">BUILD PHASE</em>
+    </div>
+  </div>
+
+  <div class="pod">
+    <div class="col">
+      <b id="timer-val">0:45</b>
+      <em id="timer-label">UNTIL DROP</em>
+    </div>
+  </div>
+
+  <button id="call-wave" class="ghost-btn">CALL WAVE <kbd>space</kbd></button>
+  <button id="pause-btn" class="ghost-btn small" title="Pause (P)">❚❚</button>
+  <button id="mute-btn" class="ghost-btn small" title="Mute (M)">♪</button>
+  <button id="help-btn" class="ghost-btn small" title="How to play">?</button>
+</header>
+
+<!-- ── Build bar ─────────────────────────────────────────────────────── -->
+<nav id="buildbar" class="hidden"></nav>
+
+<!-- ── Selection inspector ───────────────────────────────────────────── -->
+<aside id="inspector" class="hidden">
+  <h3 id="insp-title">—</h3>
+  <p id="insp-sub" class="sub"></p>
+  <dl id="insp-stats"></dl>
+  <div class="row">
+    <button id="btn-upgrade" class="act">UPGRADE <kbd>U</kbd></button>
+    <button id="btn-sell" class="act danger">SELL <kbd>X</kbd></button>
+  </div>
+</aside>
+
+<!-- ── Surface map ───────────────────────────────────────────────────── -->
+<section id="mapbox" class="hidden">
+  <canvas id="minimap" width="304" height="152"></canvas>
+  <div class="legend">
+    <span><i class="dot vent"></i>vent</span>
+    <span><i class="dot bld"></i>yours</span>
+    <span><i class="dot foe"></i>blight</span>
+    <span><i class="dot view"></i>view</span>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<!-- ── Overlays ──────────────────────────────────────────────────────── -->
+<div id="overlay">
+  <div class="card" id="title-card">
+    <h1>NIGHT<span>SIDE</span></h1>
+    <p class="tag">A tower defense on a turning planet. Your guns run on sunlight.
+      The Blight only ever lands in the dark.</p>
+    <ul class="brief">
+      <li><b>Sun sweeps, grid sags.</b> Solar arrays only pay out on the lit
+        half, and adjacent arrays boost each other — so a farm is a
+        <i>place</i>, and the terminator will leave it. Capacitors carry that
+        charge into the night.</li>
+      <li><b>Every tile is a frontier.</b> Pods drop on the night side, then
+        walk to the nearest Core Vent. There is no back row on a sphere.</li>
+      <li><b>Mortars need no power</b> — but they cannot touch a flyer.
+        Lasers can, until the grid browns out. Build both.</li>
+    </ul>
+    <button id="start-btn" class="primary">LAUNCH DEFENCE GRID</button>
+    <p class="foot">drag to orbit · wheel to zoom · <kbd>1</kbd>–<kbd>7</kbd> build ·
+      <kbd>space</kbd> call wave early for bonus alloy</p>
+  </div>
+
+  <div class="card hidden" id="end-card">
+    <h1 id="end-title">GRID LOST</h1>
+    <p id="end-sub" class="tag"></p>
+    <dl id="end-stats"></dl>
+    <button id="again-btn" class="primary">NEW PLANET</button>
+  </div>
+</div>
+
+<div id="help" class="hidden">
+  <h3>HOW TO PLAY</h3>
+  <p><b>Goal</b> — survive 12 waves. Three Core Vents share one integrity pool;
+    anything that reaches a vent takes a bite out of it.</p>
+  <p><b>Power</b> — Solar Arrays produce only in daylight (<i>the sun sweeps
+    right across your base every 2 minutes</i>), and each array touching
+    another gains <i>+22%</i>. Clustering pays more but goes dark all at once;
+    scattering is steady but weak. Capacitors store the surplus. When demand
+    outruns supply your turrets slow down instead of dying — watch the power
+    bar turn amber.</p>
+  <p><b>Alloy</b> — Extractors sit on glowing ferrite seams only. Kills pay too.</p>
+  <p><b>Threats</b> — Crawlers rush, Husks soak (armour halves beam damage),
+    Drifters <i>fly</i> over your walls and mortars, Spitters stop to shell your
+    buildings. Wave 12 brings a Leviathan.</p>
+  <p><b>Keys</b> — <kbd>1</kbd>–<kbd>7</kbd> pick a structure, click a tile to
+    place, <kbd>U</kbd> upgrade, <kbd>X</kbd> sell, <kbd>space</kbd> call the
+    next wave early, <kbd>P</kbd> pause, <kbd>M</kbd> mute,
+    <kbd>Shift</kbd>+<kbd>R</kbd> new planet.</p>
+  <button id="help-close" class="primary">GOT IT</button>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

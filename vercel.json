@@ -138,6 +138,14 @@
       "dest": "/windward/$1"
     },
     {
+      "src": "/nightside/?$",
+      "dest": "/nightside/index.html"
+    },
+    {
+      "src": "/nightside/(.*)",
+      "dest": "/nightside/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/particle-life/$1"
     }

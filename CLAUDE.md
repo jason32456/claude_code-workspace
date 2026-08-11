@@ -75,6 +75,7 @@ ES modules require an HTTP server — `file://` URLs will not work.
 | `pulse` | Vanilla JS + Web Audio API | `cd pulse && python -m http.server 8080` |
 | `afterimage` | Three.js + Vanilla JS (vendored, no build) | `cd afterimage && python -m http.server 8080` |
 | `windward` | Three.js + Vanilla JS + GLSL (vendored, no build) | `cd windward && python -m http.server 8080` |
+| `nightside` | Three.js + Vanilla JS (vendored, no build) | `cd nightside && python -m http.server 8080` |
 
 ## Conventions
 
