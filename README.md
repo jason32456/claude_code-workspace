@@ -39,6 +39,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [moodlog](./moodlog/) | Daily mood journal — pick one of 8 emoji moods, add an optional note, and watch your emotional patterns emerge as a color-coded monthly calendar heatmap; streak tracking, top-mood stat, zero sign-up | Vanilla JS · CSS3 · localStorage · ES Modules | ✅ Complete |
 | [pulse](./pulse/) | Synthesized browser groovebox — a 16-step sequencer that ships zero audio files: every kick, hat, clap and bassline is built from oscillators and noise, so every voice is editable, it loads instantly offline, and the loop renders to a real 16-bit WAV. Scale-locked note roll, per-step velocity and probability, pattern chaining, Euclidean fills, genre generator, and shareable-link sessions | Vanilla JS · Web Audio API · ES Modules | ✅ Complete |
 | [snapframe](./snapframe/) | Screenshot beautifier — paste or drop a screenshot, wrap it in a gradient background with padding, rounded corners, shadow, tilt and a macOS/dark window bar, then export a PNG at 1×/2× or copy it to the clipboard; fully client-side | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
+| [afterimage](./afterimage/) | 3D time-loop puzzle-platformer — every attempt you make stays in the room as a solid, replaying ghost of yourself; stand on your past selves, let them hold pressure plates and flip switches, and solve six chambers under par | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 
 ## Running a project
 

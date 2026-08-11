@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFTERIMAGE — a time-loop puzzle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div id="flash"></div>
+
+<!-- ── In-game HUD ─────────────────────────────────────────────────────── -->
+<div id="hud" class="hidden">
+  <div id="hud-top">
+    <div id="level-tag"><span id="level-num">01</span><span id="level-name">First Light</span></div>
+    <div id="crystals">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M12 2 L20 12 L12 22 L4 12 Z"/></svg>
+      <span id="crystal-count">0/2</span>
+    </div>
+  </div>
+
+  <div id="hud-right">
+    <div id="echo-block">
+      <div class="lbl">ECHOES</div>
+      <div id="echo-pips"></div>
+      <div id="par-note">par 1</div>
+    </div>
+  </div>
+
+  <div id="hud-bottom">
+    <svg id="loop-ring" viewBox="0 0 100 100">
+      <circle class="ring-bg" cx="50" cy="50" r="42"/>
+      <circle id="ring-fill" cx="50" cy="50" r="42"/>
+    </svg>
+    <div id="loop-time">14.0</div>
+  </div>
+
+  <div id="hint"></div>
+  <div id="toast"></div>
+
+  <div id="keys">
+    <span><b>WASD</b> move</span><span><b>SPACE</b> jump</span><span><b>E</b> use</span>
+    <span><b>R</b> rewind</span><span><b>Q</b> retry</span><span><b>Z</b> undo echo</span><span><b>ESC</b> menu</span>
+  </div>
+</div>
+
+<!-- ── Title / level select ────────────────────────────────────────────── -->
+<div id="menu" class="overlay">
+  <div class="panel">
+    <h1>AFTER<span>IMAGE</span></h1>
+    <p class="tag">Every attempt you make stays in the room. Solve it with your own ghosts.</p>
+
+    <div id="level-grid"></div>
+
+    <div class="how">
+      <div class="how-col">
+        <h3>The loop</h3>
+        <p>Each chamber runs on a timer. Press <b>R</b> and time rewinds — your last take
+           replays forever as a solid <em>echo</em> of you.</p>
+      </div>
+      <div class="how-col">
+        <h3>Echoes are solid</h3>
+        <p>Stand on them. Let them hold a pressure plate. Let them flip a switch while
+           you are on the far side of a door.</p>
+      </div>
+      <div class="how-col">
+        <h3>Goal</h3>
+        <p>Every crystal collected in a single timeline arms the exit pad. Fewer echoes
+           than par is the real win.</p>
+      </div>
+    </div>
+    <div class="foot">Mouse to look · click the canvas to lock the cursor</div>
+  </div>
+</div>
+
+<!-- ── Pause ───────────────────────────────────────────────────────────── -->
+<div id="pause" class="overlay hidden">
+  <div class="panel small">
+    <h2>PAUSED</h2>
+    <button id="btn-resume" class="btn">Resume</button>
+    <button id="btn-restart" class="btn ghost">Restart level</button>
+    <button id="btn-quit" class="btn ghost">Level select</button>
+  </div>
+</div>
+
+<!-- ── Win ─────────────────────────────────────────────────────────────── -->
+<div id="win" class="overlay hidden">
+  <div class="panel small">
+    <h2>CHAMBER CLEARED</h2>
+    <div id="win-stats"></div>
+    <button id="btn-next" class="btn">Next chamber</button>
+    <button id="btn-replay" class="btn ghost">Replay</button>
+    <button id="btn-menu" class="btn ghost">Level select</button>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

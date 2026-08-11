@@ -122,6 +122,14 @@
       "dest": "/pulse/$1"
     },
     {
+      "src": "/afterimage/?$",
+      "dest": "/afterimage/index.html"
+    },
+    {
+      "src": "/afterimage/(.*)",
+      "dest": "/afterimage/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/particle-life/$1"
     }
