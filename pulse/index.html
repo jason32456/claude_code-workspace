@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PULSE — synthesized browser groovebox</title>
+<meta name="description" content="A 16-step groovebox with zero audio files. Every drum and bassline is synthesized live in the Web Audio graph, and exports to a real WAV." />
+<link rel="stylesheet" href="style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0d12'/><rect x='5' y='13' width='4' height='6' rx='1.5' fill='%23ff8a3d'/><rect x='12' y='8' width='4' height='16' rx='1.5' fill='%23ffc46b'/><rect x='19' y='11' width='4' height='10' rx='1.5' fill='%2338d6c4'/><rect x='26' y='14' width='3' height='4' rx='1.5' fill='%237b8cff'/></svg>" />
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <div class="brand-text">
+        <h1>PULSE</h1>
+        <span class="tag">synthesized groovebox · no samples</span>
+      </div>
+    </div>
+
+    <div class="group transport">
+      <button id="btn-play" class="play" aria-label="Play" title="Play / stop (Space)">
+        <span class="icon-play"></span>
+        <span class="icon-stop"></span>
+      </button>
+      <div class="pos" id="pos">–</div>
+    </div>
+
+    <div class="group">
+      <label class="field">
+        <span>BPM</span>
+        <input id="bpm" type="number" min="60" max="200" step="1" />
+      </label>
+      <label class="field wide">
+        <span>Swing <em id="swing-val">0%</em></span>
+        <input id="swing" type="range" min="0" max="0.65" step="0.01" />
+      </label>
+    </div>
+
+    <div class="group">
+      <label class="field">
+        <span>Key</span>
+        <select id="root" title="Root note"></select>
+      </label>
+      <label class="field">
+        <span>Scale</span>
+        <select id="scale" title="Scale used by the note roll"></select>
+      </label>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="group">
+      <label class="field">
+        <span>Kit</span>
+        <select id="kit" title="Swap every voice's parameters"></select>
+      </label>
+      <label class="field">
+        <span>Genre</span>
+        <select id="genre" title="Style used by the generator (K to cycle)"></select>
+      </label>
+      <button id="btn-gen" class="btn accent" title="Roll a new pattern (G)">Generate</button>
+    </div>
+
+    <div class="group">
+      <button id="btn-export" class="btn primary" title="Render offline and download a 16-bit WAV">Export WAV</button>
+      <button id="btn-share" class="btn" title="Copy a link containing this whole session">Share</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="sequencer">
+
+      <div class="patternbar">
+        <span class="lbl">Pattern</span>
+        <div id="pattern-slots" class="slots"></div>
+        <button id="btn-copy" class="btn tiny-btn" title="Copy this pattern into the next slot">Copy →</button>
+        <button id="btn-clear" class="btn tiny-btn" title="Clear this pattern">Clear</button>
+        <span class="divider"></span>
+        <button id="btn-song" class="btn tiny-btn" title="Play the chain below instead of a single pattern">Song</button>
+        <div id="song-chain" class="chain"></div>
+      </div>
+
+      <div class="lane ruler" id="ruler"></div>
+      <div class="grid" id="drumgrid"></div>
+
+      <div class="roll-header">
+        <div id="roll-tabs" class="tabs"></div>
+        <span class="hint">click a cell to place a note · notes are locked to the scale</span>
+      </div>
+      <div class="grid roll" id="roll"></div>
+
+    </section>
+
+    <aside class="inspector" id="inspector"></aside>
+  </main>
+
+  <footer class="statusbar">
+    <span id="status"></span>
+    <span class="shortcuts">
+      <kbd>Space</kbd> play · <kbd>1</kbd>–<kbd>4</kbd> pattern · <kbd>G</kbd> generate ·
+      <kbd>K</kbd> genre · <kbd>right-click</kbd> accent · <kbd>alt-click</kbd> probability
+    </span>
+  </footer>
+
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -283,6 +283,21 @@ export const projects = [
     screenshots: ['early', 'settled'].map((f) => shot('cocktail-finder', `${f}.png`)),
   },
   {
+    slug: 'pulse',
+    name: 'PULSE',
+    tagline: 'Synthesized groovebox — no samples',
+    description:
+      'A 16-step groovebox that ships zero audio files. Every kick, hat, clap and bassline is synthesized live in the Web Audio graph, so every voice is editable and the whole instrument loads instantly and works offline. Lookahead scheduling keeps the timing rock solid, patterns chain into songs, and the loop renders offline to a real 16-bit WAV.',
+    stack: ['Vanilla JS', 'Web Audio API', 'ES Modules'],
+    category: 'Tools',
+    status: 'complete',
+    runType: 'static',
+    launchable: true,
+    runCommand: 'cd pulse && python -m http.server 8080',
+    sourceHref: '../pulse/',
+    screenshots: ['pattern', 'playing'].map((f) => shot('pulse', `${f}.png`)),
+  },
+  {
     slug: 'finance-dashboard',
     name: 'Finance Dashboard',
     tagline: 'Personal finance, full-stack',

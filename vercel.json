@@ -114,6 +114,14 @@
       "dest": "/snapframe/$1"
     },
     {
+      "src": "/pulse/?$",
+      "dest": "/pulse/index.html"
+    },
+    {
+      "src": "/pulse/(.*)",
+      "dest": "/pulse/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/particle-life/$1"
     }
