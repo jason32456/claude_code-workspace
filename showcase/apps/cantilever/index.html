@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cantilever — build it, then drive across it</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <div class="brand">
+        <span class="brand-mark">◺</span>
+        <span class="brand-name">CANTILEVER</span>
+      </div>
+
+      <button class="chip" id="levels-btn" type="button" aria-haspopup="dialog">
+        <span id="level-label">1 · First Crossing</span>
+        <span class="caret">▾</span>
+      </button>
+
+      <div class="budget" id="budget">
+        <div class="budget-bar"><span id="budget-fill"></span></div>
+        <div class="budget-text"><b id="spent">0</b> / <span id="budget-total">0</span></div>
+      </div>
+
+      <div class="tools" id="tools" role="group" aria-label="Materials"></div>
+
+      <div class="actions">
+        <button class="btn ghost" id="undo" type="button" title="Undo (Ctrl+Z)">↶</button>
+        <button class="btn ghost" id="redo" type="button" title="Redo (Ctrl+Shift+Z)">↷</button>
+        <button class="btn ghost" id="clear" type="button" title="Clear all members">Clear</button>
+        <button class="btn primary" id="test" type="button">▶ Test</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <canvas id="canvas"></canvas>
+
+      <div class="hint" id="hint"></div>
+
+      <div class="readout" id="readout" hidden>
+        <div class="readout-row">
+          <span class="readout-label">Peak load</span>
+          <span class="readout-value" id="peak">—</span>
+        </div>
+        <div class="meter"><span id="peak-fill"></span></div>
+        <div class="readout-row">
+          <span class="readout-label">Broken</span>
+          <span class="readout-value" id="breaks">0</span>
+        </div>
+      </div>
+
+      <div class="banner" id="banner" hidden>
+        <div class="banner-title" id="banner-title"></div>
+        <div class="banner-sub" id="banner-sub"></div>
+        <div class="banner-actions">
+          <button class="btn ghost" id="banner-retry" type="button">Back to build</button>
+          <button class="btn primary" id="banner-next" type="button">Next level</button>
+        </div>
+      </div>
+
+      <div class="panel" id="panel" hidden role="dialog" aria-label="Level select">
+        <div class="panel-head">
+          <h2>Levels</h2>
+          <button class="btn ghost" id="panel-close" type="button">✕</button>
+        </div>
+        <div class="panel-list" id="panel-list"></div>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <span><b>Drag</b> between joints to place · <b>1/2/3</b> material · <b>E</b> erase · <b>Ctrl+Z</b> undo · <b>Space</b> test</span>
+    </footer>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
