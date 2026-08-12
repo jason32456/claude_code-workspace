@@ -26,7 +26,7 @@ export function createCard(project, onOpen) {
     .join('');
 
   const action = project.launchable
-    ? `<a class="btn btn-launch" href="${project.sourceHref}" target="_blank" rel="noopener">▶ Launch</a>`
+    ? `<a class="btn btn-launch" href="${project.launchHref}" target="_blank" rel="noopener">▶ Launch</a>`
     : `<button class="btn btn-view" type="button">View</button>`;
 
   card.innerHTML = `

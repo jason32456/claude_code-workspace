@@ -4,7 +4,7 @@ const RUN_LABEL = {
   static: 'Static site',
   next: 'Next.js app',
   python: 'Python CLI',
-  'vite-unbuilt': 'Vite / TypeScript',
+  vite: 'Vite / TypeScript',
 };
 
 export function createModal(rootEl) {
@@ -96,10 +96,11 @@ export function createModal(rootEl) {
     rootEl.querySelector('#modal-runtype').textContent = RUN_LABEL[project.runType] || project.runType;
     rootEl.querySelector('#modal-runcmd').textContent = project.runCommand;
 
+    const source = `<a class="btn btn-ghost" href="${project.sourceHref}" target="_blank" rel="noopener">Source ↗</a>`;
     const actions = project.launchable
-      ? `<a class="btn btn-launch" href="${project.sourceHref}" target="_blank" rel="noopener">▶ Launch app</a>
-         <a class="btn btn-ghost" href="${project.sourceHref}" target="_blank" rel="noopener">Source folder</a>`
-      : `<a class="btn btn-ghost" href="${project.sourceHref}" target="_blank" rel="noopener">Open source folder</a>
+      ? `<a class="btn btn-launch" href="${project.launchHref}" target="_blank" rel="noopener">▶ Launch app</a>
+         ${source}`
+      : `${source}
          <span class="run-note">Needs a build/server step — see command above.</span>`;
     rootEl.querySelector('#modal-actions').innerHTML = actions;
 
