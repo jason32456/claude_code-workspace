@@ -233,6 +233,19 @@ export const projects = [
     screenshots: shots('typeblitz', ['settled', 'early']),
   },
   {
+    slug: 'cantilever',
+    name: 'Cantilever',
+    tagline: 'Build a bridge, then load it',
+    description:
+      'A structural engineering puzzle. Span the gap with road, beams and cables on a budget, then send a truck across. Every member is an XPBD constraint whose Lagrange multiplier is its real axial force, so the deck sags, members color by how close they are to failing, and overloaded ones snap and cascade. Cables go slack instead of pushing, and long struts buckle before short ones.',
+    stack: ['Vanilla JS', 'Canvas 2D', 'XPBD'],
+    category: 'Simulations',
+    runType: 'static',
+    launchHref: 'apps/cantilever/',
+    runCommand: 'cd showcase/apps/cantilever && python -m http.server 8080',
+    screenshots: shots('cantilever', ['stress', 'build', 'collapse', 'cable-stay', 'wreck', 'levels']),
+  },
+  {
     slug: 'particle-life',
     name: 'Particle Life',
     tagline: 'Emergent particle simulation',

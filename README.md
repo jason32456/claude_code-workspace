@@ -2,13 +2,14 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder under `showcase/apps/`. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 35 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 36 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 ## Projects
 
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
 | [showcase](./showcase/) | Arcade-style launcher for every app in this repo — neon cabinet cards, category filters and search, a screenshot-gallery modal, and live "Launch" buttons for the runnable projects | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
+| [cantilever](./showcase/apps/cantilever/) | Structural engineering puzzle — span a gap with road, beams and cables on a budget, then drive a truck across; members are XPBD constraints carrying real axial forces, so decks sag, cables go slack instead of pushing, long struts buckle first, and overloaded members snap in cascades | Vanilla JS · Canvas 2D · XPBD · ES Modules | ✅ Complete |
 | [particle-life](./showcase/apps/particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [focus-pet](./showcase/apps/focus-pet/) | Pomodoro timer fused with a virtual pet — complete focus sessions to feed and evolve your blob creature, time-based decay keeps it real | Vanilla JS · SVG · CSS · localStorage | ✅ Complete |
 | [maze-pathfinder](./showcase/apps/maze-pathfinder/) | Interactive maze generator and pathfinding visualizer — watch BFS, Dijkstra, and A* explore mazes step by step, paint walls and weights, compare algorithms | Vanilla JS · CSS Grid · ES Modules | ✅ Complete |
