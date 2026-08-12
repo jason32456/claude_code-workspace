@@ -146,6 +146,14 @@
       "dest": "/nightside/$1"
     },
     {
+      "src": "/gambit/?$",
+      "dest": "/gambit/index.html"
+    },
+    {
+      "src": "/gambit/(.*)",
+      "dest": "/gambit/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/particle-life/$1"
     }

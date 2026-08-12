@@ -42,6 +42,7 @@ A growing collection of browser and CLI app projects, each built in its own fold
 | [afterimage](./afterimage/) | 3D time-loop puzzle-platformer — every attempt you make stays in the room as a solid, replaying ghost of yourself; stand on your past selves, let them hold pressure plates and flip switches, and solve six chambers under par | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [nightside](./nightside/) | 3D tower defense on a rotating planet — 642-tile geodesic globe, flow-field pathing, and a solar power grid that half goes dark as the terminator sweeps; the Blight only ever drops on the night side | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [windward](./windward/) | 3D sailing regatta with no throttle — you get a rudder and a sheet, and the wind decides; a real no-go zone forces you to tack upwind, gusts drift across the water as readable dark patches, and 3 AI rivals sail the identical physics | Three.js · Vanilla JS · GLSL · ES Modules | ✅ Complete |
+| [gambit](./gambit/) | Full chess game against a built-in AI — hand-written legal move generator (castling, en passant, promotion, check/mate/stalemate, all draw rules), four difficulty levels via minimax + alpha-beta search running in a Web Worker, algebraic move history, PGN export | Vanilla JS · CSS Grid · Web Worker · ES Modules | ✅ Complete |
 
 ## Running a project
 

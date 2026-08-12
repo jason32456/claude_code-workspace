@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gambit — Chess vs AI</title>
+  <meta name="description" content="Play chess against a built-in AI opponent — full rules, algebraic move history, four difficulty levels, right in your browser." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♞</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Gambit</h1>
+      <p class="tagline">Chess against a built-in AI opponent</p>
+    </header>
+
+    <div class="setup-bar">
+      <label>
+        Play as
+        <select id="sideSelect">
+          <option value="w">White</option>
+          <option value="b">Black</option>
+          <option value="random">Random</option>
+        </select>
+      </label>
+      <label>
+        Difficulty
+        <select id="difficultySelect">
+          <option value="casual">Casual</option>
+          <option value="club" selected>Club</option>
+          <option value="strong">Strong</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+      <button id="newGameBtn" class="primary">New Game</button>
+    </div>
+
+    <main class="game-area">
+      <div class="board-column">
+        <div class="captured-row">
+          <span class="pieces" id="capturedTop"></span>
+          <span class="material-diff" id="materialTop"></span>
+        </div>
+        <div id="board" class="board" aria-label="Chess board"></div>
+        <div class="captured-row">
+          <span class="pieces" id="capturedBottom"></span>
+          <span class="material-diff" id="materialBottom"></span>
+        </div>
+      </div>
+
+      <aside class="side-panel">
+        <div class="status-line" id="status">Your move</div>
+        <ol class="move-list" id="moveList" aria-label="Move history"></ol>
+        <div class="controls">
+          <button id="undoBtn">Undo</button>
+          <button id="flipBtn">Flip Board</button>
+          <button id="copyPgnBtn">Copy PGN</button>
+        </div>
+        <p class="hint">Click or drag a piece to move it. <kbd>F</kbd> flips the board, <kbd>Ctrl+Z</kbd> undoes.</p>
+      </aside>
+    </main>
+  </div>
+
+  <div id="promotionModal" class="modal hidden"></div>
+
+  <div id="resultBanner" class="modal hidden">
+    <div class="result-card">
+      <p id="resultText"></p>
+      <button id="rematchBtn" class="primary">Rematch</button>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
