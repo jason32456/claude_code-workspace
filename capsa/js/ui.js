@@ -13,6 +13,7 @@ import {
 } from './engine.js';
 import { hintMove } from './bot.js';
 import { cardElement, overlapFor } from './cards.js';
+import * as sound from './sound.js';
 
 export function createTable(el, handlers) {
   let view = null;
@@ -22,6 +23,13 @@ export function createTable(el, handlers) {
   let lastPileKey = '';
   let lastTrick = 0;
   let lastHandNo = 0;
+
+  // Sound is driven by transitions, not by state: the table re-renders on every
+  // poll, and replaying the same effect each second would be maddening.
+  let settled = false;
+  let wasMyTurn = false;
+  let lastPhase = null;
+  let lastPassed = [false, false, false, false];
 
   const isYourTurn = () =>
     view && view.phase === 'playing' && view.turn === view.you;
@@ -114,6 +122,7 @@ export function createTable(el, handlers) {
   // Lift the finished trick off the table instead of having it vanish.
   function sweepPile() {
     if (!el.playCards.children.length) return;
+    if (settled) sound.play('sweep');
     const ghost = document.createElement('div');
     ghost.className = 'play-ghost';
     ghost.append(...el.playCards.children);
@@ -144,6 +153,12 @@ export function createTable(el, handlers) {
       const from = el.playCards.children.length;
       for (let i = from; i < pile.length; i++) {
         el.playCards.append(buildGroup(pile[i], i));
+      }
+
+      // One landing sound for the play that just arrived. Catching up several
+      // at once — on a first render or after a reconnect — is not a new play.
+      if (settled && pile.length === from + 1) {
+        sound.play('place', pile[pile.length - 1].cards.length);
       }
 
       // Depth drives how far each play sits under the one on top of it.
@@ -215,6 +230,7 @@ export function createTable(el, handlers) {
       // A fresh deal fans in with a stagger; picking one card back up out of a
       // hand you already hold should not replay the whole animation.
       const isFreshDeal = hand.length === 13;
+      if (isFreshDeal) sound.play('deal', hand.length);
       el.hand.replaceChildren(
         ...hand.map((card, i) => {
           const node = cardElement(card, { button: true });
@@ -297,8 +313,13 @@ export function createTable(el, handlers) {
 
   function toggle(card) {
     if (!isYourTurn()) return;
-    if (selected.has(card)) selected.delete(card);
-    else selected.add(card);
+    if (selected.has(card)) {
+      selected.delete(card);
+      sound.play('deselect');
+    } else {
+      selected.add(card);
+      sound.play('select');
+    }
     hinted.clear();
     renderHand();
     renderActions();
@@ -359,6 +380,30 @@ export function createTable(el, handlers) {
     }
   });
 
+  // Everything here is a state change worth hearing. Compared against the
+  // previous view so a re-render of unchanged state stays silent.
+  function announce() {
+    const yourTurn = isYourTurn();
+
+    if (settled) {
+      for (const seat of view.seats) {
+        if (seat.passed && !lastPassed[seat.index]) {
+          sound.play('pass');
+          break;
+        }
+      }
+      if (yourTurn && !wasMyTurn) sound.play('turn');
+      if (view.phase === 'done' && lastPhase !== 'done') {
+        sound.play(view.winner === view.you ? 'win' : 'lose');
+      }
+    }
+
+    lastPassed = view.seats.map((s) => s.passed);
+    wasMyTurn = yourTurn;
+    lastPhase = view.phase;
+    settled = true;
+  }
+
   return {
     resize: sizeHand,
     render(next) {
@@ -369,6 +414,7 @@ export function createTable(el, handlers) {
       renderHand();
       renderActions();
       renderStatus();
+      announce();
     },
     clearSelection,
     get selection() {

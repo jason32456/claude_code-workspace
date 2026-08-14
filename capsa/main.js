@@ -14,6 +14,7 @@ import {
 } from './js/net-game.js';
 import { createTable } from './js/ui.js';
 import { login, logout, currentUser, setCredentials, storedToken } from './js/auth.js';
+import * as sound from './js/sound.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -71,12 +72,19 @@ function showScreen(name) {
 const table = createTable(el, {
   onPlay: async (cards) => {
     const result = await session.play(cards);
-    if (!result.ok) toast(result.error);
-    else table.clearSelection();
+    if (!result.ok) {
+      sound.play('invalid');
+      toast(result.error);
+    } else {
+      table.clearSelection();
+    }
   },
   onPass: async () => {
     const result = await session.pass();
-    if (!result.ok) toast(result.error);
+    if (!result.ok) {
+      sound.play('invalid');
+      toast(result.error);
+    }
   },
   onToast: toast,
 });
@@ -635,6 +643,25 @@ $('admin-self-form').addEventListener('submit', (event) => {
   event.preventDefault();
   saveCredentials('admin', 'admin-self-user', 'admin-self-pass');
 });
+
+/* ── Sound ───────────────────────────────────────────────────────────────── */
+
+function paintSoundButton() {
+  const on = sound.isEnabled();
+  $('btn-sound').textContent = on ? '🔊' : '🔇';
+  $('btn-sound').setAttribute('aria-pressed', String(on));
+  $('btn-sound').setAttribute('aria-label', on ? 'Mute sound' : 'Unmute sound');
+}
+
+$('btn-sound').addEventListener('click', () => {
+  sound.toggle();
+  paintSoundButton();
+});
+
+// Audio is blocked until the page has been interacted with, so the first press
+// anywhere — signing in, dealing — is what starts it.
+sound.unlockOnFirstGesture();
+paintSoundButton();
 
 /* ── Boot ────────────────────────────────────────────────────────────────── */
 

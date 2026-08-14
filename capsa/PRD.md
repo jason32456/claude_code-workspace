@@ -112,6 +112,25 @@ so the tracker can show more than a running total: totals sorted best-first, and
 a hand-by-hand breakdown. **New game** clears scores and history and deals
 again on the same seats — host-only online, and refused mid-hand.
 
+### Sound
+
+Synthesised from noise and oscillators at runtime rather than shipped as files,
+for the same reason the cards are drawn in CSS: nothing to download, works
+offline, no assets to keep in sync. A card sound is broadband noise shaped by a
+filter and a fast envelope — bright and short for a flick, duller with low-end
+body for a card landing on felt — so that is how each one is built, with a small
+random variation per hit so runs of cards do not sound looped.
+
+Two rules keep it from becoming irritating:
+
+- **Sound follows transitions, not state.** The table re-renders on every poll;
+  replaying an effect each second would be intolerable. Every cue is fired from
+  a change against the previous view, and catching up several plays at once —
+  a first render, a reconnect — is silent.
+- **It is always mutable, and the choice persists.** Audio also cannot start
+  before a user gesture, so the context is created on first interaction rather
+  than on load.
+
 ### Motion
 
 Motion is used to answer questions the player would otherwise have to work out:

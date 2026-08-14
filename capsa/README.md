@@ -148,6 +148,7 @@ another reason the store is worth connecting.
 | **Hint** | selects the lowest legal play, or tells you that you have to pass |
 | **Sort** | clears the selection and re-tidies the hand |
 | **📊 Scores** | running totals plus a hand-by-hand breakdown, and the New game button |
+| **🔊 Sound** | mute or unmute; the choice is remembered |
 
 Screenshots of the sign-in and admin screens:
 
@@ -172,6 +173,34 @@ Cards fly in from the direction of the seat that played them, your hand deals in
 with a stagger, the active seat's ring breathes so it is findable at a glance,
 and your score bumps when it changes. All of it is decorative and all of it is
 disabled under `prefers-reduced-motion`.
+
+## Sound
+
+Every sound is **synthesised at runtime** — there are no audio files to
+download, so the game stays self-contained and works offline. A card sound is
+mostly a short burst of broadband noise shaped by a filter, so that is exactly
+how these are built: a flick is bright and fast, a card landing on felt is
+duller with a little low-frequency body underneath it.
+
+| Sound | When |
+|---|---|
+| Flick run | dealing — one flick per card, in step with the fan animation |
+| Snap + thud | a card landing, one per card in the play, lightly staggered |
+| Dull knock | a player passing |
+| Filter sweep | the trick being gathered off the table |
+| Two-note nudge | your turn |
+| Rising arpeggio | you win the hand · falling one when you lose it |
+| Low buzz | a move the server rejected |
+| Tick | picking a card up or putting it down |
+
+Each hit gets a small random variation in playback rate and filter frequency, so
+a run of cards never sounds like a loop.
+
+The 🔊 button in the top bar mutes and unmutes, and the choice is remembered.
+Browsers block audio until the page has been interacted with, so the context is
+created on your first press — signing in or dealing — rather than on load.
+Sound is driven by state *transitions*, never by re-renders, so a table that
+polls once a second stays quiet until something actually happens.
 
 ## Scores
 
@@ -322,6 +351,7 @@ capsa/                      ← Vercel Root Directory for this project
     ├── engine.js           rules: combinations, comparison, turn flow, scoring
     ├── bot.js              three policies over one evaluation core
     ├── cards.js            card rendering and hand-fan geometry
+    ├── sound.js            synthesised card sounds — no audio files
     ├── ui.js               table rendering, selection, keyboard
     ├── local-game.js       solo session driving bots in-tab
     └── net-game.js         online session: polling, reconnect, backoff
