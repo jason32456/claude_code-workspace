@@ -63,6 +63,10 @@ Then add the store: **Storage → Marketplace → Upstash Redis → Create**, co
 it to the Capsa project, and redeploy. It injects `KV_REST_API_URL` and
 `KV_REST_API_TOKEN` automatically — there is no schema and nothing to migrate.
 
+Only **one** Vercel project should be connected to this repository for Capsa.
+Importing it twice means every push builds twice and each copy needs its own
+Redis and its own credentials — they will not share sign-ins or rooms.
+
 Check it worked at `https://<capsa-project>.vercel.app/api/capsa?action=health`:
 
 | Response | Meaning |
