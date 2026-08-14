@@ -209,14 +209,12 @@ the showcase. The exceptions:
   ```bash
   git checkout main && git merge --no-ff <your-branch> && git push origin main
   ```
-  **The `--no-ff` matters for deployment, not for history.** A fast-forward merge
-  leaves `main` and the feature branch pointing at the *same commit SHA*. Both
-  refs get pushed, GitHub fires a webhook for each, and Vercel — which
-  deduplicates by SHA — builds it once and attaches that build to whichever ref
-  it saw first. That is usually the feature branch, which is not the production
-  branch, so the build lands as a **preview** and production silently never
-  advances. `--no-ff` gives `main` its own commit, so it always gets its own
-  production deployment.
+  `--no-ff` keeps each piece of work as an identifiable merge commit on `main`
+  rather than melting it into the branch history.
+- **After pushing `main`, confirm the deploy actually landed.** Pushing is not
+  the same as shipping: check that the Vercel project built the new commit and
+  that it went to **production**, not to a preview. A build listed against the
+  feature branch is a preview and does not update the live site.
 - **Commit often** with short, descriptive messages.
 - **No secrets** — never commit `.env` files or API keys.
 - Code comments only where the *why* is non-obvious. No docblocks, no task references.
