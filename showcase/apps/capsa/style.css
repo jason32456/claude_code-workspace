@@ -358,7 +358,20 @@ input:focus-visible, button:focus-visible {
   min-height: 0;
 }
 
-.play-area { text-align: center; }
+/* A framed landing zone rather than a card floating in open green — it tells
+   you where to look, and stops the middle of the table reading as empty. */
+.play-area {
+  text-align: center;
+  min-width: 190px;
+  min-height: calc(var(--card-h) + 56px);
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  display: grid;
+  align-content: center;
+  gap: 2px;
+}
 
 .play-cards {
   display: flex;
@@ -366,6 +379,10 @@ input:focus-visible, button:focus-visible {
   gap: 4px;
   min-height: var(--card-h);
 }
+
+/* With no cards down, the reserved row would push the "lead anything" prompt
+   to the top of an otherwise empty box. */
+.play-cards:empty { min-height: 0; }
 
 .play-empty { color: var(--ink-faint); font-size: 14px; margin: 0; }
 .play-cards:empty + .play-meta { display: none; }
@@ -593,17 +610,27 @@ input:focus-visible, button:focus-visible {
   .table-grid {
     max-width: 1180px;
     margin: 0 auto;
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "top" "felt" "you" "act";
     padding: 0 24px;
+    row-gap: 10px;
   }
 
-  /* Opponents are absolutely placed around the felt: left, top, right. */
-  .opponents {
+  /* The felt and the opponent layer occupy the same grid cell and are given
+     identical boxes, so the seats can be pinned to the felt's real edges
+     rather than floating over its border. */
+  .opponents, .felt {
     grid-area: felt;
+    align-self: center;
+    width: 100%;
+    height: min(100%, 520px);
+  }
+
+  .opponents {
     display: block;
     padding: 0;
+    margin: 0;
     position: relative;
     pointer-events: none;
     z-index: 3;
@@ -611,50 +638,65 @@ input:focus-visible, button:focus-visible {
 
   .opp {
     position: absolute;
-    width: 190px;
+    width: 186px;
     pointer-events: auto;
     padding: 12px 10px;
   }
-  .opp:nth-child(1) { left: 0; top: 50%; transform: translateY(-50%); }
-  .opp:nth-child(2) { left: 50%; top: 0; transform: translateX(-50%); }
-  .opp:nth-child(3) { right: 0; top: 50%; transform: translateY(-50%); }
+  .opp:nth-child(1) { left: 18px; top: 50%; transform: translateY(-50%); }
+  .opp:nth-child(2) { left: 50%; top: 18px; transform: translateX(-50%); }
+  .opp:nth-child(3) { right: 18px; top: 50%; transform: translateY(-50%); }
 
   .opp.is-turn { box-shadow: 0 0 0 1px var(--gold), 0 10px 30px rgba(232, 196, 119, 0.2); }
 
   .felt {
-    grid-area: felt;
-    margin: 8px 0 16px;
+    margin: 0;
     border-radius: 28px;
     background:
-      radial-gradient(70% 60% at 50% 45%, rgba(255, 255, 255, 0.07), transparent 70%),
+      radial-gradient(64% 58% at 50% 50%, rgba(255, 255, 255, 0.07), transparent 72%),
       var(--felt-1);
     border: 1px solid var(--line);
     box-shadow: inset 0 2px 40px rgba(0, 0, 0, 0.35);
     padding: 30px;
   }
 
+  /* A visible landing zone stops the middle of the table reading as dead space
+     when only one card is down. */
+  .play-area {
+    min-width: 260px;
+    min-height: calc(var(--card-h) + 76px);
+    padding: 22px 30px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.16);
+    border: 1px dashed rgba(255, 255, 255, 0.09);
+    display: grid;
+    align-content: center;
+    gap: 4px;
+  }
+
   .play-cards { gap: 8px; }
 
-  /* Enough room to lay 13 cards out flat. */
-  .hand { padding-top: 26px; gap: 0; }
+  .hand { padding-top: 26px; }
   .hand .card { margin-left: var(--overlap, -6px); }
-  .hand .card:hover:not(.is-selected) {
-    transform: translateY(-9px);
-    z-index: 3;
-  }
+  .hand .card:hover:not(.is-selected) { transform: translateY(-9px); z-index: 3; }
   .hand .card.is-selected { transform: translateY(-24px); }
 
-  .you { padding: 0 0 6px; }
-  .you-head { font-size: 13px; }
-
-  .actions {
-    grid-template-columns: auto auto auto minmax(220px, 320px);
-    justify-content: end;
-    background: none;
-    padding: 6px 0 22px;
+  .you { padding: 0; }
+  .you-head {
+    font-size: 13px;
+    justify-content: center;
+    gap: 14px;
   }
 
-  .topbar { padding: 16px 0 8px; }
+  /* Centred under the hand rather than pushed to one edge, so the bottom of
+     the table reads as one unit. */
+  .actions {
+    grid-template-columns: auto auto auto minmax(200px, 260px);
+    justify-content: center;
+    background: none;
+    padding: 4px 0 20px;
+  }
+
+  .topbar { padding: 14px 0 0; }
   .icon-btn { width: 42px; height: 42px; }
   .status-line { font-size: 14px; }
 }

@@ -16,6 +16,26 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'capsa',
+    name: 'Capsa',
+    tagline: 'Big Two with online rooms',
+    description:
+      'The four-player shedding game (Big Two / Capsa Banting) — beat the table with a stronger combination of the same size, or pass. Cross-device online rooms behind a 4-letter code with serverless-safe polling, empty seats played by bots, and a simulation-tuned AI ladder. Server-authoritative, so opponents\u2019 cards are never sent to your browser.',
+    stack: ['Vanilla JS', 'ES Modules', 'Vercel Functions', 'Upstash Redis'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/capsa/',
+    runCommand: 'cd showcase/apps/capsa && python -m http.server 8080',
+    screenshots: shots('capsa', [
+      'desktop-table',
+      'mobile-table',
+      'menu',
+      'result',
+      'rules',
+      'mobile-menu',
+    ]),
+  },
+  {
     slug: 'crossy-road',
     name: 'Crossy Road',
     tagline: 'Blocky endless hopper in 3D',

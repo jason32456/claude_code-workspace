@@ -19,6 +19,7 @@ export function createTable(el, handlers) {
   let selected = new Set();
   let hinted = new Set();
   let lastHandKey = '';
+  let lastPlayKey = '';
 
   const isYourTurn = () =>
     view && view.phase === 'playing' && view.turn === view.you;
@@ -70,7 +71,15 @@ export function createTable(el, handlers) {
 
   function renderPlayArea() {
     const cards = view.currentCards || [];
-    el.playCards.replaceChildren(...cards.map((c) => cardElement(c)));
+    const key = cards.join(',');
+
+    // Only rebuild when the played cards actually change. Recreating them on
+    // every render would restart the deal-in animation, leaving the table
+    // flickering once a second while opponents think.
+    if (key !== lastPlayKey) {
+      lastPlayKey = key;
+      el.playCards.replaceChildren(...cards.map((c) => cardElement(c)));
+    }
     el.playEmpty.hidden = cards.length > 0;
 
     if (cards.length && view.current) {
