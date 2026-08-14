@@ -38,6 +38,8 @@ export const projects = [
       'mobile-table',
       'scores',
       'lobby',
+      'login',
+      'admin',
       'menu',
       'result',
       'rules',

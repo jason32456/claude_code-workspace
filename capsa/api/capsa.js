@@ -9,11 +9,25 @@
 // no package.json, and adding one purely to switch module systems would change
 // how Vercel treats the project.
 
+const crypto = require('node:crypto');
+
 const ENGINE = '../js/engine.js';
 const BOT = '../js/bot.js';
 
 const ROOM_TTL_SECONDS = 2 * 60 * 60;
+const SESSION_TTL_SECONDS = 12 * 60 * 60;
+const PBKDF2_ROUNDS = 120_000;
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+const LOGIN_MAX_FAILURES = 10;
 const AWAY_AFTER_MS = 25_000;
+
+// Shared, role-based credentials — a gate into the game rather than per-person
+// accounts. Players still type a display name when they join a room. Seeded
+// once into the store, after which the admin owns them; see README.
+const DEFAULT_CREDENTIALS = {
+  player: { username: 'user', password: process.env.CAPSA_PLAYER_PASSWORD || 'magang124' },
+  admin: { username: 'admin', password: process.env.CAPSA_ADMIN_PASSWORD || 'p455w0rd' },
+};
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I or O — they read as 1 and 0
 const DIFFICULTIES = ['casual', 'sharp', 'ruthless'];
 
@@ -43,6 +57,40 @@ async function redis(command) {
 }
 
 const key = (code) => `capsa:room:${code}`;
+
+// Generic helpers, used by the auth records and sessions. ttlSeconds of 0 means
+// "keep indefinitely" — credentials must outlive any session.
+async function kvGet(k) {
+  if (!hasRedis) return memory.get(k) || null;
+  return (await redis(['GET', k])) || null;
+}
+
+async function kvSet(k, value, ttlSeconds = 0) {
+  if (!hasRedis) {
+    memory.set(k, value);
+    return;
+  }
+  await redis(ttlSeconds > 0 ? ['SET', k, value, 'EX', String(ttlSeconds)] : ['SET', k, value]);
+}
+
+async function kvDel(k) {
+  if (!hasRedis) {
+    memory.delete(k);
+    return;
+  }
+  await redis(['DEL', k]);
+}
+
+async function kvCountFailure(k) {
+  if (!hasRedis) {
+    const next = (Number(memory.get(k)) || 0) + 1;
+    memory.set(k, String(next));
+    return next;
+  }
+  const next = await redis(['INCR', k]);
+  if (next === 1) await redis(['EXPIRE', k, String(LOGIN_WINDOW_SECONDS)]);
+  return next;
+}
 
 async function readRaw(code) {
   if (!hasRedis) return memory.get(key(code)) || null;
@@ -75,6 +123,81 @@ async function writeIfUnchanged(code, expected, raw) {
     'EVAL', CAS_SCRIPT, '1', key(code), expected, raw, String(ROOM_TTL_SECONDS),
   ]);
   return result === 1;
+}
+
+/* ── Authentication ──────────────────────────────────────────────────────── */
+
+// Passwords are never stored — only a PBKDF2 digest with a per-record salt.
+// Nothing kept here can be turned back into the original password.
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hash = crypto
+    .pbkdf2Sync(String(password), salt, PBKDF2_ROUNDS, 32, 'sha256')
+    .toString('hex');
+  return { salt, hash };
+}
+
+function verifyPassword(password, record) {
+  if (!record || !record.salt || !record.hash) return false;
+  const { hash } = hashPassword(password, record.salt);
+  const a = Buffer.from(hash, 'hex');
+  const b = Buffer.from(record.hash, 'hex');
+  // Constant-time: a near-miss must not be detectable by how long this takes.
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+const AUTH_KEY = 'capsa:auth';
+const sessionKey = (token) => `capsa:session:${token}`;
+const failureKey = (ip) => `capsa:login-fail:${ip}`;
+
+function seedCredentials() {
+  const seeded = {};
+  for (const [role, { username, password }] of Object.entries(DEFAULT_CREDENTIALS)) {
+    seeded[role] = { username, ...hashPassword(password) };
+  }
+  return seeded;
+}
+
+// Credentials live in the store so an admin can change them at runtime. On a
+// cold store the documented defaults are written once; after that the admin
+// owns them and redeploying will not reset anything.
+async function loadCredentials() {
+  const raw = await kvGet(AUTH_KEY);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.player && parsed.admin) return parsed;
+    } catch { /* unreadable record — fall through and reseed */ }
+  }
+  const seeded = seedCredentials();
+  await kvSet(AUTH_KEY, JSON.stringify(seeded));
+  return seeded;
+}
+
+async function createSession(role, username) {
+  const token = crypto.randomBytes(24).toString('base64url');
+  await kvSet(
+    sessionKey(token),
+    JSON.stringify({ role, username, at: Date.now() }),
+    SESSION_TTL_SECONDS,
+  );
+  return token;
+}
+
+async function readSession(token) {
+  if (!token || typeof token !== 'string' || token.length > 200) return null;
+  const raw = await kvGet(sessionKey(token));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function clientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded.length) return forwarded.split(',')[0].trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
 }
 
 /* ── Room helpers ────────────────────────────────────────────────────────── */
@@ -198,10 +321,108 @@ module.exports = async function handler(req, res) {
 
   const send = (status, payload) => res.status(status).json(payload);
 
+  // The gate credential, kept separate from the per-seat room token so the two
+  // can never be confused for one another.
+  const authToken = body.auth || url.searchParams.get('auth');
+
   try {
     if (action === 'health') {
-      return send(200, { ok: true, store: hasRedis ? 'redis' : 'memory' });
+      return send(200, { ok: true, store: hasRedis ? 'redis' : 'memory', auth: true });
     }
+
+    /* auth --------------------------------------------------------------- */
+    if (action === 'login') {
+      const ip = clientIp(req);
+      const failures = Number(await kvGet(failureKey(ip))) || 0;
+      if (failures >= LOGIN_MAX_FAILURES) {
+        return send(429, { error: 'Too many attempts — wait a few minutes and try again' });
+      }
+
+      const username = String(body.username || '').trim();
+      const password = String(body.password || '');
+      const credentials = await loadCredentials();
+
+      // Check every role rather than trusting a role the client claims.
+      const role = ['admin', 'player'].find(
+        (r) => credentials[r].username.toLowerCase() === username.toLowerCase()
+          && verifyPassword(password, credentials[r]),
+      );
+
+      if (!role) {
+        await kvCountFailure(failureKey(ip));
+        // Deliberately vague: revealing which half was wrong helps an attacker
+        // confirm a valid username.
+        return send(401, { error: 'Wrong username or password' });
+      }
+
+      await kvDel(failureKey(ip));
+      const token = await createSession(role, credentials[role].username);
+      return send(200, { token, role, username: credentials[role].username });
+    }
+
+    if (action === 'me') {
+      const session = await readSession(authToken);
+      if (!session) return send(401, { error: 'Not signed in' });
+      const credentials = await loadCredentials();
+      return send(200, {
+        role: session.role,
+        username: session.username,
+        playerUsername: credentials.player.username,
+        adminUsername: credentials.admin.username,
+      });
+    }
+
+    if (action === 'logout') {
+      if (authToken) await kvDel(sessionKey(authToken));
+      return send(200, { ok: true });
+    }
+
+    // Admins set the shared player credentials, and may rotate their own.
+    if (action === 'set-credentials') {
+      const session = await readSession(authToken);
+      if (!session) return send(401, { error: 'Not signed in' });
+      if (session.role !== 'admin') return send(403, { error: 'Admins only' });
+
+      const target = body.target === 'admin' ? 'admin' : 'player';
+      const credentials = await loadCredentials();
+      const nextUsername = String(body.username ?? credentials[target].username).trim();
+      const nextPassword = body.password === undefined ? null : String(body.password);
+
+      if (nextUsername.length < 3 || nextUsername.length > 24) {
+        return send(400, { error: 'Username must be 3–24 characters' });
+      }
+      if (!/^[A-Za-z0-9._-]+$/.test(nextUsername)) {
+        return send(400, { error: 'Username can use letters, numbers, dot, dash and underscore' });
+      }
+      const other = target === 'admin' ? 'player' : 'admin';
+      if (nextUsername.toLowerCase() === credentials[other].username.toLowerCase()) {
+        return send(409, { error: 'That username is already used by the other role' });
+      }
+      if (nextPassword !== null && nextPassword.length < 6) {
+        return send(400, { error: 'Password must be at least 6 characters' });
+      }
+
+      credentials[target] = {
+        username: nextUsername,
+        ...(nextPassword !== null
+          ? hashPassword(nextPassword)
+          : { salt: credentials[target].salt, hash: credentials[target].hash }),
+      };
+      await kvSet(AUTH_KEY, JSON.stringify(credentials));
+
+      return send(200, {
+        ok: true,
+        target,
+        username: nextUsername,
+        passwordChanged: nextPassword !== null,
+      });
+    }
+
+    // Everything past this point is the game itself, and needs a valid session.
+    // Enforcing it here rather than in the UI is the point: a static page can
+    // never gate itself, but the server can refuse to answer.
+    const session = await readSession(authToken);
+    if (!session) return send(401, { error: 'Sign in to play' });
 
     /* create ------------------------------------------------------------- */
     if (action === 'create') {

@@ -74,6 +74,70 @@ Check it worked at `https://<capsa-project>.vercel.app/api/capsa?action=health`:
 Finally, paste the deployment URL into `CAPSA_URL` at the top of
 `showcase/data/projects.js` to switch the arcade card's Launch button on.
 
+## Signing in
+
+The game sits behind a shared sign-in. This is a **gate into the game, not a set
+of per-person accounts** — everyone who plays uses the same player credentials,
+and each person still types their own display name when they create or join an
+online room.
+
+There are two roles:
+
+| Role | Default username | Default password | Can |
+|---|---|---|---|
+| Player | `user` | `magang124` | play everything |
+| Admin | `admin` | `p455w0rd` | play everything, plus change the sign-in details |
+
+Signing in as admin adds an **Admin** link to the menu. From there you can change
+the player username and password, and rotate your own admin credentials. Leave a
+password field blank to rename without changing the password.
+
+### What this does and does not protect
+
+The gate is enforced **by the server**. Every room endpoint — create, join,
+state, play, pass, start, next, newgame, leave — requires a session token issued
+by `login`, and returns `401` without one. That is the part that actually holds:
+a static page can never police itself, because anyone can read its JavaScript.
+Hiding the menu behind a login screen is a convenience for honest users; the
+server refusing to answer is the control.
+
+Specifically:
+
+- Passwords are stored only as a PBKDF2-SHA256 digest (120k rounds) with a
+  per-record salt, and compared in constant time. Nothing stored can be turned
+  back into a password.
+- Failed logins are counted per IP; after 10 in 15 minutes that address is
+  refused for the rest of the window.
+- A wrong username and a wrong password give the identical error, so the form
+  cannot be used to discover which usernames exist.
+- Sessions last 12 hours and are revoked on sign-out.
+- **Solo play against bots is not protected and cannot be**, since it runs
+  entirely in the browser with no server involved. There is nothing at stake in
+  it — no shared state, no other players. With no API at all (a plain static
+  host) the app says sign-in is unavailable and offers solo play only.
+
+### Change the defaults
+
+These defaults are published in this README and in a public repository, so treat
+them as a starting point, not a secret. Sign in as admin and change the player
+password once, and the change persists in Redis across redeploys.
+
+You can also seed different starting credentials so the published ones are never
+live, by setting these before the **first** run against an empty store:
+
+| Variable | Effect |
+|---|---|
+| `CAPSA_PLAYER_PASSWORD` | seeds the player password instead of the default |
+| `CAPSA_ADMIN_PASSWORD` | seeds the admin password instead of the default |
+
+They only apply when no credential record exists yet — once seeded, the admin
+owns the credentials and these variables are ignored. To force a reseed, delete
+the `capsa:auth` key from Redis.
+
+Without Redis the credential record lives in per-instance memory, so it resets
+whenever the function cold-starts. That is fine for local development and
+another reason the store is worth connecting.
+
 ## Playing
 
 | | |
@@ -84,6 +148,12 @@ Finally, paste the deployment URL into `CAPSA_URL` at the top of
 | **Hint** | selects the lowest legal play, or tells you that you have to pass |
 | **Sort** | clears the selection and re-tidies the hand |
 | **📊 Scores** | running totals plus a hand-by-hand breakdown, and the New game button |
+
+Screenshots of the sign-in and admin screens:
+
+| Sign in | Admin |
+|:---:|:---:|
+| ![Sign in](../showcase/apps/capsa/screenshots/login.png) | ![Admin](../showcase/apps/capsa/screenshots/admin.png) |
 
 On desktop: `Enter` play, `Space` pass, `H` hint, `Esc` clear, `1`–`0` toggle
 cards. Cards you could legally play are marked with a small gold underline when
@@ -212,6 +282,8 @@ otherwise:
 |---|---|
 | `KV_REST_API_URL` | injected by the Vercel Upstash/KV integration |
 | `KV_REST_API_TOKEN` | injected by the Vercel Upstash/KV integration |
+| `CAPSA_PLAYER_PASSWORD` | optional — seeds the player password on first run |
+| `CAPSA_ADMIN_PASSWORD` | optional — seeds the admin password on first run |
 
 `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` are accepted as aliases.
 Without them the API still works, but each serverless instance has its own map,
@@ -246,6 +318,7 @@ capsa/                      ← Vercel Root Directory for this project
 ├── api/
 │   └── capsa.js            the one serverless function: rooms, moves, bots
 └── js/
+    ├── auth.js             sign-in, session token, admin credential calls
     ├── engine.js           rules: combinations, comparison, turn flow, scoring
     ├── bot.js              three policies over one evaluation core
     ├── cards.js            card rendering and hand-fan geometry

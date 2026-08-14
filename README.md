@@ -11,7 +11,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
 | [showcase](./showcase/) | Arcade-style launcher for every app in this repo — neon cabinet cards, category filters and search, a screenshot-gallery modal, and live "Launch" buttons for the runnable projects | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
-| [capsa](./capsa/) | Capsa / Big Two card game — beat the table with a stronger combination of the same size or pass; cross-device online rooms behind a 4-letter code, server-authoritative so opponents' cards never reach your browser, empty seats played by a simulation-tuned AI ladder, and a phone-first layout that becomes a real felt table on desktop | Vanilla JS · ES Modules · Vercel Functions · Upstash Redis | ✅ Complete |
+| [capsa](./capsa/) | Capsa / Big Two card game — beat the table with a stronger combination of the same size or pass; cross-device online rooms behind a 4-letter code and a shared server-enforced sign-in, server-authoritative so opponents' cards never reach your browser, empty seats played by a simulation-tuned AI ladder, the trick piling up on the table as it would in person, a running score tracker, and a phone-first layout that becomes a real felt table on desktop | Vanilla JS · ES Modules · Vercel Functions · Upstash Redis | ✅ Complete |
 | [cantilever](./showcase/apps/cantilever/) | Structural engineering puzzle — span a gap with road, beams and cables on a budget, then drive a truck across; members are XPBD constraints carrying real axial forces, so decks sag, cables go slack instead of pushing, long struts buckle first, and overloaded members snap in cascades | Vanilla JS · Canvas 2D · XPBD · ES Modules | ✅ Complete |
 | [particle-life](./showcase/apps/particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [focus-pet](./showcase/apps/focus-pet/) | Pomodoro timer fused with a virtual pet — complete focus sessions to feed and evolve your blob creature, time-based decay keeps it real | Vanilla JS · SVG · CSS · localStorage | ✅ Complete |
@@ -58,6 +58,12 @@ deploying one never touches the other.
 |---|---|---|---|
 | **showcase** | `showcase` (or repo root, which redirects to `/showcase/`) | the arcade launcher and every static app | nothing — no build step, no env vars |
 | **capsa** | `capsa` | [the Capsa game](./capsa/) plus its `/api/capsa` function | `KV_REST_API_URL` + `KV_REST_API_TOKEN` from Upstash Redis |
+
+Capsa is behind a shared sign-in (one credential for players, one for an admin
+who can change it). The gate is enforced server-side — every room endpoint
+returns 401 without a session — and the shipped defaults are documented in
+[`capsa/README.md`](./capsa/README.md), so change the player password from the
+admin panel after deploying.
 
 For both: Framework Preset **Other**, and leave build / output / install commands
 empty.

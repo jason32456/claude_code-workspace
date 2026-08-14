@@ -90,7 +90,7 @@ Rules:
 | Vercel project | Root Directory | Notes |
 |---|---|---|
 | showcase | `showcase` (or repo root, which redirects to `/showcase/`) | static, no functions |
-| capsa | `capsa` | needs `KV_REST_API_URL` + `KV_REST_API_TOKEN` (Upstash Redis) |
+| capsa | `capsa` | needs `KV_REST_API_URL` + `KV_REST_API_TOKEN` (Upstash Redis); optional `CAPSA_PLAYER_PASSWORD` / `CAPSA_ADMIN_PASSWORD` seed the sign-in |
 
 ## Rules for adding a new project
 

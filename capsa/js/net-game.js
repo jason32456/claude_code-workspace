@@ -5,6 +5,8 @@
 // invisible in play, and polling survives sleeping phones and flaky mobile
 // networks far better than a socket would.
 
+import { storedToken } from './auth.js';
+
 const API = '/api/capsa';
 
 const POLL_LIVE = 900;
@@ -18,10 +20,15 @@ async function call(action, { method = 'GET', body = null, params = {} } = {}) {
     if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
   }
 
+  // Every room endpoint is behind the gate, so the session token rides along
+  // with each request. It is separate from the per-seat room token.
+  const auth = storedToken();
+  if (method === 'GET') url.searchParams.set('auth', auth);
+
   const res = await fetch(url, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
+    body: body ? JSON.stringify({ ...body, auth }) : undefined,
     cache: 'no-store',
   });
 

@@ -13,10 +13,12 @@ import {
   forgetSeat,
 } from './js/net-game.js';
 import { createTable } from './js/ui.js';
+import { login, logout, currentUser, setCredentials, storedToken } from './js/auth.js';
 
 const $ = (id) => document.getElementById(id);
 
 const el = {
+  login: $('screen-login'),
   menu: $('screen-menu'),
   table: $('screen-table'),
   opponents: $('opponents'),
@@ -61,6 +63,7 @@ function toast(message) {
 }
 
 function showScreen(name) {
+  el.login.classList.toggle('is-active', name === 'login');
   el.menu.classList.toggle('is-active', name === 'menu');
   el.table.classList.toggle('is-active', name === 'table');
 }
@@ -528,6 +531,111 @@ $('overlay-rules').addEventListener('click', (event) => {
   if (event.target === $('overlay-rules')) $('overlay-rules').hidden = true;
 });
 
+/* ── Sign in ─────────────────────────────────────────────────────────────── */
+
+let account = null;
+
+function showLoginError(message) {
+  const node = $('login-error');
+  node.textContent = message;
+  node.hidden = !message;
+}
+
+function enterApp(user) {
+  account = user;
+  $('signed-as').innerHTML = '';
+  const who = document.createElement('strong');
+  who.textContent = user.username;
+  $('signed-as').append('signed in as ', who);
+  $('btn-admin').hidden = user.role !== 'admin';
+  showLoginError('');
+  showScreen('menu');
+}
+
+$('login-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const button = $('btn-login');
+  button.disabled = true;
+  showLoginError('');
+  try {
+    const user = await login($('login-user').value.trim(), $('login-pass').value);
+    $('login-pass').value = '';
+    enterApp(user);
+    await afterSignIn();
+  } catch (err) {
+    showLoginError(err.message || 'Could not sign in');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$('btn-logout').addEventListener('click', async () => {
+  detach();
+  await logout();
+  account = null;
+  $('login-user').value = '';
+  $('login-pass').value = '';
+  showScreen('login');
+});
+
+/* ── Admin ───────────────────────────────────────────────────────────────── */
+
+function adminMessage(error, ok) {
+  $('admin-error').textContent = error || '';
+  $('admin-error').hidden = !error;
+  $('admin-ok').textContent = ok || '';
+  $('admin-ok').hidden = !ok;
+}
+
+async function openAdmin() {
+  adminMessage('', '');
+  const user = await currentUser();
+  if (user) {
+    $('admin-player-user').value = user.playerUsername || '';
+    $('admin-self-user').value = user.adminUsername || '';
+  }
+  $('admin-player-pass').value = '';
+  $('admin-self-pass').value = '';
+  $('overlay-admin').hidden = false;
+}
+
+async function saveCredentials(target, userField, passField) {
+  adminMessage('', '');
+  try {
+    const result = await setCredentials(target, $(userField).value.trim(), $(passField).value);
+    $(passField).value = '';
+    const what = target === 'admin' ? 'Admin' : 'Player';
+    adminMessage(
+      '',
+      result.passwordChanged
+        ? `${what} username and password updated.`
+        : `${what} username updated.`,
+    );
+    if (target === 'admin' && account) {
+      account.username = result.username;
+      enterApp(account);
+    }
+  } catch (err) {
+    adminMessage(err.message || 'Could not save', '');
+  }
+}
+
+$('btn-admin').addEventListener('click', openAdmin);
+$('btn-admin-close').addEventListener('click', () => {
+  $('overlay-admin').hidden = true;
+});
+$('overlay-admin').addEventListener('click', (event) => {
+  if (event.target === $('overlay-admin')) $('overlay-admin').hidden = true;
+});
+$('admin-player-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  saveCredentials('player', 'admin-player-user', 'admin-player-pass');
+});
+$('admin-self-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  saveCredentials('admin', 'admin-self-user', 'admin-self-pass');
+});
+
 /* ── Boot ────────────────────────────────────────────────────────────────── */
 
 $('difficulty-blurb').textContent = DIFFICULTY_BLURB[difficulty];
@@ -536,7 +644,8 @@ $('name-input').value = recallName();
 // Reclaim a seat after an accidental refresh rather than stranding it as a bot.
 const previous = recallSeat();
 
-initOnline().then(async () => {
+async function afterSignIn() {
+  await initOnline();
   if (await joinFromUrl()) return;
   if (previous && serverAvailable) {
     try {
@@ -546,4 +655,37 @@ initOnline().then(async () => {
       forgetSeat();
     }
   }
-});
+}
+
+(async function boot() {
+  const { online } = await probeServer();
+
+  // With no API there is nothing that can check a password, and nothing worth
+  // protecting either — the only thing available is a local game against bots.
+  // Pretending to authenticate here would be theatre, so say so instead.
+  if (!online) {
+    $('login-note').textContent =
+      'No server behind this page, so sign-in is unavailable. Solo play against bots works offline; online rooms need the deployed API.';
+    $('login-form').hidden = true;
+    const skip = document.createElement('button');
+    skip.className = 'btn btn-primary';
+    skip.textContent = 'Play solo offline';
+    skip.addEventListener('click', () => {
+      $('btn-logout').hidden = true;
+      $('signed-as').textContent = 'offline';
+      showScreen('menu');
+      initOnline();
+    });
+    $('login-form').after(skip);
+    return;
+  }
+
+  const user = storedToken() ? await currentUser() : null;
+  if (user) {
+    enterApp(user);
+    await afterSignIn();
+    return;
+  }
+  showScreen('login');
+  $('login-user').focus();
+})();

@@ -29,7 +29,8 @@ stretched — for desktop.
 
 ## Non-goals
 
-- Accounts, persistent profiles, ELO, or cross-session history.
+- Per-person accounts, persistent profiles, ELO, or cross-session history. The
+  sign-in is a shared gate into the game, not an identity system.
 - Chat (a fixed set of emotes instead — no moderation surface).
 - Spectators.
 - Money, wagering, or anything resembling it.
@@ -157,6 +158,32 @@ turn-based with think-times measured in seconds, so it does not need them.
 - **Writes are compare-and-set.** Every mutation runs a Redis Lua script that
   writes only if the version is unchanged, retrying on conflict. Two players
   acting on the same tick cannot corrupt the room.
+
+### The gate
+
+The game sits behind a shared sign-in with two roles, player and admin. This is
+deliberately **not** per-person accounts: everyone shares one player credential,
+and identity within a game still comes from the display name a person types when
+they join a room. The admin role exists only to change those credentials.
+
+The important design constraint is that **a static client cannot authenticate
+itself** — its JavaScript is readable by anyone it is served to. So the gate is
+enforced server-side: `login` issues a session token, and every room endpoint
+refuses to answer without one. The login screen is a convenience for honest
+users; the 401 is the actual control.
+
+Consequences accepted:
+
+- Passwords are stored as PBKDF2-SHA256 digests (120k rounds, per-record salt),
+  compared in constant time, rate-limited per IP, with an identical error for a
+  wrong username and a wrong password so the form is not a username oracle.
+- Credentials live in the store, not in code, so an admin can change them at
+  runtime and a redeploy does not reset them. Defaults are seeded once into an
+  empty store and can be overridden by environment variable so the published
+  ones need never be live.
+- Solo play is not protected and cannot be, since it never contacts a server.
+  Nothing is at stake in it. With no API present the app says so plainly and
+  offers solo play rather than pretending to authenticate.
 
 ### The lobby
 

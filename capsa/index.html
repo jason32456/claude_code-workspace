@@ -11,8 +11,40 @@
 </head>
 <body>
 
+<!-- ── Sign in ────────────────────────────────────────────────────────────── -->
+<main id="screen-login" class="screen is-active">
+  <div class="menu-card">
+    <header class="brand">
+      <div class="brand-suits" aria-hidden="true">
+        <span class="s-d">♦</span><span class="s-c">♣</span><span class="s-h">♥</span><span class="s-s">♠</span>
+      </div>
+      <h1>Capsa</h1>
+      <p class="tagline">Sign in to play</p>
+    </header>
+
+    <form id="login-form" autocomplete="on">
+      <label class="field">
+        <span>Username</span>
+        <input type="text" id="login-user" autocomplete="username" autocapitalize="none"
+               spellcheck="false" required />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" id="login-pass" autocomplete="current-password" required />
+      </label>
+      <p class="login-error" id="login-error" hidden role="alert"></p>
+      <button class="btn btn-primary" id="btn-login" type="submit">Sign in</button>
+    </form>
+
+    <p class="hint-text" id="login-note">
+      A shared sign-in for everyone using this table — you still pick a display
+      name when you join an online room.
+    </p>
+  </div>
+</main>
+
 <!-- ── Menu ───────────────────────────────────────────────────────────────── -->
-<main id="screen-menu" class="screen is-active">
+<main id="screen-menu" class="screen">
   <div class="menu-card">
     <header class="brand">
       <div class="brand-suits" aria-hidden="true">
@@ -58,9 +90,58 @@
       <p class="hint-text" id="online-status">Checking for a server…</p>
     </section>
 
-    <button class="link-btn" id="btn-rules">How to play</button>
+    <div class="menu-foot">
+      <button class="link-btn" id="btn-rules">How to play</button>
+      <span class="signed-as" id="signed-as"></span>
+      <button class="link-btn" id="btn-admin" hidden>Admin</button>
+      <button class="link-btn" id="btn-logout">Sign out</button>
+    </div>
   </div>
 </main>
+
+<!-- ── Admin ──────────────────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay-admin" hidden>
+  <div class="dialog dialog-scroll">
+    <h2>Admin</h2>
+    <p class="scores-sub">
+      One shared sign-in per role. Changing these signs everyone out of nothing —
+      existing sessions keep working until they expire.
+    </p>
+
+    <form id="admin-player-form">
+      <h3>Player sign-in</h3>
+      <label class="field">
+        <span>Username</span>
+        <input type="text" id="admin-player-user" autocapitalize="none" spellcheck="false" />
+      </label>
+      <label class="field">
+        <span>New password</span>
+        <input type="password" id="admin-player-pass" autocomplete="new-password"
+               placeholder="leave blank to keep the current one" />
+      </label>
+      <button class="btn btn-primary" type="submit">Save player sign-in</button>
+    </form>
+
+    <form id="admin-self-form">
+      <h3>Your admin sign-in</h3>
+      <label class="field">
+        <span>Username</span>
+        <input type="text" id="admin-self-user" autocapitalize="none" spellcheck="false" />
+      </label>
+      <label class="field">
+        <span>New password</span>
+        <input type="password" id="admin-self-pass" autocomplete="new-password"
+               placeholder="leave blank to keep the current one" />
+      </label>
+      <button class="btn" type="submit">Save admin sign-in</button>
+    </form>
+
+    <p class="login-error" id="admin-error" hidden role="alert"></p>
+    <p class="admin-ok" id="admin-ok" hidden role="status"></p>
+
+    <button class="btn btn-ghost" id="btn-admin-close">Close</button>
+  </div>
+</div>
 
 <!-- ── Table ──────────────────────────────────────────────────────────────── -->
 <main id="screen-table" class="screen">
