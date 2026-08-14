@@ -415,11 +415,18 @@ export function createTable(el, handlers) {
           break;
         }
       }
-      if (yourTurn && !wasMyTurn) sound.play('turn');
+      if (yourTurn && !wasMyTurn) {
+        sound.play('turn');
+        handlers.onYourTurn();
+      }
       if (view.phase === 'done' && lastPhase !== 'done') {
         sound.play(view.winner === view.you ? 'win' : 'lose');
       }
     }
+
+    // Leaving your turn — whether you played, passed or the hand ended — is
+    // what retires the alert, so it never outlives the turn it announced.
+    if (wasMyTurn && !yourTurn) handlers.onTurnEnded();
 
     lastPassed = view.seats.map((s) => s.passed);
     wasMyTurn = yourTurn;

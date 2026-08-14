@@ -111,8 +111,7 @@ A higher category always beats a lower one. Within a category:
 
 Each finished hand appends `{hand, winner, deltas, left, order, mode}` to the
 room's history, so the tracker can show more than a running total: totals
-sorted best-first, and
-a hand-by-hand breakdown. **New game** clears scores and history and deals
+sorted best-first, and a hand-by-hand breakdown. **New game** clears scores and history and deals
 again on the same seats — host-only online, and refused mid-hand.
 
 ### Sound
@@ -133,6 +132,28 @@ Two rules keep it from becoming irritating:
 - **It is always mutable, and the choice persists.** Audio also cannot start
   before a user gesture, so the context is created on first interaction rather
   than on load.
+
+### Turn alerts
+
+The moment that matters in an online game usually arrives while the player is
+looking at something else, so the alert is layered and degrades cleanly: an
+on-screen banner, a sound, vibration, the tab title, and — only if permission is
+granted — a system notification. Everything except the last works with no
+permission at all, and permission is requested from the lobby, where there is
+time to read the offer and the click supplies the gesture browsers require.
+
+Every layer is retired when the turn ends, and the title and notification are
+also cleared the moment the tab regains focus: an alert for a turn already taken
+is worse than no alert.
+
+This forced one change elsewhere. The poller previously stopped completely while
+the tab was hidden, to save battery and request quota. That is precisely the
+state in which the alert has to work, so a hidden tab now polls at 6 s rather
+than not at all — cheap enough to keep, awake enough to notice.
+
+The banner is suppressed in solo unless the wait exceeded four seconds. Against
+bots the turn returns every few seconds, and an alert that frequent trains the
+player to ignore it.
 
 ### Motion
 
@@ -315,6 +336,7 @@ All three respect a 600–1400 ms randomized think-time so play feels human.
 - [ ] Full 4-player hand playable end to end against bots with no illegal move accepted.
 - [ ] Both rule sets terminate every hand, with a complete 1st-to-4th order in
       play-to-the-end and zero-sum scoring in both.
+- [ ] A backgrounded tab still learns it is your turn and says so.
 - [ ] Two browsers joining one room code stay in sync within ~1 s.
 - [ ] Closing a tab mid-game does not stall the other players.
 - [ ] Usable one-handed at 390×844; uses the space at 1440×900.

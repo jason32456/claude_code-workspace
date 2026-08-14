@@ -249,6 +249,42 @@ created on your first press — signing in or dealing — rather than on load.
 Sound is driven by state *transitions*, never by re-renders, so a table that
 polls once a second stays quiet until something actually happens.
 
+## Turn alerts
+
+Waiting on three other people means the moment that matters usually arrives
+while you are looking at something else. The alert works in layers, so it lands
+whether or not you are watching, and none of it is required:
+
+| Layer | When | Needs permission |
+|---|---|---|
+| On-screen banner | your turn, in an online game or after a long wait | no |
+| Two-note sound | every turn | no |
+| Vibration | your turn, on a phone | no |
+| Tab title → `🔔 Your turn — Capsa` | your turn, tab in the background | no |
+| System notification | your turn, tab in the background | yes — offered in the lobby |
+
+The banner sits at the foot of the felt, next to the hand you are about to play
+from, rather than at the top where the opposite seat is. It clears the moment
+you play or pass, so it never outlives the turn it announced — as does the title
+and any system notification, which are also cleared as soon as you look at the
+tab again.
+
+Permission is asked for **in the lobby**, where there is time to read the offer
+and the click is the user gesture browsers require. Decline it and everything
+except the system notification still works.
+
+Solo play does not show the banner unless the wait ran past four seconds — the
+turn comes back every few seconds against bots, and a banner that often is just
+noise. The background layers still fire in solo.
+
+### One thing this required
+
+A backgrounded tab used to stop polling entirely to save battery and quota.
+That would have made the whole feature useless: the client would not learn it
+was your turn until you looked, which is exactly when you no longer need
+telling. A hidden tab now keeps polling at 6 s instead of 900 ms — slow enough
+to stay cheap, awake enough to alert you.
+
 ## Scores
 
 The 📊 button opens a running tracker: totals sorted best-first with the leader

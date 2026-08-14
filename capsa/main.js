@@ -15,6 +15,7 @@ import {
 import { createTable } from './js/ui.js';
 import { login, logout, currentUser, setCredentials, storedToken } from './js/auth.js';
 import * as sound from './js/sound.js';
+import * as notify from './js/notify.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -96,7 +97,54 @@ const table = createTable(el, {
     }
   },
   onToast: toast,
+  onYourTurn: announceTurn,
+  onTurnEnded: retireTurnAlert,
 });
+
+/* ── Your turn ───────────────────────────────────────────────────────────── */
+
+let bannerTimer = null;
+let turnEndedAt = 0;
+
+function showTurnBanner() {
+  const banner = $('turn-banner');
+  clearTimeout(bannerTimer);
+  banner.classList.remove('is-leaving');
+  banner.hidden = false;
+  bannerTimer = setTimeout(() => {
+    banner.classList.add('is-leaving');
+    bannerTimer = setTimeout(() => {
+      banner.hidden = true;
+      banner.classList.remove('is-leaving');
+    }, 280);
+  }, 2600);
+}
+
+function hideTurnBanner() {
+  clearTimeout(bannerTimer);
+  $('turn-banner').hidden = true;
+  $('turn-banner').classList.remove('is-leaving');
+}
+
+function announceTurn() {
+  // Title, vibration and the system notification only speak up when the page
+  // is in the background — that check lives in notify.js.
+  notify.turnAlert({ roomCode: el.roomTag.hidden ? null : el.roomTag.textContent });
+
+  // The banner answers "I was looking but did not notice". Online it always
+  // earns its place; solo the turn comes back every few seconds, so it would
+  // be noise unless the wait was actually long.
+  const waited = turnEndedAt ? Date.now() - turnEndedAt : Infinity;
+  if ((session && session.kind === 'net') || waited > 4000 || document.hidden) {
+    showTurnBanner();
+  }
+}
+
+function retireTurnAlert() {
+  turnEndedAt = Date.now();
+  hideTurnBanner();
+  notify.clear();
+}
 
 /* ── Result overlay ──────────────────────────────────────────────────────── */
 
@@ -305,8 +353,20 @@ function renderLobby(view) {
     textContent: MODE_LABEL[lobbyMode],
   }));
 
+  // Waiting in the lobby is the natural moment to offer this: there is time to
+  // read it, and the click is the user gesture the permission prompt needs.
+  const canAsk = notify.supported() && notify.permission() === 'default';
+  $('btn-enable-alerts').hidden = !canAsk;
+
   $('overlay-lobby').hidden = false;
 }
+
+$('btn-enable-alerts').addEventListener('click', async () => {
+  const result = await notify.requestPermission();
+  $('btn-enable-alerts').hidden = true;
+  if (result === 'granted') toast("You'll be alerted when it's your turn");
+  else if (result === 'denied') toast('Alerts blocked — the tab title still changes');
+});
 
 /* ── Session lifecycle ───────────────────────────────────────────────────── */
 
@@ -361,6 +421,9 @@ function detach() {
   $('overlay-result').hidden = true;
   $('overlay-lobby').hidden = true;
   $('overlay-scores').hidden = true;
+  hideTurnBanner();
+  notify.clear();
+  turnEndedAt = 0;
   latestView = null;
 }
 
