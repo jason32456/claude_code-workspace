@@ -6,6 +6,7 @@
 
 import {
   COMBO_LABEL,
+  ORDINALS,
   detectCombo,
   explainInvalid,
   legalPlays,
@@ -43,9 +44,22 @@ export function createTable(el, handlers) {
       ...order.map((seat) => {
         const node = document.createElement('div');
         node.className = 'opp';
+        // Finishing positions only mean something in play-to-the-end; in
+        // first-out-wins there is a winner, not a ranking.
+        const isOut = view.mode === 'playToEnd' && seat.handCount === 0 && seat.rank;
         if (view.phase === 'playing' && view.turn === seat.index) node.classList.add('is-turn');
-        if (seat.passed) node.classList.add('is-passed');
+        if (seat.passed && !isOut) node.classList.add('is-passed');
         if (seat.away) node.classList.add('is-away');
+        if (isOut) node.classList.add('is-out');
+
+        // In play-to-the-end a finished seat keeps its place at the table with
+        // the position it took.
+        if (isOut) {
+          const rank = document.createElement('span');
+          rank.className = 'opp-rank';
+          rank.textContent = ORDINALS[seat.rank - 1] || `#${seat.rank}`;
+          node.append(rank);
+        }
 
         if (view.currentSeat === seat.index && view.currentCards.length) {
           const badge = document.createElement('span');
@@ -206,6 +220,13 @@ export function createTable(el, handlers) {
       el.status.textContent = `${w.index === view.you ? 'You' : w.name} won the hand`;
       return;
     }
+    // You are out but the hand is still running — say where you finished
+    // rather than leaving a dead "someone is thinking" line.
+    const me = view.seats[view.you];
+    if (view.mode === 'playToEnd' && me && me.rank && me.handCount === 0) {
+      el.status.textContent = `You finished ${ORDINALS[me.rank - 1]} — waiting for the rest`;
+      return;
+    }
     if (isYourTurn()) {
       const invalid = selected.size ? explainInvalid([...selected], view.current) : null;
       el.status.textContent = invalid || (selected.size ? 'Ready' : 'Your turn');
@@ -306,7 +327,9 @@ export function createTable(el, handlers) {
     el.youName.classList.toggle('is-turn', yours);
     const me = view.seats[view.you];
     el.youName.textContent = me.name;
-    el.youScore.textContent = `${me.handCount} cards · ${me.score >= 0 ? '+' : ''}${me.score}`;
+    el.youScore.textContent = view.mode === 'playToEnd' && me.rank && me.handCount === 0
+      ? `finished ${ORDINALS[me.rank - 1]} · ${me.score >= 0 ? '+' : ''}${me.score}`
+      : `${me.handCount} cards · ${me.score >= 0 ? '+' : ''}${me.score}`;
   }
 
   /* ── Interaction ───────────────────────────────────────────────────────── */

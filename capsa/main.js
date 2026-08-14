@@ -1,6 +1,6 @@
 // App shell: menu, session lifecycle, overlays.
 
-import { handPenalty } from './js/engine.js';
+import { handPenalty, MODES, MODE_LABEL, RANK_POINTS, ORDINALS } from './js/engine.js';
 import { DIFFICULTY_LABEL } from './js/bot.js';
 import { createLocalSession } from './js/local-game.js';
 import {
@@ -48,7 +48,16 @@ let session = null;
 let unsubscribe = null;
 let difficulty = 'sharp';
 let lobbyDifficulty = 'sharp';
+let soloMode = MODES.FIRST_OUT;
+let lobbyMode = MODES.FIRST_OUT;
 let resultShownFor = -1;
+
+const MODE_BLURB = {
+  firstOut:
+    'The hand stops the moment someone sheds their last card. Everyone else scores the cards left in their hand.',
+  playToEnd:
+    'Going out does not stop the hand — the rest keep playing for 2nd and 3rd, and the player left holding cards comes 4th. Scored by position: 1st −3, 2nd −1, 3rd +1, 4th +3.',
+};
 
 /* ── Chrome ──────────────────────────────────────────────────────────────── */
 
@@ -92,23 +101,45 @@ const table = createTable(el, {
 /* ── Result overlay ──────────────────────────────────────────────────────── */
 
 function renderResult(view) {
-  $('result-title').textContent =
-    view.winner === view.you ? 'You win the hand' : `${view.seats[view.winner].name} wins the hand`;
+  const playToEnd = view.mode === MODES.PLAY_TO_END;
+  const me = view.seats[view.you];
 
+  $('result-title').textContent = playToEnd && me.rank
+    ? `You finished ${ORDINALS[me.rank - 1]}`
+    : view.winner === view.you
+      ? 'You win the hand'
+      : `${view.seats[view.winner].name} wins the hand`;
+
+  // In play-to-the-end the deltas come from the finishing order; otherwise from
+  // the cards left behind. Both are reproduced here from the same rules the
+  // engine used, so the sheet always adds up to zero.
   const pot = view.seats.reduce(
     (sum, s) => (s.index === view.winner ? sum : sum + handPenalty(s.handCount)),
     0,
   );
+  const deltaFor = (seat) => {
+    if (playToEnd) return RANK_POINTS[view.finishOrder.indexOf(seat.index)] ?? 0;
+    return seat.index === view.winner ? -pot : handPenalty(seat.handCount);
+  };
+
+  // Ranked order when we have one, otherwise seat order.
+  const rows = playToEnd && view.finishOrder.length === 4
+    ? view.finishOrder.map((i) => view.seats[i])
+    : view.seats;
 
   $('result-rows').replaceChildren(
-    ...view.seats.map((seat) => {
-      const delta = seat.index === view.winner ? -pot : handPenalty(seat.handCount);
+    ...rows.map((seat) => {
+      const delta = deltaFor(seat);
       const row = document.createElement('tr');
       if (seat.index === view.winner) row.className = 'is-winner';
 
       const name = document.createElement('td');
       name.className = 'sb-name';
       name.textContent = seat.index === view.you ? 'You' : seat.name;
+
+      const place = document.createElement('td');
+      place.className = 'sb-rank';
+      place.textContent = playToEnd && seat.rank ? ORDINALS[seat.rank - 1] : '';
 
       const cards = document.createElement('td');
       cards.className = 'sb-cards';
@@ -122,7 +153,7 @@ function renderResult(view) {
       total.className = 'sb-cards';
       total.textContent = `total ${seat.score}`;
 
-      row.append(name, cards, score, total);
+      row.append(name, place, cards, score, total);
       return row;
     }),
   );
@@ -262,6 +293,18 @@ function renderLobby(view) {
     const host = view.seats[view.hostSeat];
     $('lobby-wait').textContent = `Waiting for ${host.name} to start…`;
   }
+
+  // The rule set is stored on the room, so everyone sees what they are about
+  // to play, not just the host who chose it.
+  lobbyMode = view.mode || MODES.FIRST_OUT;
+  for (const pill of document.querySelectorAll('#lobby-mode .pill')) {
+    pill.classList.toggle('is-active', pill.dataset.mode === lobbyMode);
+  }
+  $('lobby-mode-note').innerHTML = '';
+  $('lobby-mode-note').append('Rules: ', Object.assign(document.createElement('strong'), {
+    textContent: MODE_LABEL[lobbyMode],
+  }));
+
   $('overlay-lobby').hidden = false;
 }
 
@@ -346,8 +389,18 @@ for (const pill of document.querySelectorAll('#difficulty-group .pill')) {
   });
 }
 
+for (const pill of document.querySelectorAll('#mode-group .pill')) {
+  pill.addEventListener('click', () => {
+    soloMode = pill.dataset.mode;
+    for (const other of document.querySelectorAll('#mode-group .pill')) {
+      other.classList.toggle('is-active', other === pill);
+    }
+    $('mode-blurb').textContent = MODE_BLURB[soloMode];
+  });
+}
+
 $('btn-solo').addEventListener('click', () => {
-  attach(createLocalSession({ difficulty, name: soloName() }));
+  attach(createLocalSession({ difficulty, name: soloName(), mode: soloMode }));
 });
 
 const NAME_KEY = 'capsa:name';
@@ -504,9 +557,22 @@ for (const pill of document.querySelectorAll('#lobby-difficulty .pill')) {
   });
 }
 
+for (const pill of document.querySelectorAll('#lobby-mode .pill')) {
+  pill.addEventListener('click', async () => {
+    lobbyMode = pill.dataset.mode;
+    for (const other of document.querySelectorAll('#lobby-mode .pill')) {
+      other.classList.toggle('is-active', other === pill);
+    }
+    if (session && session.setMode) {
+      const result = await session.setMode(lobbyMode);
+      if (result && !result.ok) toast(result.error);
+    }
+  });
+}
+
 $('btn-start').addEventListener('click', async () => {
   $('btn-start').disabled = true;
-  const result = await session.start(lobbyDifficulty);
+  const result = await session.start(lobbyDifficulty, lobbyMode);
   $('btn-start').disabled = false;
   if (result && !result.ok) toast(result.error);
 });

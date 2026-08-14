@@ -27,7 +27,7 @@ export const projects = [
     name: 'Capsa',
     tagline: 'Big Two with online rooms',
     description:
-      'The four-player shedding game (Big Two / Capsa Banting) — beat the table with a stronger combination of the same size, or pass. Cross-device online rooms behind a 4-letter code with serverless-safe polling, empty seats played by bots, and a simulation-tuned AI ladder. Server-authoritative, so opponents\u2019 cards are never sent to your browser. The trick piles up on the table the way it would in person, a running score tracker keeps a match going across hands, and every card sound is synthesised at runtime so nothing is downloaded. Lives at /capsa in the repo and deploys as its own Vercel project.',
+      'The four-player shedding game (Big Two / Capsa Banting) — beat the table with a stronger combination of the same size, or pass. Cross-device online rooms behind a 4-letter code with serverless-safe polling, empty seats played by bots, and a simulation-tuned AI ladder. Server-authoritative, so opponents\u2019 cards are never sent to your browser. The trick piles up on the table the way it would in person, two rule sets — stop at the first player out, or play on for a full 1st-to-4th ranking — a running score tracker keeps a match going across hands, and every card sound is synthesised at runtime so nothing is downloaded. Lives at /capsa in the repo and deploys as its own Vercel project.',
     stack: ['Vanilla JS', 'Web Audio API', 'ES Modules', 'Vercel Functions', 'Upstash Redis'],
     category: 'Games',
     runType: 'static',
@@ -36,6 +36,7 @@ export const projects = [
     screenshots: shots('capsa', [
       'desktop-table',
       'mobile-table',
+      'ranking',
       'scores',
       'lobby',
       'login',

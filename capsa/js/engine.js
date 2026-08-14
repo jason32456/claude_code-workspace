@@ -16,6 +16,23 @@ export const SUIT_KEYS = ['diamonds', 'clubs', 'hearts', 'spades'];
 export const RANK_TWO = 12;
 export const THREE_OF_DIAMONDS = 0;
 
+// Two ways to end a hand.
+//   firstOut  — the hand stops the moment someone sheds their last card.
+//   playToEnd — play continues without them until only one player still holds
+//               cards, producing a full 1st-to-4th finishing order.
+export const MODES = { FIRST_OUT: 'firstOut', PLAY_TO_END: 'playToEnd' };
+
+export const MODE_LABEL = {
+  firstOut: 'First out wins',
+  playToEnd: 'Play to the end',
+};
+
+// Zero-sum positional scoring for playToEnd. Card counts cannot score that
+// mode — everyone but the last player finishes on zero cards.
+export const RANK_POINTS = [-3, -1, 1, 3];
+
+export const ORDINALS = ['1st', '2nd', '3rd', '4th'];
+
 export const rankOf = (card) => (card / 4) | 0;
 export const suitOf = (card) => card % 4;
 export const cardLabel = (card) => RANKS[rankOf(card)] + SUITS[suitOf(card)];
@@ -214,6 +231,9 @@ export function createSeat(index, patch = {}) {
     away: false,
     lastSeen: 0,
     score: 0,
+    // Finishing position in the current hand, 1-based; null while still holding
+    // cards. Only ever above 1 in playToEnd.
+    rank: null,
     emote: null,
     ...patch,
   };
@@ -227,6 +247,9 @@ export function createRoom(code, seed) {
     // startHand() immediately and never see this phase.
     phase: 'lobby',
     hostSeat: 0,
+    mode: MODES.FIRST_OUT,
+    // Seat indices in the order they shed their last card.
+    finishOrder: [],
     seed,
     handNo: 0,
     seats: [0, 1, 2, 3].map((i) => createSeat(i)),
@@ -259,8 +282,10 @@ export function startHand(room, seed) {
     seat.hand = hands[i];
     seat.handCount = hands[i].length;
     seat.passed = false;
+    seat.rank = null;
     seat.emote = null;
   });
+  room.finishOrder = [];
   room.turn = room.seats.findIndex((s) => s.hand.includes(THREE_OF_DIAMONDS));
   room.current = null;
   room.currentCards = [];
@@ -274,29 +299,43 @@ export function startHand(room, seed) {
   return room;
 }
 
+// A player who has shed their last card is skipped entirely — they are out of
+// the hand, not merely passed for this trick.
 function nextActiveSeat(room, from) {
   for (let step = 1; step <= 4; step++) {
     const i = (from + step) % 4;
-    if (!room.seats[i].passed) return i;
+    const seat = room.seats[i];
+    if (!seat.passed && seat.hand.length > 0) return i;
   }
   return from;
 }
 
 function closeTrickIfSettled(room) {
-  const active = room.seats.filter((s) => !s.passed);
-  if (room.current && active.length === 1) {
-    room.trick += 1;
-    room.current = null;
-    room.currentCards = [];
-    room.trickPile = [];
-    room.turn = room.currentSeat;
-    room.seats.forEach((s) => {
-      s.passed = false;
-    });
-    room.log.push({ t: 'trick', seat: room.currentSeat });
-    return true;
-  }
-  return false;
+  if (!room.current) return false;
+
+  // The trick is over once nobody except the player holding it can still
+  // answer. Someone who went out cannot answer, so going out can end a trick.
+  const canAnswer = room.seats.filter(
+    (s) => s.hand.length > 0 && !s.passed && s.index !== room.currentSeat,
+  );
+  if (canAnswer.length > 0) return false;
+
+  room.trick += 1;
+  room.current = null;
+  room.currentCards = [];
+  room.trickPile = [];
+  room.seats.forEach((s) => {
+    s.passed = false;
+  });
+
+  // The trick winner leads the next one — unless that was the card that put
+  // them out, in which case the lead moves on to whoever is still playing.
+  room.turn = room.seats[room.currentSeat].hand.length > 0
+    ? room.currentSeat
+    : nextActiveSeat(room, room.currentSeat);
+
+  room.log.push({ t: 'trick', seat: room.currentSeat });
+  return true;
 }
 
 export function handPenalty(count) {
@@ -306,21 +345,33 @@ export function handPenalty(count) {
   return count;
 }
 
-function finishHand(room, winnerSeat) {
+function finishHand(room) {
   room.phase = 'done';
-  room.winner = winnerSeat;
+  const winnerSeat = room.finishOrder[0];
+  room.winner = winnerSeat ?? null;
 
   const deltas = [0, 0, 0, 0];
-  let pot = 0;
+
+  if (room.mode === MODES.PLAY_TO_END) {
+    // Everyone has a finishing position, so score the positions. Card counts
+    // are useless here — only the last player has any cards left.
+    room.finishOrder.forEach((seatIndex, i) => {
+      deltas[seatIndex] = RANK_POINTS[i] ?? 0;
+    });
+  } else {
+    let pot = 0;
+    room.seats.forEach((seat) => {
+      if (seat.index === winnerSeat) return;
+      const penalty = handPenalty(seat.hand.length);
+      deltas[seat.index] = penalty;
+      pot += penalty;
+    });
+    deltas[winnerSeat] = -pot;
+  }
+
   room.seats.forEach((seat) => {
-    if (seat.index === winnerSeat) return;
-    const penalty = handPenalty(seat.hand.length);
-    seat.score += penalty;
-    deltas[seat.index] = penalty;
-    pot += penalty;
+    seat.score += deltas[seat.index];
   });
-  room.seats[winnerSeat].score -= pot;
-  deltas[winnerSeat] = -pot;
 
   room.history = room.history || [];
   room.history.push({
@@ -328,16 +379,20 @@ function finishHand(room, winnerSeat) {
     winner: winnerSeat,
     deltas,
     left: room.seats.map((s) => s.hand.length),
+    order: [...room.finishOrder],
+    mode: room.mode,
   });
-  room.log.push({ t: 'win', seat: winnerSeat, pot });
+  room.log.push({ t: 'win', seat: winnerSeat, order: [...room.finishOrder] });
 }
 
 // Wipes the running scores and starts a fresh match on the same seats.
 export function resetScores(room) {
   room.seats.forEach((seat) => {
     seat.score = 0;
+    seat.rank = null;
   });
   room.history = [];
+  room.finishOrder = [];
   room.handNo = 0;
   return room;
 }
@@ -372,8 +427,25 @@ export function applyPlay(room, seatIndex, cards) {
   room.log.push({ t: 'play', seat: seatIndex, cards: room.currentCards, combo: combo.type });
 
   if (seat.hand.length === 0) {
-    finishHand(room, seatIndex);
-    return { ok: true };
+    room.finishOrder.push(seatIndex);
+    seat.rank = room.finishOrder.length;
+
+    if (room.mode !== MODES.PLAY_TO_END) {
+      finishHand(room);
+      return { ok: true };
+    }
+
+    // Play on without them. Once one player is left holding cards there is
+    // nothing to contest, so they take last place and the hand ends.
+    const stillPlaying = room.seats.filter((s) => s.hand.length > 0);
+    if (stillPlaying.length <= 1) {
+      for (const last of stillPlaying) {
+        room.finishOrder.push(last.index);
+        last.rank = room.finishOrder.length;
+      }
+      finishHand(room);
+      return { ok: true };
+    }
   }
 
   room.turn = nextActiveSeat(room, seatIndex);
@@ -413,6 +485,8 @@ export function redact(room, seatIndex) {
     mustInclude: room.mustInclude,
     winner: room.winner,
     hostSeat: room.hostSeat ?? 0,
+    mode: room.mode || MODES.FIRST_OUT,
+    finishOrder: room.finishOrder || [],
     seats: room.seats.map((s) => ({
       index: s.index,
       name: s.name,
@@ -422,6 +496,7 @@ export function redact(room, seatIndex) {
       passed: s.passed,
       away: s.away,
       score: s.score,
+      rank: s.rank ?? null,
       emote: s.emote,
       joined: Boolean(s.id),
     })),

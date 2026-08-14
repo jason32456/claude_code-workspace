@@ -9,9 +9,10 @@ import { chooseMove, thinkDelay, botName } from './bot.js';
 
 const YOU = 0;
 
-export function createLocalSession({ difficulty = 'sharp', name = 'You' } = {}) {
+export function createLocalSession({ difficulty = 'sharp', name = 'You', mode } = {}) {
   const seed = (Math.random() * 2 ** 31) | 0;
   const room = createRoom('SOLO', seed);
+  if (mode) room.mode = mode;
   const listeners = new Set();
   let timer = null;
   let alive = true;
