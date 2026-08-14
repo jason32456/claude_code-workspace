@@ -509,6 +509,7 @@ module.exports = async function handler(req, res) {
       action === 'next' ||
       action === 'newgame' ||
       action === 'start' ||
+      action === 'set-mode' ||
       action === 'leave'
     ) {
       const code = String(body.code || '').toUpperCase();
@@ -543,12 +544,29 @@ module.exports = async function handler(req, res) {
           return null;
         }
 
+        // The host picks the rule set in the lobby; persisting it means the
+        // other players can see which one they are about to play.
+        if (action === 'set-mode') {
+          if (room.hostSeat !== seatIndex) {
+            return { error: 'Only the host can change the rules', status: 403 };
+          }
+          if (room.phase === 'playing') {
+            return { error: 'Finish the hand first', status: 409 };
+          }
+          if (!Object.values(engine.MODES).includes(body.mode)) {
+            return { error: 'Unknown rule set', status: 400 };
+          }
+          room.mode = body.mode;
+          return null;
+        }
+
         if (action === 'start') {
           if (room.hostSeat !== seatIndex) {
             return { error: 'Only the host can start the game', status: 403 };
           }
           if (room.phase !== 'lobby') return { error: 'Game already started', status: 409 };
 
+          if (Object.values(engine.MODES).includes(body.mode)) room.mode = body.mode;
           const difficulty = DIFFICULTIES.includes(body.difficulty) ? body.difficulty : 'sharp';
           for (const s of room.seats) {
             if (s.kind !== 'empty') continue;

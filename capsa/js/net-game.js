@@ -181,8 +181,11 @@ export function createNetSession(credentials) {
     newGame() {
       return send('newgame');
     },
-    start(difficulty) {
-      return send('start', { difficulty });
+    start(difficulty, mode) {
+      return send('start', { difficulty, mode });
+    },
+    setMode(mode) {
+      return send('set-mode', { mode });
     },
     subscribe(fn) {
       listeners.add(fn);

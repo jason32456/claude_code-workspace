@@ -70,6 +70,16 @@
         </div>
       </label>
       <p class="hint-text" id="difficulty-blurb">Plays a solid game — holds 2s back and won't break a pair to win a trick it doesn't need.</p>
+
+      <label class="field">
+        <span>Rules</span>
+        <div class="pill-group pill-group-2" id="mode-group">
+          <button class="pill is-active" data-mode="firstOut">First out wins</button>
+          <button class="pill" data-mode="playToEnd">Play to the end</button>
+        </div>
+      </label>
+      <p class="hint-text" id="mode-blurb">The hand stops the moment someone sheds their last card. Everyone else scores the cards left in their hand.</p>
+
       <button class="btn btn-primary" id="btn-solo">Deal me in</button>
     </section>
 
@@ -234,6 +244,13 @@
 
     <div class="lobby-host" id="lobby-host" hidden>
       <label class="field">
+        <span>Rules</span>
+        <div class="pill-group pill-group-2" id="lobby-mode">
+          <button class="pill is-active" data-mode="firstOut">First out wins</button>
+          <button class="pill" data-mode="playToEnd">Play to the end</button>
+        </div>
+      </label>
+      <label class="field">
         <span>Fill empty seats with</span>
         <div class="pill-group" id="lobby-difficulty">
           <button class="pill" data-difficulty="casual">Casual</button>
@@ -245,6 +262,7 @@
     </div>
 
     <p class="lobby-wait" id="lobby-wait" hidden>Waiting for the host to start…</p>
+    <p class="lobby-mode-note" id="lobby-mode-note"></p>
     <button class="link-btn" id="btn-lobby-leave">Leave room</button>
   </div>
 </div>
@@ -279,10 +297,16 @@
        When everyone else passes, the last player to play leads a fresh trick with
        anything they like.</p>
 
-    <h3>Scoring</h3>
-    <p>Losers score their remaining cards as penalty points — doubled at 8 cards,
-       tripled at 10, quadrupled if you never played at all. The winner takes the
-       negative of everyone's penalties. Low score wins.</p>
+    <h3>Two rule sets</h3>
+    <p><strong>First out wins</strong> — the hand stops the moment someone sheds
+       their last card. Losers score the cards left in their hand as penalty
+       points, doubled at 8 cards, tripled at 10, quadrupled if they never played
+       at all. The winner takes the negative of everyone's penalties.</p>
+    <p><strong>Play to the end</strong> — going out does not stop the hand. The
+       rest keep playing for 2nd and 3rd, and whoever is left holding cards comes
+       4th. Scoring is by finishing position instead of cards:</p>
+    <p class="mono">1st −3 · 2nd −1 · 3rd +1 · 4th +3</p>
+    <p>Either way the totals are zero-sum and the lowest total wins.</p>
 
     <button class="btn btn-primary" id="btn-rules-close">Got it</button>
   </div>

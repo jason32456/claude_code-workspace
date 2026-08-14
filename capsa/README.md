@@ -164,6 +164,49 @@ On desktop: `Enter` play, `Space` pass, `H` hint, `Esc` clear, `1`–`0` toggle
 cards. Cards you could legally play are marked with a small gold underline when
 it is your turn.
 
+## Two rule sets
+
+Pick one before the hand starts — in the solo menu, or in the lobby, where the
+host chooses and everyone sees which one they are about to play.
+
+### First out wins *(default)*
+
+The hand stops the moment someone sheds their last card. Everyone else scores
+the cards left in their hand — ×2 at 8 cards, ×3 at 10, ×4 if they never played
+— and the winner takes the negative of that total.
+
+### Play to the end
+
+Going out does **not** stop the hand. The remaining players keep going for 2nd
+and 3rd, and whoever is left still holding cards comes 4th. You get a real
+finishing order rather than one winner and three losers.
+
+Scoring switches to position, because card counts cannot rank a hand that was
+played out — everybody except the last player finishes on zero:
+
+| Place | Points |
+|---|---|
+| 1st | −3 |
+| 2nd | −1 |
+| 3rd | +1 |
+| 4th | +3 |
+
+Both are zero-sum, and the lowest total still wins the match.
+
+Two rules change once players can be out mid-hand, and both are handled:
+
+- **A player who is out is skipped entirely** — not merely passed for the trick.
+- **Going out can end a trick.** If nobody left holding cards can answer the
+  play, the trick closes; and because its winner has no cards, the lead moves on
+  to the next player still in the hand rather than stalling on an empty seat.
+
+A seat that has finished keeps its place at the table, dimmed, with the position
+it took:
+
+| Play-to-the-end, mid-hand | Final ranking |
+|:---:|:---:|
+| ![Ranking](../showcase/apps/capsa/screenshots/ranking.png) | ![Result](../showcase/apps/capsa/screenshots/result.png) |
+
 ## The table
 
 Plays are not replaced one at a time — every play in the current trick stays on
@@ -238,9 +281,9 @@ Whoever holds 3♦ leads first and must include it. After that, beat the table w
 the same number of cards or pass. When the other three all pass, the last player
 to play leads a fresh trick with anything.
 
-Losers score their remaining cards as penalty points — ×2 at 8 cards, ×3 at 10,
-×4 if they never played at all. The winner takes the negative of the total, so
-every hand is zero-sum and low score wins.
+How the hand ends and how it scores depends on the rule set — see
+[Two rule sets](#two-rule-sets). Either way the totals are zero-sum and the
+lowest total wins.
 
 ## Opponents
 
@@ -275,8 +318,9 @@ you can wait for people to arrive.
 - The host chooses a bot difficulty for whatever seats are still empty at the
   moment they start — a room can be started with one human and three bots, or
   with four humans and no bots at all.
-- **Only the host** can start the game, deal the next hand, or reset the match
-  with New game. All three are rejected server-side, not merely hidden in the UI.
+- **Only the host** can choose the rule set, start the game, deal the next hand,
+  or reset the match with New game. All of them are rejected server-side, not
+  merely hidden in the UI.
 - If the host leaves, the host role migrates to another human in the room, so a
   lobby can never be left with nobody able to start it.
 - Joining a room whose hand is already running is still allowed — you take over

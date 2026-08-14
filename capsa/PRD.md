@@ -103,12 +103,15 @@ A higher category always beats a lower one. Within a category:
 - Once three consecutive players pass, the trick closes. The player who made the
   last play leads the next trick with **any legal combination**.
 - Passing is binding for the current trick only; you re-enter on the next.
-- A player who empties their hand ends the game immediately.
+- A player who empties their hand goes out. Whether that ends the hand depends
+  on the rule set — see [Rule sets](#rule-sets). A player who is out is skipped
+  in turn order entirely, and cannot be the one to lead a new trick.
 
 ### Score tracking
 
-Each finished hand appends `{hand, winner, deltas, left}` to the room's history,
-so the tracker can show more than a running total: totals sorted best-first, and
+Each finished hand appends `{hand, winner, deltas, left, order, mode}` to the
+room's history, so the tracker can show more than a running total: totals
+sorted best-first, and
 a hand-by-hand breakdown. **New game** clears scores and history and deals
 again on the same seats — host-only online, and refused mid-hand.
 
@@ -140,7 +143,27 @@ breathes), and that a trick is over (the pile lifts away instead of vanishing).
 Everything is decorative and everything is disabled under
 `prefers-reduced-motion`.
 
-### Scoring
+### Rule sets
+
+Two ways to end a hand, chosen before it starts (host's choice online):
+
+- **First out wins** — the hand stops when someone sheds their last card.
+- **Play to the end** — going out does not stop the hand; the rest play on for
+  2nd and 3rd, and the player left holding cards comes 4th.
+
+Play-to-the-end forces two changes that first-out never exercises: a player who
+is out must be skipped in turn order rather than treated as passed, and going
+out can itself close a trick — in which case the lead cannot stay with the
+player who won it, because they have no cards. Both are in the engine, and both
+are covered by the mode soak test.
+
+Scoring has to differ, because card counts cannot rank a hand that was played
+out — everyone but the last player finishes on zero. Play-to-the-end scores by
+position (1st −3, 2nd −1, 3rd +1, 4th +3); first-out keeps the card-count
+penalties. Both remain zero-sum, so the tracker's totals stay comparable across
+a match even if the rule set changes between hands.
+
+### Scoring — first out wins
 
 Each losing player scores penalty points equal to the cards left in hand,
 multiplied by a hand-size penalty:
@@ -290,6 +313,8 @@ All three respect a 600–1400 ms randomized think-time so play feels human.
 ## Success criteria
 
 - [ ] Full 4-player hand playable end to end against bots with no illegal move accepted.
+- [ ] Both rule sets terminate every hand, with a complete 1st-to-4th order in
+      play-to-the-end and zero-sum scoring in both.
 - [ ] Two browsers joining one room code stay in sync within ~1 s.
 - [ ] Closing a tab mid-game does not stall the other players.
 - [ ] Usable one-handed at 390×844; uses the space at 1440×900.
