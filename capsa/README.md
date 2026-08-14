@@ -83,10 +83,36 @@ Finally, paste the deployment URL into `CAPSA_URL` at the top of
 | **Pass** | give up the trick (disabled when you are leading — there is nothing to beat) |
 | **Hint** | selects the lowest legal play, or tells you that you have to pass |
 | **Sort** | clears the selection and re-tidies the hand |
+| **📊 Scores** | running totals plus a hand-by-hand breakdown, and the New game button |
 
 On desktop: `Enter` play, `Space` pass, `H` hint, `Esc` clear, `1`–`0` toggle
 cards. Cards you could legally play are marked with a small gold underline when
 it is your turn.
+
+## The table
+
+Plays are not replaced one at a time — every play in the current trick stays on
+the table and cascades up and to the left as it is buried, so you can read back
+what the trick has been. Each earlier play keeps its rank corner visible; the
+live play sits on top at full brightness. Three plays back are kept and anything
+older is trimmed, since past that it is clutter rather than information. When
+the trick closes the whole pile is lifted away rather than blinking out.
+
+Cards fly in from the direction of the seat that played them, your hand deals in
+with a stagger, the active seat's ring breathes so it is findable at a glance,
+and your score bumps when it changes. All of it is decorative and all of it is
+disabled under `prefers-reduced-motion`.
+
+## Scores
+
+The 📊 button opens a running tracker: totals sorted best-first with the leader
+marked, and a hand-by-hand table showing what each player scored in each hand
+(the winner's figure in gold). Opponents also carry their running total on their
+seat once it is non-zero.
+
+**New game** resets every score and the history and deals a fresh hand on the
+same seats — no need to leave and share a new room code. Online it is host-only
+and refuses to run mid-hand, like Start and Next hand.
 
 ## Rules as implemented
 
@@ -146,8 +172,8 @@ you can wait for people to arrive.
 - The host chooses a bot difficulty for whatever seats are still empty at the
   moment they start — a room can be started with one human and three bots, or
   with four humans and no bots at all.
-- **Only the host** can start the game or deal the next hand. Both are rejected
-  server-side, not merely hidden in the UI.
+- **Only the host** can start the game, deal the next hand, or reset the match
+  with New game. All three are rejected server-side, not merely hidden in the UI.
 - If the host leaves, the host role migrates to another human in the room, so a
   lobby can never be left with nobody able to start it.
 - Joining a room whose hand is already running is still allowed — you take over

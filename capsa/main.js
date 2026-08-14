@@ -118,12 +118,92 @@ function renderResult(view) {
 
   const isHost = view.you === view.hostSeat;
   $('btn-next-hand').hidden = !isHost;
+  $('btn-new-game').hidden = !isHost;
   $('result-wait').hidden = isHost;
   if (!isHost) {
     $('result-wait').textContent = `Waiting for ${view.seats[view.hostSeat].name} to deal…`;
   }
 
   $('overlay-result').hidden = false;
+}
+
+/* ── Scoreboard ──────────────────────────────────────────────────────────── */
+
+let latestView = null;
+
+function renderScores(view) {
+  const best = Math.min(...view.seats.map((s) => s.score));
+  const label = (seat) => (seat.index === view.you ? 'You' : seat.name);
+
+  // Count finished hands, not dealt ones — a hand in progress has not scored.
+  const played = (view.history || []).length;
+  $('scores-sub').textContent =
+    played > 0
+      ? `${played} hand${played === 1 ? '' : 's'} played · lowest total wins.`
+      : 'No hands finished yet · lowest total wins.';
+
+  $('scores-totals').replaceChildren(
+    ...[...view.seats]
+      .sort((a, b) => a.score - b.score)
+      .map((seat) => {
+        const row = document.createElement('tr');
+        if (seat.score === best && played > 0) row.className = 'is-leader';
+
+        const name = document.createElement('td');
+        name.className = 'sb-name';
+        name.textContent = label(seat);
+
+        const kind = document.createElement('td');
+        kind.className = 'sb-cards';
+        kind.textContent = seat.kind === 'bot' ? 'bot' : '';
+
+        const total = document.createElement('td');
+        total.className = 'sb-delta' + (seat.score < 0 ? ' good' : '');
+        total.textContent = `${seat.score > 0 ? '+' : ''}${seat.score}`;
+
+        row.append(name, kind, total);
+        return row;
+      }),
+  );
+
+  const history = view.history || [];
+  $('history-empty').hidden = history.length > 0;
+
+  const head = document.createElement('tr');
+  const corner = document.createElement('th');
+  corner.textContent = 'Hand';
+  head.append(corner);
+  for (const seat of view.seats) {
+    const th = document.createElement('th');
+    th.textContent = label(seat);
+    head.append(th);
+  }
+  $('history-head').replaceWith(head);
+  head.id = 'history-head';
+
+  $('history-rows').replaceChildren(
+    ...history
+      .slice()
+      .reverse()
+      .map((entry) => {
+        const row = document.createElement('tr');
+        const n = document.createElement('td');
+        n.textContent = `#${entry.hand}`;
+        row.append(n);
+        for (const seat of view.seats) {
+          const td = document.createElement('td');
+          const delta = entry.deltas[seat.index];
+          td.textContent = `${delta > 0 ? '+' : ''}${delta}`;
+          if (entry.winner === seat.index) td.className = 'win';
+          row.append(td);
+        }
+        return row;
+      }),
+  );
+
+  // Only the host may reset an online match.
+  $('btn-scores-new').hidden = view.you !== view.hostSeat;
+  $('overlay-scores').hidden = false;
 }
 
 /* ── Lobby ───────────────────────────────────────────────────────────────── */
@@ -190,7 +270,15 @@ function attach(next, { code = null } = {}) {
 
   unsubscribe = session.subscribe((view) => {
     if (!view) return;
+    const scoreChanged = latestView && latestView.seats[view.you].score !== view.seats[view.you].score;
+    latestView = view;
     table.render(view);
+    if (scoreChanged) {
+      el.youScore.classList.remove('is-bumped');
+      void el.youScore.offsetWidth; // restart the animation
+      el.youScore.classList.add('is-bumped');
+    }
+    if (!$('overlay-scores').hidden) renderScores(view);
 
     if (view.phase === 'lobby') {
       renderLobby(view);
@@ -218,6 +306,8 @@ function detach() {
   unsubscribe = null;
   $('overlay-result').hidden = true;
   $('overlay-lobby').hidden = true;
+  $('overlay-scores').hidden = true;
+  latestView = null;
 }
 
 /* ── Menu ────────────────────────────────────────────────────────────────── */
@@ -371,6 +461,27 @@ $('btn-next-hand').addEventListener('click', async () => {
   $('overlay-result').hidden = true;
   const result = await session.nextHand();
   if (result && !result.ok) toast(result.error);
+});
+
+async function startNewGame() {
+  $('overlay-result').hidden = true;
+  $('overlay-scores').hidden = true;
+  const result = await session.newGame();
+  if (result && !result.ok) toast(result.error);
+  else toast('New game — scores reset');
+}
+
+$('btn-new-game').addEventListener('click', startNewGame);
+$('btn-scores-new').addEventListener('click', startNewGame);
+
+$('btn-scores').addEventListener('click', () => {
+  if (latestView) renderScores(latestView);
+});
+$('btn-scores-close').addEventListener('click', () => {
+  $('overlay-scores').hidden = true;
+});
+$('overlay-scores').addEventListener('click', (event) => {
+  if (event.target === $('overlay-scores')) $('overlay-scores').hidden = true;
 });
 
 for (const pill of document.querySelectorAll('#lobby-difficulty .pill')) {

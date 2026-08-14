@@ -286,6 +286,7 @@ module.exports = async function handler(req, res) {
       action === 'play' ||
       action === 'pass' ||
       action === 'next' ||
+      action === 'newgame' ||
       action === 'start' ||
       action === 'leave'
     ) {
@@ -344,6 +345,21 @@ module.exports = async function handler(req, res) {
             return { error: 'Only the host can deal the next hand', status: 403 };
           }
           if (room.phase !== 'done') return { error: 'Hand is still in progress', status: 409 };
+          engine.startHand(room, (Math.random() * 2 ** 31) | 0);
+          room.botAt = Date.now() + 900;
+          return null;
+        }
+
+        // Same seats, scores back to zero — used to start a fresh match without
+        // everyone having to leave and re-share a new room code.
+        if (action === 'newgame') {
+          if (room.hostSeat !== seatIndex) {
+            return { error: 'Only the host can start a new game', status: 403 };
+          }
+          if (room.phase === 'playing') {
+            return { error: 'Finish the hand first', status: 409 };
+          }
+          engine.resetScores(room);
           engine.startHand(room, (Math.random() * 2 ** 31) | 0);
           room.botAt = Date.now() + 900;
           return null;

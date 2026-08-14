@@ -19,7 +19,9 @@ export function createTable(el, handlers) {
   let selected = new Set();
   let hinted = new Set();
   let lastHandKey = '';
-  let lastPlayKey = '';
+  let lastPileKey = '';
+  let lastTrick = 0;
+  let lastHandNo = 0;
 
   const isYourTurn = () =>
     view && view.phase === 'playing' && view.turn === view.you;
@@ -62,6 +64,14 @@ export function createTable(el, handlers) {
         count.textContent = String(seat.handCount);
 
         node.append(name, sub, count);
+
+        // Running total, once there is one worth showing.
+        if (seat.score !== 0) {
+          const score = document.createElement('span');
+          score.className = 'opp-score' + (seat.score < 0 ? ' good' : '');
+          score.textContent = `${seat.score > 0 ? '+' : ''}${seat.score}`;
+          node.append(score);
+        }
         return node;
       }),
     );
@@ -69,22 +79,96 @@ export function createTable(el, handlers) {
 
   /* ── Centre ────────────────────────────────────────────────────────────── */
 
+  // Where a play should fly in from, relative to the seat that made it.
+  // Seat order around the table is: you at the bottom, then left, top, right.
+  function originFor(seat) {
+    const step = (seat - view.you + 4) % 4;
+    return ['0px, 130px', '-150px, 0px', '0px, -130px', '150px, 0px'][step];
+  }
+
+  const pileKey = (play) => `${play.seat}:${play.cards.join('.')}`;
+
+  // Only the jitter is computed here — the cascade itself lives in CSS, keyed
+  // off --depth, so the step can shrink on a phone without JS knowing about
+  // breakpoints. Cards are pushed up and to the left as they are buried, which
+  // keeps every earlier play's rank corner visible and clear of the label
+  // underneath the pile.
+  function jitterFor(jitter) {
+    return {
+      jx: (jitter % 7) - 3,
+      jy: (((jitter / 7) | 0) % 7) - 3,
+      rot: ((jitter % 15) - 7) * 0.9,
+    };
+  }
+
+  function buildGroup(play, index) {
+    const group = document.createElement('div');
+    group.className = 'play-group';
+    group.dataset.key = pileKey(play);
+    group.dataset.jitter = String((play.seat * 37 + play.cards[0] * 17 + index * 91) % 100);
+    group.style.setProperty('--from', originFor(play.seat));
+    group.append(...play.cards.map((c) => cardElement(c)));
+    return group;
+  }
+
+  // Lift the finished trick off the table instead of having it vanish.
+  function sweepPile() {
+    if (!el.playCards.children.length) return;
+    const ghost = document.createElement('div');
+    ghost.className = 'play-ghost';
+    ghost.append(...el.playCards.children);
+    el.playCards.parentElement.append(ghost);
+    requestAnimationFrame(() => ghost.classList.add('is-swept'));
+    setTimeout(() => ghost.remove(), 620);
+  }
+
   function renderPlayArea() {
-    const cards = view.currentCards || [];
-    const key = cards.join(',');
+    const pile = view.trickPile || [];
+    const key = `${view.handNo}|${view.trick}|${pile.map(pileKey).join('/')}`;
 
-    // Only rebuild when the played cards actually change. Recreating them on
-    // every render would restart the deal-in animation, leaving the table
-    // flickering once a second while opponents think.
-    if (key !== lastPlayKey) {
-      lastPlayKey = key;
-      el.playCards.replaceChildren(...cards.map((c) => cardElement(c)));
+    if (key !== lastPileKey) {
+      const trickChanged = view.trick !== lastTrick || view.handNo !== lastHandNo;
+      if (trickChanged) {
+        sweepPile();
+        el.playCards.replaceChildren();
+      }
+      lastTrick = view.trick;
+      lastHandNo = view.handNo;
+      lastPileKey = key;
+
+      // Append only what is new, so settled cards are not re-animated every
+      // time somebody else plays.
+      const rendered = [...el.playCards.children];
+      const shares = rendered.every((node, i) => pile[i] && node.dataset.key === pileKey(pile[i]));
+      if (!shares) el.playCards.replaceChildren();
+      const from = el.playCards.children.length;
+      for (let i = from; i < pile.length; i++) {
+        el.playCards.append(buildGroup(pile[i], i));
+      }
+
+      // Depth drives how far each play sits under the one on top of it.
+      // Re-laid out on every change: as a new play lands, the ones beneath it
+      // slide further out, which is what makes the pile read as a pile.
+      // Re-laid out on every change: as a new play lands, the ones beneath it
+      // slide further out, which is what makes the pile read as a pile.
+      const groups = [...el.playCards.children];
+      groups.forEach((node, i) => {
+        const depth = groups.length - 1 - i;
+        const { jx, jy, rot } = jitterFor(Number(node.dataset.jitter) || 0);
+        node.style.setProperty('--depth', String(depth));
+        node.style.setProperty('--jx', `${jx}px`);
+        node.style.setProperty('--jy', `${jy}px`);
+        node.style.setProperty('--jrot', `${rot.toFixed(1)}deg`);
+        node.classList.toggle('is-top', depth === 0);
+        node.classList.toggle('is-buried', depth >= 4);
+      });
     }
-    el.playEmpty.hidden = cards.length > 0;
 
-    if (cards.length && view.current) {
+    el.playEmpty.hidden = pile.length > 0;
+
+    if (view.current && view.currentSeat !== null) {
       const who = view.seats[view.currentSeat];
-      el.playMeta.textContent = `${COMBO_LABEL[view.current.type]} · ${who.name}`;
+      el.playMeta.textContent = `${COMBO_LABEL[view.current.type]} · ${who.index === view.you ? 'you' : who.name}`;
       el.playMeta.hidden = false;
     } else {
       el.playMeta.hidden = true;
@@ -128,9 +212,14 @@ export function createTable(el, handlers) {
       selected = new Set([...selected].filter((c) => hand.includes(c)));
       hinted.clear();
 
+      // A fresh deal fans in with a stagger; picking one card back up out of a
+      // hand you already hold should not replay the whole animation.
+      const isFreshDeal = hand.length === 13;
       el.hand.replaceChildren(
-        ...hand.map((card) => {
+        ...hand.map((card, i) => {
           const node = cardElement(card, { button: true });
+          if (isFreshDeal) node.style.setProperty('--deal-delay', `${i * 34}ms`);
+          else node.style.animation = 'none';
           node.addEventListener('click', () => toggle(card));
           return node;
         }),
@@ -163,13 +252,23 @@ export function createTable(el, handlers) {
   function sizeHand() {
     const count = el.hand.children.length;
     if (!count) return;
-    const available = el.hand.getBoundingClientRect().width;
+    // clientWidth is the padding box and, unlike getBoundingClientRect, is not
+    // inflated by the cards overflowing it — measuring the overflow was what
+    // let the fan grow wider than the phone.
+    const available = el.hand.clientWidth;
     // While the table is still hidden every measurement is 0, which would pin
     // the hand to maximum overlap and leave it there. Better to wait.
     if (available < 1) return;
-    const cardWidth = el.hand.firstElementChild.getBoundingClientRect().width;
+    const cardWidth = el.hand.firstElementChild.offsetWidth;
     if (cardWidth < 1) return;
     el.hand.style.setProperty('--overlap', `${overlapFor(count, available, cardWidth)}px`);
+  }
+
+  // Any change to the hand's width refits the fan, so a transient measurement
+  // during a screen transition or an orientation change cannot leave the cards
+  // stuck at the wrong overlap.
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => sizeHand()).observe(el.hand);
   }
 
   /* ── Actions ───────────────────────────────────────────────────────────── */

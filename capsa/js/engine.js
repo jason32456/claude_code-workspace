@@ -236,8 +236,13 @@ export function createRoom(code, seed) {
     currentSeat: null,
     mustInclude: null,
     trick: 0,
+    // Every play made in the current trick, oldest first, so the table can be
+    // drawn the way a real one looks — cards piling up rather than a single
+    // card replacing the last.
+    trickPile: [],
     played: [],
     log: [],
+    history: [],
     winner: null,
     botAt: 0,
     createdAt: Date.now(),
@@ -262,6 +267,7 @@ export function startHand(room, seed) {
   room.currentSeat = null;
   room.mustInclude = THREE_OF_DIAMONDS;
   room.trick = 1;
+  room.trickPile = [];
   room.played = [];
   room.winner = null;
   room.log = [{ t: 'deal', hand: room.handNo }];
@@ -282,6 +288,7 @@ function closeTrickIfSettled(room) {
     room.trick += 1;
     room.current = null;
     room.currentCards = [];
+    room.trickPile = [];
     room.turn = room.currentSeat;
     room.seats.forEach((s) => {
       s.passed = false;
@@ -302,15 +309,37 @@ export function handPenalty(count) {
 function finishHand(room, winnerSeat) {
   room.phase = 'done';
   room.winner = winnerSeat;
+
+  const deltas = [0, 0, 0, 0];
   let pot = 0;
   room.seats.forEach((seat) => {
     if (seat.index === winnerSeat) return;
     const penalty = handPenalty(seat.hand.length);
     seat.score += penalty;
+    deltas[seat.index] = penalty;
     pot += penalty;
   });
   room.seats[winnerSeat].score -= pot;
+  deltas[winnerSeat] = -pot;
+
+  room.history = room.history || [];
+  room.history.push({
+    hand: room.handNo,
+    winner: winnerSeat,
+    deltas,
+    left: room.seats.map((s) => s.hand.length),
+  });
   room.log.push({ t: 'win', seat: winnerSeat, pot });
+}
+
+// Wipes the running scores and starts a fresh match on the same seats.
+export function resetScores(room) {
+  room.seats.forEach((seat) => {
+    seat.score = 0;
+  });
+  room.history = [];
+  room.handNo = 0;
+  return room;
 }
 
 // Applies a play. Returns { ok: true } or { ok: false, error } — never throws
@@ -339,6 +368,7 @@ export function applyPlay(room, seatIndex, cards) {
   room.currentSeat = seatIndex;
   room.mustInclude = null;
   room.played.push(...cards);
+  room.trickPile.push({ seat: seatIndex, cards: room.currentCards, type: combo.type });
   room.log.push({ t: 'play', seat: seatIndex, cards: room.currentCards, combo: combo.type });
 
   if (seat.hand.length === 0) {
@@ -379,6 +409,7 @@ export function redact(room, seatIndex) {
     current: room.current,
     currentCards: room.currentCards,
     currentSeat: room.currentSeat,
+    trickPile: room.trickPile || [],
     mustInclude: room.mustInclude,
     winner: room.winner,
     hostSeat: room.hostSeat ?? 0,
@@ -395,6 +426,7 @@ export function redact(room, seatIndex) {
       joined: Boolean(s.id),
     })),
     hand: seatIndex === null ? [] : room.seats[seatIndex].hand,
+    history: (room.history || []).slice(-12),
     log: room.log.slice(-24),
   };
 }

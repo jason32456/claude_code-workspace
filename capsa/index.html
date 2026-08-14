@@ -72,7 +72,10 @@
         <span class="room-tag" id="room-tag" hidden></span>
         <span class="trick-tag" id="trick-tag">Trick 1</span>
       </div>
-      <button class="icon-btn" id="btn-rules-2" aria-label="Rules">?</button>
+      <div class="topbar-end">
+        <button class="icon-btn" id="btn-scores" aria-label="Scores">📊</button>
+        <button class="icon-btn" id="btn-rules-2" aria-label="Rules">?</button>
+      </div>
     </header>
 
     <section class="opponents" id="opponents"></section>
@@ -112,6 +115,29 @@
     <div class="dialog-actions">
       <button class="btn btn-ghost" id="btn-result-leave">Leave</button>
       <button class="btn btn-primary" id="btn-next-hand">Next hand</button>
+    </div>
+    <button class="link-btn" id="btn-new-game">Start a new game — reset scores</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-scores" hidden>
+  <div class="dialog dialog-scroll">
+    <h2>Scores</h2>
+    <p class="scores-sub" id="scores-sub">Lowest total wins.</p>
+    <table class="scoreboard scoreboard-totals"><tbody id="scores-totals"></tbody></table>
+
+    <h3>Hand by hand</h3>
+    <div class="history-scroll">
+      <table class="history-table">
+        <thead><tr id="history-head"></tr></thead>
+        <tbody id="history-rows"></tbody>
+      </table>
+    </div>
+    <p class="history-empty" id="history-empty" hidden>No hands finished yet.</p>
+
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="btn-scores-close">Close</button>
+      <button class="btn btn-primary" id="btn-scores-new">New game</button>
     </div>
   </div>
 </div>

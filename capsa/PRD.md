@@ -104,6 +104,22 @@ A higher category always beats a lower one. Within a category:
 - Passing is binding for the current trick only; you re-enter on the next.
 - A player who empties their hand ends the game immediately.
 
+### Score tracking
+
+Each finished hand appends `{hand, winner, deltas, left}` to the room's history,
+so the tracker can show more than a running total: totals sorted best-first, and
+a hand-by-hand breakdown. **New game** clears scores and history and deals
+again on the same seats — host-only online, and refused mid-hand.
+
+### Motion
+
+Motion is used to answer questions the player would otherwise have to work out:
+where a card came from (plays fly in from the seat that played them), what just
+changed (score bump, badge fade-in), whose turn it is (the active seat's ring
+breathes), and that a trick is over (the pile lifts away instead of vanishing).
+Everything is decorative and everything is disabled under
+`prefers-reduced-motion`.
+
 ### Scoring
 
 Each losing player scores penalty points equal to the cards left in hand,
@@ -198,7 +214,10 @@ All three respect a 600–1400 ms randomized think-time so play feels human.
 
 - Opponents as a compact row of avatars along the top: name, card count, a
   "passed" dimmer, and a turn ring.
-- Table centre shows the current play, large.
+- Table centre shows the trick as a pile: every play made in the current trick
+  stays visible, cascading up-left as it is buried so each one keeps its rank
+  corner readable, with the live play on top. The pile is swept when the trick
+  closes.
 - Your hand fans across the bottom, overlapped so 13 cards fit at 390 px.
   Tapping a card lifts it; tapping again drops it.
 - A sticky action bar sits above the safe-area inset: **Pass**, **Play** (labelled

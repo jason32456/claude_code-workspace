@@ -171,6 +171,9 @@ export function createNetSession(credentials) {
     nextHand() {
       return send('next');
     },
+    newGame() {
+      return send('newgame');
+    },
     start(difficulty) {
       return send('start', { difficulty });
     },

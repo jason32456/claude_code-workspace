@@ -4,7 +4,7 @@
 // nextHand / subscribe / leave) so the table UI is identical either way, and
 // so the game stays fully playable when there is no server at all.
 
-import { createRoom, startHand, applyPlay, applyPass, redact } from './engine.js';
+import { createRoom, startHand, applyPlay, applyPass, redact, resetScores } from './engine.js';
 import { chooseMove, thinkDelay, botName } from './bot.js';
 
 const YOU = 0;
@@ -96,6 +96,13 @@ export function createLocalSession({ difficulty = 'sharp', name = 'You' } = {}) 
       return result;
     },
     nextHand() {
+      startHand(room, (Math.random() * 2 ** 31) | 0);
+      emit();
+      schedule();
+      return { ok: true };
+    },
+    newGame() {
+      resetScores(room);
       startHand(room, (Math.random() * 2 ** 31) | 0);
       emit();
       schedule();

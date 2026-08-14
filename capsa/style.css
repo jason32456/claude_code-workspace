@@ -18,6 +18,10 @@
   --card-h: 66px;
   --radius: 14px;
 
+  /* Per-step offset for buried plays in the trick pile. */
+  --pile-x: -15px;
+  --pile-y: -13px;
+
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
 
@@ -293,7 +297,12 @@ input:focus-visible, button:focus-visible {
 .opp.is-turn {
   border-color: var(--gold);
   background: rgba(232, 196, 119, 0.14);
-  box-shadow: 0 0 0 1px var(--gold), 0 6px 18px rgba(232, 196, 119, 0.16);
+  animation: turn-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes turn-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px var(--gold), 0 4px 14px rgba(232, 196, 119, 0.14); }
+  50% { box-shadow: 0 0 0 2px var(--gold), 0 8px 26px rgba(232, 196, 119, 0.3); }
 }
 .opp.is-passed { opacity: 0.45; }
 .opp.is-away .opp-name::after { content: " ⏻"; color: var(--red); }
@@ -327,6 +336,16 @@ input:focus-visible, button:focus-visible {
   display: inline-block;
 }
 
+.opp-score {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+.opp-score.good { color: var(--gold); }
+
 .opp-badge {
   position: absolute;
   top: -7px;
@@ -345,6 +364,12 @@ input:focus-visible, button:focus-visible {
 }
 .opp-badge.pass { color: var(--ink-faint); }
 .opp-badge.play { color: var(--gold); border-color: var(--gold-dim); }
+.opp-badge { animation: badge-in 0.22s ease both; }
+
+@keyframes badge-in {
+  from { opacity: 0; transform: translate(-50%, 4px) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
 
 /* Felt */
 .felt {
@@ -362,9 +387,9 @@ input:focus-visible, button:focus-visible {
    you where to look, and stops the middle of the table reading as empty. */
 .play-area {
   text-align: center;
-  min-width: 190px;
-  min-height: calc(var(--card-h) + 56px);
-  padding: 14px 18px;
+  min-width: 210px;
+  min-height: calc(var(--card-h) + 96px);
+  padding: 52px 18px 16px; /* headroom for the pile cascading upward */
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.14);
   border: 1px dashed rgba(255, 255, 255, 0.08);
@@ -373,16 +398,77 @@ input:focus-visible, button:focus-visible {
   gap: 2px;
 }
 
+/* The trick pile. Every play in the current trick stays on the table, stacked
+   the way it would be in front of you, until the trick is swept. */
 .play-cards {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
+  position: relative;
+  display: grid;
+  place-items: center;
   min-height: var(--card-h);
 }
+.play-cards > * { grid-area: 1 / 1; }
 
 /* With no cards down, the reserved row would push the "lead anything" prompt
    to the top of an otherwise empty box. */
 .play-cards:empty { min-height: 0; }
+
+.play-group {
+  display: flex;
+  gap: 4px;
+  /* Buried plays cascade up and to the left. Every earlier play keeps its
+     rank corner in view, and the pile never grows down into the label. */
+  transform:
+    translate(
+      calc(var(--depth, 0) * var(--pile-x) + var(--jx, 0px)),
+      calc(var(--depth, 0) * var(--pile-y) + var(--jy, 0px))
+    )
+    rotate(calc(var(--jrot, 0deg) - var(--depth, 0) * 2.5deg))
+    scale(calc(1 - var(--depth, 0) * 0.04));
+  transition: transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.3s ease;
+  animation: play-land 0.34s cubic-bezier(0.18, 0.75, 0.28, 1) both;
+  will-change: transform;
+}
+
+/* Buried plays stay legible as a pile without competing with the live one. */
+.play-group:not(.is-top) { opacity: 0.78; filter: brightness(0.6) saturate(0.8); }
+.play-group:not(.is-top) .card { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+/* Beyond three plays back the pile stops being informative and starts being
+   clutter, so it is trimmed rather than fanned forever. */
+.play-group.is-buried { display: none; }
+
+/* Cards fly in from the seat that played them. */
+@keyframes play-land {
+  from {
+    opacity: 0;
+    transform: translate(var(--from, 0, 0)) rotate(calc(var(--jrot, 0deg) * 3)) scale(1.16);
+  }
+  to {
+    opacity: 1;
+    transform:
+      translate(
+        calc(var(--depth, 0) * var(--pile-x) + var(--jx, 0px)),
+        calc(var(--depth, 0) * var(--pile-y) + var(--jy, 0px))
+      )
+      rotate(calc(var(--jrot, 0deg) - var(--depth, 0) * 2.5deg))
+      scale(calc(1 - var(--depth, 0) * 0.04));
+  }
+}
+
+/* The finished trick is lifted away rather than deleted. */
+.play-ghost {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.play-ghost > * { grid-area: 1 / 1; }
+.play-ghost.is-swept {
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.7, 0.4), opacity 0.55s ease;
+  transform: translateY(-34px) scale(0.78) rotate(6deg);
+  opacity: 0;
+}
 
 .play-empty { color: var(--ink-faint); font-size: 14px; margin: 0; }
 .play-cards:empty + .play-meta { display: none; }
@@ -508,11 +594,12 @@ input:focus-visible, button:focus-visible {
 
 .play-cards .card { box-shadow: 0 5px 14px rgba(0, 0, 0, 0.42); }
 
+/* Your hand deals in with a slight stagger rather than appearing at once. */
 @keyframes deal-in {
-  from { opacity: 0; transform: translateY(14px) scale(0.94); }
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
   to { opacity: 1; transform: none; }
 }
-.play-cards .card { animation: deal-in 0.2s ease both; }
+.hand .card { animation: deal-in 0.26s ease both; animation-delay: var(--deal-delay, 0ms); }
 
 /* ── Overlays ────────────────────────────────────────────────────────────── */
 
@@ -605,7 +692,7 @@ input:focus-visible, button:focus-visible {
 /* ── Desktop: a real table, not a stretched phone ────────────────────────── */
 
 @media (min-width: 900px) {
-  :root { --card-w: 66px; --card-h: 94px; }
+  :root { --card-w: 66px; --card-h: 94px; --pile-x: -22px; --pile-y: -18px; }
 
   .table-grid {
     max-width: 1180px;
@@ -662,9 +749,9 @@ input:focus-visible, button:focus-visible {
   /* A visible landing zone stops the middle of the table reading as dead space
      when only one card is down. */
   .play-area {
-    min-width: 260px;
-    min-height: calc(var(--card-h) + 76px);
-    padding: 22px 30px;
+    min-width: 340px;
+    min-height: calc(var(--card-h) + 132px);
+    padding: 66px 40px 22px;
     border-radius: 20px;
     background: rgba(0, 0, 0, 0.16);
     border: 1px dashed rgba(255, 255, 255, 0.09);
@@ -673,7 +760,7 @@ input:focus-visible, button:focus-visible {
     gap: 4px;
   }
 
-  .play-cards { gap: 8px; }
+  .play-group { gap: 8px; }
 
   .hand { padding-top: 26px; }
   .hand .card { margin-left: var(--overlap, -6px); }
@@ -704,6 +791,72 @@ input:focus-visible, button:focus-visible {
 @media (min-width: 1240px) {
   :root { --card-w: 74px; --card-h: 105px; }
 }
+
+/* ── Scoreboard ──────────────────────────────────────────────────────────── */
+
+.topbar-end { display: flex; gap: 8px; }
+
+.scores-sub {
+  margin: -8px 0 16px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.scoreboard-totals .sb-delta { font-size: 17px; }
+.scoreboard-totals tr.is-leader .sb-name::after {
+  content: " leading";
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-left: 6px;
+}
+
+.history-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+.history-table th {
+  text-align: right;
+  padding: 8px 6px;
+  color: var(--ink-faint);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.history-table th:first-child { text-align: left; }
+.history-table td {
+  padding: 9px 6px;
+  text-align: right;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+.history-table td:first-child { text-align: left; color: var(--ink-faint); }
+.history-table td.win { color: var(--gold); font-weight: 800; }
+.history-table tr:last-child td { border-bottom: 0; }
+
+.history-empty {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: center;
+  padding: 14px 0;
+}
+
+/* Score changes are worth noticing. */
+@keyframes score-bump {
+  0% { transform: none; }
+  35% { transform: scale(1.18); }
+  100% { transform: none; }
+}
+.you-score.is-bumped { display: inline-block; animation: score-bump 0.4s ease; }
 
 /* ── Lobby ───────────────────────────────────────────────────────────────── */
 
