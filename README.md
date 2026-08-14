@@ -1,15 +1,17 @@
 # claude_code-workspace
 
-A growing collection of browser and CLI app projects, each built in its own folder under `showcase/apps/`. Every project is self-contained — no shared dependencies at the repo root.
+A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 36 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 37 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+
+Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
 ## Projects
 
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
 | [showcase](./showcase/) | Arcade-style launcher for every app in this repo — neon cabinet cards, category filters and search, a screenshot-gallery modal, and live "Launch" buttons for the runnable projects | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
-| [capsa](./showcase/apps/capsa/) | Capsa / Big Two card game — beat the table with a stronger combination of the same size or pass; cross-device online rooms behind a 4-letter code, server-authoritative so opponents' cards never reach your browser, empty seats played by a simulation-tuned AI ladder, and a phone-first layout that becomes a real felt table on desktop | Vanilla JS · ES Modules · Vercel Functions · Upstash Redis | ✅ Complete |
+| [capsa](./capsa/) | Capsa / Big Two card game — beat the table with a stronger combination of the same size or pass; cross-device online rooms behind a 4-letter code, server-authoritative so opponents' cards never reach your browser, empty seats played by a simulation-tuned AI ladder, and a phone-first layout that becomes a real felt table on desktop | Vanilla JS · ES Modules · Vercel Functions · Upstash Redis | ✅ Complete |
 | [cantilever](./showcase/apps/cantilever/) | Structural engineering puzzle — span a gap with road, beams and cables on a budget, then drive a truck across; members are XPBD constraints carrying real axial forces, so decks sag, cables go slack instead of pushing, long struts buckle first, and overloaded members snap in cascades | Vanilla JS · Canvas 2D · XPBD · ES Modules | ✅ Complete |
 | [particle-life](./showcase/apps/particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [focus-pet](./showcase/apps/focus-pet/) | Pomodoro timer fused with a virtual pet — complete focus sessions to feed and evolve your blob creature, time-based decay keeps it real | Vanilla JS · SVG · CSS · localStorage | ✅ Complete |
@@ -47,6 +49,32 @@ The **[showcase](./showcase/)** is the front door: an arcade launcher for all 36
 | [nightside](./showcase/apps/nightside/) | 3D tower defense on a rotating planet — 642-tile geodesic globe, flow-field pathing, and a solar power grid that half goes dark as the terminator sweeps; the Blight only ever drops on the night side | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [windward](./showcase/apps/windward/) | 3D sailing regatta with no throttle — you get a rudder and a sheet, and the wind decides; a real no-go zone forces you to tack upwind, gusts drift across the water as readable dark patches, and 3 AI rivals sail the identical physics | Three.js · Vanilla JS · GLSL · ES Modules | ✅ Complete |
 
+## Deployments
+
+Two Vercel projects are created from this one repository. They are independent —
+deploying one never touches the other.
+
+| Vercel project | Root Directory | Serves | Needs |
+|---|---|---|---|
+| **showcase** | `showcase` (or repo root, which redirects to `/showcase/`) | the arcade launcher and every static app | nothing — no build step, no env vars |
+| **capsa** | `capsa` | [the Capsa game](./capsa/) plus its `/api/capsa` function | `KV_REST_API_URL` + `KV_REST_API_TOKEN` from Upstash Redis |
+
+For both: Framework Preset **Other**, and leave build / output / install commands
+empty.
+
+**The Root Directory matters.** Vercel only picks up serverless functions from an
+`api/` folder at the *project root*, which is exactly why Capsa is not under
+`showcase/apps/`. Point the Capsa project at the repo root and its API will 404;
+point the showcase project at `capsa` and you will serve the game instead of the
+arcade.
+
+Verify a Capsa deploy at `/api/capsa?action=health` — it reports `{"store":"redis"}`
+once Upstash is connected, `{"store":"memory"}` before that, and 404s if the Root
+Directory is wrong.
+
+Once Capsa is deployed, paste its URL into `CAPSA_URL` at the top of
+`showcase/data/projects.js` so the arcade card gets a working Launch button.
+
 ## Running everything
 
 Serve the showcase folder and you get all of it — the launcher plus every app it
@@ -68,10 +96,22 @@ python -m http.server 8080
 # open http://localhost:8080
 ```
 
-See each project's `README.md` for details. Three need a runtime of their own:
-`finance-dashboard` (Next.js), `pit-backtester` (Python CLI), and `apex-riders`
-(Vite dev server — its production build is checked in, so the showcase can launch
-it without one).
+`capsa` lives at the repo root rather than under `showcase/apps/`, so it runs
+from there instead:
+
+```bash
+cd capsa
+python -m http.server 8080
+```
+
+That gives you solo play against bots. Online rooms need its serverless API, which
+only runs on a real deployment or under `vercel dev`; without it the app says so
+and stays playable solo.
+
+See each project's `README.md` for details. Three others need a runtime of their
+own: `finance-dashboard` (Next.js), `pit-backtester` (Python CLI), and
+`apex-riders` (Vite dev server — its production build is checked in, so the
+showcase can launch it without one).
 
 ## Repository layout
 
@@ -80,17 +120,31 @@ claude_code-workspace/
 ├── README.md              ← this file
 ├── CLAUDE.md              ← guide for AI agents working in this repo
 ├── vercel.json            ← redirects / to /showcase/
-└── showcase/              ← the deployable site: host this folder, nothing else
-    ├── index.html         ← arcade launcher
-    ├── data/projects.js   ← one entry per project
-    └── apps/              ← every project, one folder each
-        ├── particle-life/
-        │   ├── README.md
-        │   ├── index.html
-        │   ├── main.js
-        │   └── …
-        └── focus-pet/
-            ├── README.md
-            ├── index.html
-            └── …
+│
+├── showcase/              ← DEPLOY 1: the arcade — host this folder on its own
+│   ├── index.html         ← arcade launcher
+│   ├── data/projects.js   ← one entry per project
+│   └── apps/              ← every static project, one folder each
+│       ├── particle-life/
+│       │   ├── README.md
+│       │   ├── index.html
+│       │   ├── main.js
+│       │   └── …
+│       ├── focus-pet/
+│       │   ├── README.md
+│       │   ├── index.html
+│       │   └── …
+│       └── capsa/
+│           ├── README.md  ← pointer: source is at /capsa
+│           └── screenshots/  ← kept here so the launcher can read them
+│
+└── capsa/                 ← DEPLOY 2: needs a backend, so it stands alone
+    ├── vercel.json        ← its own function config
+    ├── api/capsa.js       ← serverless function (rooms, moves, bots)
+    ├── index.html
+    └── js/                ← engine, bots, UI, networking
 ```
+
+A project earns its own root-level folder when it needs a serverless function, a
+database, or environment variables — putting it under `showcase/apps/` would stop
+the showcase being a plain static site. `CLAUDE.md` documents the rules.

@@ -5,12 +5,12 @@
 // only authority on what actually happened. Opponent hands are stripped out of
 // every response, so there is nothing for a modified client to read.
 //
-// Written as CommonJS with a dynamic import of the ESM engine: the repository
-// has no root package.json, and adding one to switch module systems risks
-// changing how Vercel treats the whole project.
+// Written as CommonJS with a dynamic import of the ESM engine: this folder has
+// no package.json, and adding one purely to switch module systems would change
+// how Vercel treats the project.
 
-const ENGINE = '../showcase/apps/capsa/js/engine.js';
-const BOT = '../showcase/apps/capsa/js/bot.js';
+const ENGINE = '../js/engine.js';
+const BOT = '../js/bot.js';
 
 const ROOM_TTL_SECONDS = 2 * 60 * 60;
 const AWAY_AFTER_MS = 25_000;

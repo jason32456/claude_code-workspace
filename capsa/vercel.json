@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/capsa.js": {
+      "includeFiles": "js/**"
+    }
+  }
+}

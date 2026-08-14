@@ -1,8 +1,10 @@
 # CLAUDE.md — Agent Workspace Guide
 
-This repository is a collection of standalone browser or CLI app projects. They all
-live inside `showcase/`, which is an arcade-style launcher for them — and the only
-folder that needs to be hosted. Read this file before making any changes.
+This repository is a collection of standalone browser or CLI app projects. Almost
+all of them live inside `showcase/`, an arcade-style launcher that is hostable on
+its own. A project that needs a backend gets its own root-level folder and its own
+deployment instead — see [Projects that deploy separately](#projects-that-deploy-separately).
+Read this file before making any changes.
 
 ## Repository structure
 
@@ -11,30 +13,90 @@ claude_code-workspace/
 ├── CLAUDE.md              ← you are here
 ├── README.md              ← human-facing index of all projects
 ├── vercel.json            ← redirects / to /showcase/
-└── showcase/              ← the deployable site — self-contained by design
-    ├── README.md
-    ├── index.html         ← arcade launcher
-    ├── style.css
-    ├── main.js
-    ├── data/projects.js   ← single source of truth for the grid
-    ├── js/                ← card / grid / modal modules
-    ├── screenshots/       ← screenshots of the showcase itself
-    └── apps/
-        └── <project-name>/
-            ├── README.md          ← project-specific docs (required)
-            ├── screenshots/       ← project screenshots (required)
-            └── ...                ← all project source files
+├── showcase/              ← DEPLOY 1 — the arcade, self-contained by design
+│   ├── README.md
+│   ├── index.html         ← arcade launcher
+│   ├── style.css
+│   ├── main.js
+│   ├── data/projects.js   ← single source of truth for the grid
+│   ├── js/                ← card / grid / modal modules
+│   ├── screenshots/       ← screenshots of the showcase itself
+│   └── apps/
+│       └── <project-name>/
+│           ├── README.md          ← project-specific docs (required)
+│           ├── screenshots/       ← project screenshots (required)
+│           └── ...                ← all project source files
+└── capsa/                 ← DEPLOY 2 — needs a backend, so it stands alone
+    ├── vercel.json        ← its own function config
+    ├── api/               ← serverless functions (only work at a project root)
+    └── ...                ← game source
 ```
 
 **The showcase must stay hostable on its own.** Everything it references lives
 under `showcase/`, and every path in `data/projects.js` is relative to that folder.
 Never point the showcase at anything above it (no `../`), and never add a build
-step it needs before it can be served.
+step it needs before it can be served. The one permitted exception is an absolute
+`https://` URL in `launchHref`, used to link out to a separately deployed project.
+
+## Projects that deploy separately
+
+Most projects are static and belong under `showcase/apps/`. A project belongs in
+its **own root-level folder** instead when it needs any of:
+
+- a serverless function (Vercel only picks up an `api/` folder at a *project root*)
+- a database, cache or other stateful store
+- environment variables or secrets
+- a server process of any kind
+
+Putting such a project under `showcase/apps/` would force the showcase to stop
+being a plain static site, so it gets its own Vercel project instead. `capsa/` is
+the worked example.
+
+### Layout for a separately deployed project
+
+```
+<project-name>/            ← Vercel Root Directory for its own project
+├── vercel.json            ← its own config; the root one does not apply
+├── api/                   ← serverless functions
+├── README.md              ← must document Root Directory + required env vars
+└── ...                    ← source
+```
+
+Rules:
+
+1. **Screenshots still live at `showcase/apps/<project-name>/screenshots/`**, so
+   the launcher can read them without pointing above its own folder. Put a short
+   `README.md` beside them saying where the source actually is.
+2. **Register it in `showcase/data/projects.js` as usual**, but instead of a
+   relative `launchHref`, add a URL constant near the top of the file and spread
+   it in conditionally:
+   ```js
+   const CAPSA_URL = ''; // paste the deployment URL here
+   ...
+   ...(CAPSA_URL ? { launchHref: CAPSA_URL } : {}),
+   ```
+   While the constant is empty the card renders gallery-only, so an unset URL can
+   never produce a broken Launch button.
+3. **The project README must state its Vercel Root Directory** and every
+   environment variable it needs, plus a way to verify the deploy (a health
+   endpoint is ideal).
+4. **Never add a `package.json` at the repository root.** It changes how Vercel
+   treats every project here. Keep manifests inside the project folder that needs
+   them.
+5. **Say so in the root `README.md`** deployments table.
+
+### Current deployments
+
+| Vercel project | Root Directory | Notes |
+|---|---|---|
+| showcase | `showcase` (or repo root, which redirects to `/showcase/`) | static, no functions |
+| capsa | `capsa` | needs `KV_REST_API_URL` + `KV_REST_API_TOKEN` (Upstash Redis) |
 
 ## Rules for adding a new project
 
-1. **One folder per project, under `showcase/apps/`.** Never mix source files from
-   two projects in the same directory.
+1. **One folder per project, under `showcase/apps/`** — unless it needs a backend,
+   in which case see [Projects that deploy separately](#projects-that-deploy-separately).
+   Never mix source files from two projects in the same directory.
 2. **Always create a `README.md`** inside the project folder covering: what it does,
    how to run it, key parameters, and any dependencies.
 3. **Take screenshots and embed them.** Once the project runs, capture at least one
@@ -113,16 +175,28 @@ cd showcase/apps/<project-name>
 python -m http.server 8080
 ```
 
+A separately deployed project runs from its own root-level folder instead:
+
+```bash
+cd capsa
+python -m http.server 8080
+```
+
+That serves the static half only. Anything under `api/` needs `vercel dev` (or a
+real deployment) — write these projects so they degrade gracefully when the API
+is absent, rather than breaking.
+
 ES modules require an HTTP server — `file://` URLs will not work.
 
 ## Current projects
 
-`showcase/data/projects.js` is the authoritative list — 37 projects, all under
-`showcase/apps/`. Most are static sites launchable straight from the showcase. The
-exceptions:
+`showcase/data/projects.js` is the authoritative list — 37 projects. All but one
+live under `showcase/apps/`, and most are static sites launchable straight from
+the showcase. The exceptions:
 
 | Folder | Stack | How to run |
 |--------|-------|------------|
+| `capsa` (repo root) | Vanilla JS + Vercel Functions + Upstash Redis | `cd capsa && python -m http.server 8080` for solo; online rooms need its own Vercel project — see `capsa/README.md` |
 | `apps/finance-dashboard` | Next.js 14 + TypeScript + Prisma + Auth.js | `npm install && npm run db:push && npm run dev` |
 | `apps/pit-backtester` | Python + pandas + click | `pip install -e . && python -m pit_backtester.cli` |
 | `apps/apex-riders` | Three.js + TypeScript + Vite | `npm install && npm run dev` (or `npm run build` to refresh the checked-in `dist/`) |

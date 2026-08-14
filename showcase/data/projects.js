@@ -7,6 +7,13 @@
 
 const REPO = 'https://github.com/jason32456/claude_code-workspace/tree/main/showcase/apps';
 
+// Capsa is the one project that does not live under apps/ — it needs a
+// serverless API and a Redis store, so it deploys as its own Vercel project
+// while the showcase stays a plain static site. Paste its deployment URL here
+// to switch the card's Launch button on; while this is empty the card renders
+// as a gallery-only card and nothing breaks. Source: /capsa (repo root).
+const CAPSA_URL = '';
+
 // Screenshots are read in place from each app's own screenshots/ folder.
 const shots = (slug, files) => files.map((f) => `apps/${slug}/screenshots/${f}.png`);
 
@@ -20,12 +27,12 @@ export const projects = [
     name: 'Capsa',
     tagline: 'Big Two with online rooms',
     description:
-      'The four-player shedding game (Big Two / Capsa Banting) — beat the table with a stronger combination of the same size, or pass. Cross-device online rooms behind a 4-letter code with serverless-safe polling, empty seats played by bots, and a simulation-tuned AI ladder. Server-authoritative, so opponents\u2019 cards are never sent to your browser.',
+      'The four-player shedding game (Big Two / Capsa Banting) — beat the table with a stronger combination of the same size, or pass. Cross-device online rooms behind a 4-letter code with serverless-safe polling, empty seats played by bots, and a simulation-tuned AI ladder. Server-authoritative, so opponents\u2019 cards are never sent to your browser. Lives at /capsa in the repo and deploys as its own Vercel project.',
     stack: ['Vanilla JS', 'ES Modules', 'Vercel Functions', 'Upstash Redis'],
     category: 'Games',
     runType: 'static',
-    launchHref: 'apps/capsa/',
-    runCommand: 'cd showcase/apps/capsa && python -m http.server 8080',
+    ...(CAPSA_URL ? { launchHref: CAPSA_URL } : {}),
+    runCommand: 'cd capsa && python -m http.server 8080',
     screenshots: shots('capsa', [
       'desktop-table',
       'mobile-table',

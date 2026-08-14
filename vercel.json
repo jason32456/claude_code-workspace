@@ -5,10 +5,5 @@
       "destination": "/showcase/",
       "permanent": false
     }
-  ],
-  "functions": {
-    "api/capsa.js": {
-      "includeFiles": "showcase/apps/capsa/js/**"
-    }
-  }
+  ]
 }
