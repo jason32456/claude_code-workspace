@@ -108,10 +108,36 @@
   <div class="dialog">
     <h2 id="result-title">Hand over</h2>
     <table class="scoreboard"><tbody id="result-rows"></tbody></table>
+    <p class="lobby-wait" id="result-wait" hidden></p>
     <div class="dialog-actions">
       <button class="btn btn-ghost" id="btn-result-leave">Leave</button>
       <button class="btn btn-primary" id="btn-next-hand">Next hand</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-lobby" hidden>
+  <div class="dialog">
+    <p class="lobby-eyebrow">Room code</p>
+    <button class="lobby-code" id="lobby-code" title="Tap to share">----</button>
+    <p class="lobby-share" id="lobby-share">Tap the code to copy an invite link</p>
+
+    <ul class="seat-list" id="seat-list"></ul>
+
+    <div class="lobby-host" id="lobby-host" hidden>
+      <label class="field">
+        <span>Fill empty seats with</span>
+        <div class="pill-group" id="lobby-difficulty">
+          <button class="pill" data-difficulty="casual">Casual</button>
+          <button class="pill is-active" data-difficulty="sharp">Sharp</button>
+          <button class="pill" data-difficulty="ruthless">Ruthless</button>
+        </div>
+      </label>
+      <button class="btn btn-primary" id="btn-start">Start game</button>
+    </div>
+
+    <p class="lobby-wait" id="lobby-wait" hidden>Waiting for the host to start…</p>
+    <button class="link-btn" id="btn-lobby-leave">Leave room</button>
   </div>
 </div>
 

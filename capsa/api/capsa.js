@@ -15,6 +15,7 @@ const BOT = '../js/bot.js';
 const ROOM_TTL_SECONDS = 2 * 60 * 60;
 const AWAY_AFTER_MS = 25_000;
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I or O — they read as 1 and 0
+const DIFFICULTIES = ['casual', 'sharp', 'ruthless'];
 
 /* ── Storage ─────────────────────────────────────────────────────────────── */
 
@@ -211,21 +212,19 @@ module.exports = async function handler(req, res) {
         const code = randomCode();
         const room = engine.createRoom(code, seed);
 
-        // Every seat is filled from the start — three bots that real players
-        // replace as they arrive. There is no lobby to wait in.
+        // The room opens as a lobby. Seat 0 is the host; the rest stay empty
+        // until people join, and whatever is still empty when the host starts
+        // becomes a bot. Nothing is dealt until then.
+        room.hostSeat = 0;
         room.seats[0].kind = 'human';
         room.seats[0].name = name;
         room.seats[0].id = randomToken();
         room.seats[0].token = randomToken();
         room.seats[0].lastSeen = Date.now();
         for (let i = 1; i < 4; i++) {
-          room.seats[i].kind = 'bot';
-          room.seats[i].difficulty = 'sharp';
-          room.seats[i].name = bot.botName(seed + i * 977);
+          room.seats[i].kind = 'empty';
+          room.seats[i].name = `Seat ${i + 1}`;
         }
-
-        engine.startHand(room, seed);
-        room.botAt = Date.now() + 900;
 
         if (await writeIfAbsent(code, JSON.stringify(room))) {
           return send(200, { code, seat: 0, token: room.seats[0].token });
@@ -241,9 +240,12 @@ module.exports = async function handler(req, res) {
       let assigned = null;
 
       const outcome = await mutate(code, (room) => {
-        // Prefer a seat nobody is using; an away human's seat is not up for
-        // grabs, since they may be coming back.
-        const seat = room.seats.find((s) => s.kind === 'bot');
+        // In a lobby you take a seat nobody has claimed. Once the hand is
+        // running there are no empty seats left, so you take over a bot
+        // instead. An away human's seat is never up for grabs — they may be
+        // coming back.
+        const wanted = room.phase === 'lobby' ? 'empty' : 'bot';
+        const seat = room.seats.find((s) => s.kind === wanted);
         if (!seat) return { error: 'Room is full', status: 409 };
         seat.kind = 'human';
         seat.name = name;
@@ -280,7 +282,13 @@ module.exports = async function handler(req, res) {
     }
 
     /* play / pass / next / leave ----------------------------------------- */
-    if (action === 'play' || action === 'pass' || action === 'next' || action === 'leave') {
+    if (
+      action === 'play' ||
+      action === 'pass' ||
+      action === 'next' ||
+      action === 'start' ||
+      action === 'leave'
+    ) {
       const code = String(body.code || '').toUpperCase();
       const seatIndex = Number(body.seat);
       const token = body.token;
@@ -292,16 +300,49 @@ module.exports = async function handler(req, res) {
         seat.away = false;
 
         if (action === 'leave') {
-          // Hand the seat back to a bot so the other three keep playing.
-          seat.kind = 'bot';
           seat.token = null;
           seat.id = null;
           seat.away = false;
-          seat.name = bot.botName(room.seed + seat.index * 977);
+          if (room.phase === 'lobby') {
+            // Nothing has been dealt, so the seat simply frees up again.
+            seat.kind = 'empty';
+            seat.name = `Seat ${seat.index + 1}`;
+          } else {
+            // Mid-hand the cards still have to be played, so a bot takes over
+            // and the other three keep going.
+            seat.kind = 'bot';
+            seat.name = bot.botName(room.seed + seat.index * 977);
+          }
+          // A room whose host walked away must not be left unable to start.
+          if (room.hostSeat === seat.index) {
+            const heir = room.seats.find((s) => s.kind === 'human' && s.index !== seat.index);
+            if (heir) room.hostSeat = heir.index;
+          }
+          return null;
+        }
+
+        if (action === 'start') {
+          if (room.hostSeat !== seatIndex) {
+            return { error: 'Only the host can start the game', status: 403 };
+          }
+          if (room.phase !== 'lobby') return { error: 'Game already started', status: 409 };
+
+          const difficulty = DIFFICULTIES.includes(body.difficulty) ? body.difficulty : 'sharp';
+          for (const s of room.seats) {
+            if (s.kind !== 'empty') continue;
+            s.kind = 'bot';
+            s.difficulty = difficulty;
+            s.name = bot.botName(room.seed + s.index * 977);
+          }
+          engine.startHand(room, (Math.random() * 2 ** 31) | 0);
+          room.botAt = Date.now() + 900;
           return null;
         }
 
         if (action === 'next') {
+          if (room.hostSeat !== seatIndex) {
+            return { error: 'Only the host can deal the next hand', status: 403 };
+          }
           if (room.phase !== 'done') return { error: 'Hand is still in progress', status: 409 };
           engine.startHand(room, (Math.random() * 2 ** 31) | 0);
           room.botAt = Date.now() + 900;

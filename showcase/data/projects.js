@@ -36,6 +36,7 @@ export const projects = [
     screenshots: shots('capsa', [
       'desktop-table',
       'mobile-table',
+      'lobby',
       'menu',
       'result',
       'rules',

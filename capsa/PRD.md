@@ -17,7 +17,9 @@ stretched — for desktop.
    suit-broken singles, straight-flush bombs, four-of-a-kind — must be exactly
    right, and the same code must judge it on client and server.
 2. **Playable in 5 seconds.** Landing on the page and pressing one button should
-   put you in a game against bots. No account, no lobby, no tutorial gate.
+   put you in a game against bots. No account, no tutorial gate. Solo play never
+   waits for anything; the lobby exists only for online rooms, where waiting for
+   friends is the point.
 3. **Real multiplayer, no realtime server.** Four humans on four phones sharing
    a room code, running entirely on Vercel serverless functions.
 4. **Genuinely good on a phone.** Not a desktop layout that survives at 390px —
@@ -139,6 +141,21 @@ turn-based with think-times measured in seconds, so it does not need them.
 - **Writes are compare-and-set.** Every mutation runs a Redis Lua script that
   writes only if the version is unchanged, retrying on conflict. Two players
   acting on the same tick cannot corrupt the room.
+
+### The lobby
+
+An online room opens in a `lobby` phase and deals nothing until the **host** —
+the player who created it, seat 0 — presses Start. Players who join take the
+empty seats; whatever is still empty at the moment the host starts is filled
+with bots at a difficulty the host picks.
+
+Start and next-hand are **host-only, enforced on the server**. Hiding the button
+would not be enough: any client could call the endpoint.
+
+Host is not permanent. If the host leaves, the role migrates to another human in
+the room, because a lobby nobody can start is a dead room. If a human leaves
+during a lobby their seat simply returns to empty; if they leave mid-hand a bot
+takes over instead, since those cards still have to be played.
 
 ### Bots and the stall problem
 

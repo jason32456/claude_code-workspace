@@ -199,6 +199,8 @@ export function dealHands(seed) {
 
 /* ── Game state ──────────────────────────────────────────────────────────── */
 
+// kind is one of 'human', 'bot' or 'empty'. 'empty' only exists in a lobby —
+// once the host starts, every remaining empty seat becomes a bot.
 export function createSeat(index, patch = {}) {
   return {
     index,
@@ -221,7 +223,10 @@ export function createRoom(code, seed) {
   return {
     code,
     version: 1,
+    // Online rooms sit in 'lobby' until the host starts them. Solo games call
+    // startHand() immediately and never see this phase.
     phase: 'lobby',
+    hostSeat: 0,
     seed,
     handNo: 0,
     seats: [0, 1, 2, 3].map((i) => createSeat(i)),
@@ -376,7 +381,7 @@ export function redact(room, seatIndex) {
     currentSeat: room.currentSeat,
     mustInclude: room.mustInclude,
     winner: room.winner,
-    hostSeat: 0,
+    hostSeat: room.hostSeat ?? 0,
     seats: room.seats.map((s) => ({
       index: s.index,
       name: s.name,

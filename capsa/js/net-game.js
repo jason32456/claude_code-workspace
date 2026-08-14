@@ -171,11 +171,8 @@ export function createNetSession(credentials) {
     nextHand() {
       return send('next');
     },
-    start() {
-      return send('start');
-    },
-    addBots() {
-      return send('fill');
+    start(difficulty) {
+      return send('start', { difficulty });
     },
     subscribe(fn) {
       listeners.add(fn);

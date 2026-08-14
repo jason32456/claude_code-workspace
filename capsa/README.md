@@ -13,9 +13,9 @@ stretched one.
 |:---:|:---:|
 | ![Desktop](../showcase/apps/capsa/screenshots/desktop-table.png) | ![Mobile](../showcase/apps/capsa/screenshots/mobile-table.png) |
 
-| Menu | Hand result | Rules sheet |
+| Lobby — the host decides when to start | Menu | Hand result |
 |:---:|:---:|:---:|
-| ![Menu](../showcase/apps/capsa/screenshots/menu.png) | ![Result](../showcase/apps/capsa/screenshots/result.png) | ![Rules](../showcase/apps/capsa/screenshots/rules.png) |
+| ![Lobby](../showcase/apps/capsa/screenshots/lobby.png) | ![Menu](../showcase/apps/capsa/screenshots/menu.png) | ![Result](../showcase/apps/capsa/screenshots/result.png) |
 
 ## Where this lives
 
@@ -137,9 +137,25 @@ just playing combinations.
 
 ## Online rooms
 
-Create a room and you get a 4-letter code; tap it to share an invite link.
-The three empty seats play as bots until real players take them, so a room is
-playable from the moment it exists — there is no lobby to wait in.
+Create a room and you get a 4-letter code; tap it to share an invite link. The
+room opens as a **lobby** and nothing is dealt until the host presses Start, so
+you can wait for people to arrive.
+
+- Players joining with the code (or the invite link) take the empty seats and
+  see the same lobby, with a note that they are waiting for the host.
+- The host chooses a bot difficulty for whatever seats are still empty at the
+  moment they start — a room can be started with one human and three bots, or
+  with four humans and no bots at all.
+- **Only the host** can start the game or deal the next hand. Both are rejected
+  server-side, not merely hidden in the UI.
+- If the host leaves, the host role migrates to another human in the room, so a
+  lobby can never be left with nobody able to start it.
+- Joining a room whose hand is already running is still allowed — you take over
+  a bot seat and its cards.
+
+An invite link only seats you automatically once the app knows your name;
+otherwise it pre-fills the code and asks for one first, so a lobby never fills
+up with four players all called "Player". The name is remembered for next time.
 
 The design constraint is that Vercel serverless functions cannot hold a
 WebSocket open. Capsa is turn-based with think-times in seconds, so it does not

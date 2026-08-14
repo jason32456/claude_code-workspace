@@ -44,6 +44,7 @@ const DIFFICULTY_BLURB = {
 let session = null;
 let unsubscribe = null;
 let difficulty = 'sharp';
+let lobbyDifficulty = 'sharp';
 let resultShownFor = -1;
 
 /* ── Chrome ──────────────────────────────────────────────────────────────── */
@@ -115,7 +116,62 @@ function renderResult(view) {
     }),
   );
 
+  const isHost = view.you === view.hostSeat;
+  $('btn-next-hand').hidden = !isHost;
+  $('result-wait').hidden = isHost;
+  if (!isHost) {
+    $('result-wait').textContent = `Waiting for ${view.seats[view.hostSeat].name} to deal…`;
+  }
+
   $('overlay-result').hidden = false;
+}
+
+/* ── Lobby ───────────────────────────────────────────────────────────────── */
+
+function renderLobby(view) {
+  const isHost = view.you === view.hostSeat;
+  $('lobby-code').textContent = view.code;
+
+  $('seat-list').replaceChildren(
+    ...view.seats.map((seat) => {
+      const row = document.createElement('li');
+      row.className = 'seat-row';
+      if (seat.kind === 'empty') row.classList.add('is-empty');
+      if (seat.index === view.you) row.classList.add('is-you');
+
+      const name = document.createElement('span');
+      name.className = 'seat-row-name';
+      name.textContent =
+        seat.index === view.you ? `${seat.name} (you)`
+          : seat.kind === 'empty' ? 'Waiting for a player…'
+          : seat.name;
+
+      row.append(name);
+
+      if (seat.index === view.hostSeat) {
+        const tag = document.createElement('span');
+        tag.className = 'seat-row-tag host';
+        tag.textContent = 'Host';
+        row.append(tag);
+      }
+      if (seat.kind === 'empty') {
+        const tag = document.createElement('span');
+        tag.className = 'seat-row-tag';
+        tag.textContent = 'Empty';
+        row.append(tag);
+      }
+      return row;
+    }),
+  );
+
+  // Only the host gets the controls; everyone else is told what is happening.
+  $('lobby-host').hidden = !isHost;
+  $('lobby-wait').hidden = isHost;
+  if (!isHost) {
+    const host = view.seats[view.hostSeat];
+    $('lobby-wait').textContent = `Waiting for ${host.name} to start…`;
+  }
+  $('overlay-lobby').hidden = false;
 }
 
 /* ── Session lifecycle ───────────────────────────────────────────────────── */
@@ -136,6 +192,12 @@ function attach(next, { code = null } = {}) {
     if (!view) return;
     table.render(view);
 
+    if (view.phase === 'lobby') {
+      renderLobby(view);
+      return;
+    }
+    $('overlay-lobby').hidden = true;
+
     if (view.phase === 'done' && resultShownFor !== view.handNo) {
       resultShownFor = view.handNo;
       setTimeout(() => renderResult(view), 700);
@@ -155,6 +217,7 @@ function detach() {
   session = null;
   unsubscribe = null;
   $('overlay-result').hidden = true;
+  $('overlay-lobby').hidden = true;
 }
 
 /* ── Menu ────────────────────────────────────────────────────────────────── */
@@ -186,8 +249,26 @@ $('btn-solo').addEventListener('click', () => {
   attach(createLocalSession({ difficulty, name: soloName() }));
 });
 
+const NAME_KEY = 'capsa:name';
+
 function playerName() {
   return $('name-input').value.trim();
+}
+
+// Remembered across visits so an invite link can seat you straight away
+// instead of asking for a name every time.
+function rememberName(name) {
+  try {
+    if (name) localStorage.setItem(NAME_KEY, name);
+  } catch { /* private mode — the name just won't persist */ }
+}
+
+function recallName() {
+  try {
+    return localStorage.getItem(NAME_KEY) || '';
+  } catch {
+    return '';
+  }
 }
 
 // "You" is how the local seat is labelled; sending it to a room would show
@@ -221,6 +302,7 @@ async function enterRoom(promise, label) {
   button.disabled = true;
   try {
     const seat = await promise;
+    rememberName(playerName());
     rememberSeat(seat);
     attach(createNetSession(seat), { code: seat.code });
     if (label === 'create') toast(`Room ${seat.code} — share the code`);
@@ -252,8 +334,9 @@ $('code-input').addEventListener('keydown', (event) => {
   if (event.key === 'Enter') $('btn-join').click();
 });
 
-// A room code in the URL (?room=ABCD) joins straight away — this is what gets
-// shared, so it has to work from a cold load.
+// A room code in the URL (?room=ABCD) is what gets shared, so it has to work
+// from a cold load. It only seats you automatically once we know your name —
+// otherwise a room fills up with players all called "Player".
 async function joinFromUrl() {
   const code = new URLSearchParams(location.search).get('room');
   if (!code) return false;
@@ -263,6 +346,12 @@ async function joinFromUrl() {
   document.querySelector('.tab[data-tab="online"]').click();
   $('code-input').value = clean;
   if (!serverAvailable) return false;
+
+  if (!playerName()) {
+    $('name-input').focus();
+    $('online-status').textContent = `Enter a name to join room ${clean}.`;
+    return true;
+  }
   await enterRoom(joinRoom(clean, onlineName()), 'join');
   return true;
 }
@@ -284,7 +373,28 @@ $('btn-next-hand').addEventListener('click', async () => {
   if (result && !result.ok) toast(result.error);
 });
 
-$('room-tag').addEventListener('click', async () => {
+for (const pill of document.querySelectorAll('#lobby-difficulty .pill')) {
+  pill.addEventListener('click', () => {
+    lobbyDifficulty = pill.dataset.difficulty;
+    for (const other of document.querySelectorAll('#lobby-difficulty .pill')) {
+      other.classList.toggle('is-active', other === pill);
+    }
+  });
+}
+
+$('btn-start').addEventListener('click', async () => {
+  $('btn-start').disabled = true;
+  const result = await session.start(lobbyDifficulty);
+  $('btn-start').disabled = false;
+  if (result && !result.ok) toast(result.error);
+});
+
+$('btn-lobby-leave').addEventListener('click', leaveGame);
+$('lobby-code').addEventListener('click', shareInvite);
+
+$('room-tag').addEventListener('click', shareInvite);
+
+async function shareInvite() {
   const url = `${location.origin}${location.pathname}?room=${el.roomTag.textContent}`;
   try {
     if (navigator.share) await navigator.share({ title: 'Capsa', url });
@@ -293,7 +403,7 @@ $('room-tag').addEventListener('click', async () => {
       toast('Invite link copied');
     }
   } catch { /* the user dismissed the share sheet */ }
-});
+}
 
 for (const id of ['btn-rules', 'btn-rules-2']) {
   $(id).addEventListener('click', () => {
@@ -310,6 +420,7 @@ $('overlay-rules').addEventListener('click', (event) => {
 /* ── Boot ────────────────────────────────────────────────────────────────── */
 
 $('difficulty-blurb').textContent = DIFFICULTY_BLURB[difficulty];
+$('name-input').value = recallName();
 
 // Reclaim a seat after an accidental refresh rather than stranding it as a bot.
 const previous = recallSeat();

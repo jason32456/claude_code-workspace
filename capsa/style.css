@@ -705,6 +705,86 @@ input:focus-visible, button:focus-visible {
   :root { --card-w: 74px; --card-h: 105px; }
 }
 
+/* ── Lobby ───────────────────────────────────────────────────────────────── */
+
+.lobby-eyebrow {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.lobby-code {
+  display: block;
+  width: 100%;
+  margin: 6px 0 4px;
+  padding: 6px 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: clamp(40px, 15vw, 56px);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-indent: 0.16em; /* balance the trailing letter-space */
+  color: var(--gold);
+}
+
+.lobby-share {
+  margin: 0 0 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.seat-list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--line);
+  font-size: 14px;
+}
+.seat-row.is-empty { opacity: 0.5; border-style: dashed; }
+.seat-row.is-you { border-color: var(--gold-dim); background: rgba(232, 196, 119, 0.1); }
+
+.seat-row-name { font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seat-row-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+}
+.seat-row-tag.host { color: var(--gold); }
+
+.lobby-wait {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-dim);
+  padding: 14px 0;
+}
+
+.lobby-host .field { margin-bottom: 14px; }
+
 /* ── Preferences ─────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
