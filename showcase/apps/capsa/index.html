@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1f1a" />
+<meta name="description" content="Capsa (Big Two) — four-player card game with online rooms and AI opponents." />
+<title>Capsa — Big Two</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ── Menu ───────────────────────────────────────────────────────────────── -->
+<main id="screen-menu" class="screen is-active">
+  <div class="menu-card">
+    <header class="brand">
+      <div class="brand-suits" aria-hidden="true">
+        <span class="s-d">♦</span><span class="s-c">♣</span><span class="s-h">♥</span><span class="s-s">♠</span>
+      </div>
+      <h1>Capsa</h1>
+      <p class="tagline">Big Two · shed all 13 cards first</p>
+    </header>
+
+    <div class="menu-tabs" role="tablist">
+      <button class="tab is-active" role="tab" data-tab="solo" aria-selected="true">Solo</button>
+      <button class="tab" role="tab" data-tab="online" aria-selected="false">Online</button>
+    </div>
+
+    <!-- Solo -->
+    <section class="panel is-active" data-panel="solo">
+      <label class="field">
+        <span>Opponents</span>
+        <div class="pill-group" id="difficulty-group">
+          <button class="pill" data-difficulty="casual">Casual</button>
+          <button class="pill is-active" data-difficulty="sharp">Sharp</button>
+          <button class="pill" data-difficulty="ruthless">Ruthless</button>
+        </div>
+      </label>
+      <p class="hint-text" id="difficulty-blurb">Plays a solid game — holds 2s back and won't break a pair to win a trick it doesn't need.</p>
+      <button class="btn btn-primary" id="btn-solo">Deal me in</button>
+    </section>
+
+    <!-- Online -->
+    <section class="panel" data-panel="online">
+      <label class="field">
+        <span>Your name</span>
+        <input type="text" id="name-input" maxlength="12" placeholder="Player" autocomplete="nickname" />
+      </label>
+      <div class="online-actions">
+        <button class="btn btn-primary" id="btn-create">Create room</button>
+        <div class="join-row">
+          <input type="text" id="code-input" maxlength="4" placeholder="CODE" autocomplete="off"
+                 autocapitalize="characters" spellcheck="false" aria-label="Room code" />
+          <button class="btn" id="btn-join">Join</button>
+        </div>
+      </div>
+      <p class="hint-text" id="online-status">Checking for a server…</p>
+    </section>
+
+    <button class="link-btn" id="btn-rules">How to play</button>
+  </div>
+</main>
+
+<!-- ── Table ──────────────────────────────────────────────────────────────── -->
+<main id="screen-table" class="screen">
+  <div class="table-grid">
+
+    <header class="topbar">
+      <button class="icon-btn" id="btn-leave" aria-label="Leave game">‹</button>
+      <div class="topbar-mid">
+        <span class="room-tag" id="room-tag" hidden></span>
+        <span class="trick-tag" id="trick-tag">Trick 1</span>
+      </div>
+      <button class="icon-btn" id="btn-rules-2" aria-label="Rules">?</button>
+    </header>
+
+    <section class="opponents" id="opponents"></section>
+
+    <section class="felt">
+      <div class="play-area" id="play-area">
+        <p class="play-empty" id="play-empty">New trick — lead anything</p>
+        <div class="play-cards" id="play-cards"></div>
+        <p class="play-meta" id="play-meta"></p>
+      </div>
+      <p class="status-line" id="status-line"></p>
+    </section>
+
+    <section class="you">
+      <div class="you-head">
+        <span class="you-name" id="you-name">You</span>
+        <span class="you-score" id="you-score"></span>
+      </div>
+      <div class="hand" id="hand"></div>
+    </section>
+
+    <footer class="actions">
+      <button class="btn btn-ghost" id="btn-sort" aria-label="Sort hand">Sort</button>
+      <button class="btn btn-ghost" id="btn-hint">Hint</button>
+      <button class="btn btn-ghost" id="btn-pass">Pass</button>
+      <button class="btn btn-primary btn-play" id="btn-play" disabled>Play</button>
+    </footer>
+  </div>
+</main>
+
+<!-- ── Overlays ───────────────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay-result" hidden>
+  <div class="dialog">
+    <h2 id="result-title">Hand over</h2>
+    <table class="scoreboard"><tbody id="result-rows"></tbody></table>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="btn-result-leave">Leave</button>
+      <button class="btn btn-primary" id="btn-next-hand">Next hand</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-rules" hidden>
+  <div class="dialog dialog-scroll">
+    <h2>How to play</h2>
+    <p>Everyone gets 13 cards. Shed them all first to win the hand.</p>
+
+    <h3>Card order</h3>
+    <p class="mono">3 4 5 6 7 8 9 10 J Q K A <strong>2</strong> — the 2 is the highest card.</p>
+    <p class="mono">Suits break ties: ♦ &lt; ♣ &lt; ♥ &lt; <strong>♠</strong></p>
+
+    <h3>Plays</h3>
+    <ul>
+      <li><strong>1 card</strong> — a single</li>
+      <li><strong>2 cards</strong> — a pair (same rank)</li>
+      <li><strong>3 cards</strong> — a triple (same rank)</li>
+      <li><strong>5 cards</strong> — straight, flush, full house, four of a kind + kicker, or straight flush</li>
+    </ul>
+    <p>Four-card plays don't exist — a bomb needs a fifth card as a kicker.</p>
+
+    <h3>Five-card ranking</h3>
+    <p class="mono">straight &lt; flush &lt; full house &lt; four of a kind &lt; straight flush</p>
+    <p>Straights run 3→A. The 2 is never in a straight, and aces are high only.
+       Flushes compare by suit first, then by highest card. Full houses compare
+       the triple; bombs compare the quad.</p>
+
+    <h3>The turn</h3>
+    <p>Whoever holds <strong>3♦</strong> leads first and must include it. After that,
+       beat the play on the table using the <em>same number of cards</em>, or pass.
+       When everyone else passes, the last player to play leads a fresh trick with
+       anything they like.</p>
+
+    <h3>Scoring</h3>
+    <p>Losers score their remaining cards as penalty points — doubled at 8 cards,
+       tripled at 10, quadrupled if you never played at all. The winner takes the
+       negative of everyone's penalties. Low score wins.</p>
+
+    <button class="btn btn-primary" id="btn-rules-close">Got it</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
