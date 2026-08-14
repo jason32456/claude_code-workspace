@@ -11,6 +11,7 @@ const API = '/api/capsa';
 
 const POLL_LIVE = 900;
 const POLL_IDLE = 2500;
+const POLL_HIDDEN = 6000;
 const SEAT_KEY = 'capsa:seat';
 
 async function call(action, { method = 'GET', body = null, params = {} } = {}) {
@@ -108,6 +109,10 @@ export function createNetSession(credentials) {
     if (!latest) return POLL_LIVE;
     // Back off hard while the network is unhappy rather than hammering it.
     if (failures > 0) return Math.min(POLL_IDLE * 2 ** failures, 15000);
+    // A backgrounded tab keeps listening, slowly. Stopping entirely would save
+    // a little battery and break the one thing the turn alert exists for —
+    // telling you it is your turn while you are looking at something else.
+    if (document.hidden) return POLL_HIDDEN;
     return latest.phase === 'playing' ? POLL_LIVE : POLL_IDLE;
   }
 
@@ -118,7 +123,7 @@ export function createNetSession(credentials) {
   }
 
   async function poll() {
-    if (!alive || inFlight || document.hidden) return arm();
+    if (!alive || inFlight) return arm();
     inFlight = true;
     try {
       const view = await call('state', { params: auth });

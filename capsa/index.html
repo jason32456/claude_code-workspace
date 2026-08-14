@@ -172,6 +172,10 @@
 
     <section class="opponents" id="opponents"></section>
 
+    <div class="turn-banner" id="turn-banner" hidden role="status" aria-live="polite">
+      <span class="turn-banner-dot" aria-hidden="true"></span>Your turn
+    </div>
+
     <section class="felt">
       <div class="play-area" id="play-area">
         <p class="play-empty" id="play-empty">New trick — lead anything</p>
@@ -263,6 +267,7 @@
 
     <p class="lobby-wait" id="lobby-wait" hidden>Waiting for the host to start…</p>
     <p class="lobby-mode-note" id="lobby-mode-note"></p>
+    <button class="btn btn-ghost" id="btn-enable-alerts" hidden>🔔 Alert me when it's my turn</button>
     <button class="link-btn" id="btn-lobby-leave">Leave room</button>
   </div>
 </div>
