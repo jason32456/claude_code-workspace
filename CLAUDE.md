@@ -204,10 +204,19 @@ the showcase. The exceptions:
 ## Conventions
 
 - **Branch names** follow `claude/<feature>-<id>` — develop on the branch specified at session start.
-- **Merge to `main` when done.** After work is complete and pushed, merge your feature branch into `main` and push `main`:
+- **Merge to `main` with `--no-ff` when done.** After work is complete and pushed,
+  merge your feature branch into `main` and push `main`:
   ```bash
-  git checkout main && git merge <your-branch> && git push origin main
+  git checkout main && git merge --no-ff <your-branch> && git push origin main
   ```
+  **The `--no-ff` matters for deployment, not for history.** A fast-forward merge
+  leaves `main` and the feature branch pointing at the *same commit SHA*. Both
+  refs get pushed, GitHub fires a webhook for each, and Vercel — which
+  deduplicates by SHA — builds it once and attaches that build to whichever ref
+  it saw first. That is usually the feature branch, which is not the production
+  branch, so the build lands as a **preview** and production silently never
+  advances. `--no-ff` gives `main` its own commit, so it always gets its own
+  production deployment.
 - **Commit often** with short, descriptive messages.
 - **No secrets** — never commit `.env` files or API keys.
 - Code comments only where the *why* is non-obvious. No docblocks, no task references.
