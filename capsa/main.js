@@ -410,6 +410,26 @@ function attach(next, { code = null } = {}) {
     session.onError(() => toast('Lost contact with the server — retrying'));
   }
 
+  // Terminal failures land here rather than in onError, so the player gets an
+  // explanation and a way out instead of a toast that repeats forever.
+  if (session.onGone) {
+    session.onGone(async (err) => {
+      const signedOut = err.status === 401;
+      detach();
+      forgetSeat();
+      if (signedOut) {
+        await logout().catch(() => {});
+        showScreen('login');
+        $('login-note').textContent = 'Your session expired — sign in again to keep playing.';
+        $('login-user').focus();
+      } else {
+        showScreen('menu');
+        toast(err.message || 'That room is no longer available');
+        initOnline();
+      }
+    });
+  }
+
   requestAnimationFrame(() => table.resize());
 }
 
@@ -499,19 +519,30 @@ let serverAvailable = false;
 
 async function initOnline() {
   const { online, store } = await probeServer();
-  serverAvailable = online;
-  $('btn-create').disabled = !online;
-  $('btn-join').disabled = !online;
+
+  // A deploy with no shared store is worse than no server at all. Each
+  // serverless instance keeps its own copy of everything, so a room and a
+  // session created on one instance simply do not exist on the next — and
+  // roughly every request that lands elsewhere is rejected. That presents as a
+  // flaky connection, so name the real cause rather than let people chase it.
+  serverAvailable = online && store === 'redis';
+  $('btn-create').disabled = !serverAvailable;
+  $('btn-join').disabled = !serverAvailable;
 
   if (!online) {
     $('online-status').textContent =
       'No server behind this page — online rooms need the Vercel API. Solo play works offline.';
     return;
   }
+  if (store !== 'redis') {
+    $('online-status').textContent =
+      'Server is up but has no shared store, so online rooms cannot work — set '
+      + 'KV_REST_API_URL and KV_REST_API_TOKEN on the deployment, then redeploy. '
+      + 'Solo play against bots works in the meantime.';
+    return;
+  }
   $('online-status').textContent =
-    store === 'redis'
-      ? 'Create a room, then share the code. Empty seats play as bots until someone takes them.'
-      : 'Server is up, but has no shared store — rooms will not survive across devices. Add Upstash Redis to enable that.';
+    'Create a room, then share the code. Empty seats play as bots until someone takes them.';
 }
 
 async function enterRoom(promise, label) {

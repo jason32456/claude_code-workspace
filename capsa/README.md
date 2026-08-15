@@ -399,10 +399,43 @@ otherwise:
 | `CAPSA_ADMIN_PASSWORD` | optional — seeds the admin password on first run |
 
 `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` are accepted as aliases.
-Without them the API still works, but each serverless instance has its own map,
-so rooms will not reliably survive across devices — the menu reports this rather
-than failing silently. `GET /api/capsa?action=health` returns which backend is
-live.
+`GET /api/capsa?action=health` returns which backend is live.
+
+**Online rooms need the store.** Without it every serverless instance keeps its
+own map, so a session token and a room created on one instance do not exist on
+the next. Measured against three instances, two thirds of requests carrying a
+perfectly valid token came back `401`. The menu therefore disables Create and
+Join and names the missing variables, instead of letting people into a game that
+will drop them every few seconds.
+
+### If the game keeps losing contact with the server
+
+Check `GET /api/capsa?action=health` first — it distinguishes the two causes.
+
+- **`"store":"memory"`** — the deployment has no Upstash credentials. Set
+  `KV_REST_API_URL` and `KV_REST_API_TOKEN` and redeploy. Note that Vercel only
+  applies new environment variables to *new* deployments, so setting them
+  without redeploying changes nothing.
+- **`"store":"redis"`** — check the Upstash usage dashboard. Polling costs about
+  one command per player per poll: four players at the live cadence is roughly
+  4 commands/second, near 16,000 an hour. A tight quota will start rejecting
+  commands mid-game, which surfaces to players as exactly this symptom.
+
+An expired session no longer presents as a connection problem: the client
+distinguishes terminal rejections (`401`, `403`, `404`) from transient ones,
+stops polling, and returns to the sign-in screen with an explanation.
+
+### Polling cost
+
+`action=state` is by far the commonest request, so it avoids writing whenever
+the room has not changed: `lastSeen` is refreshed on a 10 s heartbeat rather
+than every poll, and validated sessions are cached on the instance for 30 s. A
+poll that changes nothing costs a single read and leaves `version` alone, which
+also stops every client redrawing a table that did not move.
+
+Measured over 30 s of four-player play, this took the store from 391 commands
+(131 of them writes) to 163 commands (18 writes), and cut redraws from 114 of
+118 polls to 14 of 128.
 
 ## Layout
 

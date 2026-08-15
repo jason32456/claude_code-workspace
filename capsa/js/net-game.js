@@ -39,7 +39,13 @@ async function call(action, { method = 'GET', body = null, params = {} } = {}) {
   } catch {
     throw new Error(`Server returned ${res.status}`);
   }
-  if (!res.ok) throw new Error(data?.error || `Server returned ${res.status}`);
+  if (!res.ok) {
+    const err = new Error(data?.error || `Server returned ${res.status}`);
+    // The caller needs to tell "the network hiccuped" from "the server has
+    // rejected you", because retrying only helps with the first.
+    err.status = res.status;
+    throw err;
+  }
   return data;
 }
 
@@ -92,6 +98,7 @@ export function createNetSession(credentials) {
   const { code, seat, token } = credentials;
   const listeners = new Set();
   const errorListeners = new Set();
+  const goneListeners = new Set();
 
   let latest = null;
   let timer = null;
@@ -135,6 +142,16 @@ export function createNetSession(credentials) {
         emit();
       }
     } catch (err) {
+      // A rejected session or a room that no longer exists will not heal by
+      // asking again. Retrying those forever is how a dead seat turns into an
+      // endless "lost contact" toast, so stop and say what actually happened.
+      // `alive = false` is what stops it: arm() in the finally block below
+      // declines to schedule another poll once the session is done.
+      if (err.status === 401 || err.status === 403 || err.status === 404) {
+        alive = false;
+        for (const fn of goneListeners) fn(err);
+        return;
+      }
       failures = Math.min(failures + 1, 4);
       if (failures >= 3) for (const fn of errorListeners) fn(err);
     } finally {
@@ -201,11 +218,18 @@ export function createNetSession(credentials) {
       errorListeners.add(fn);
       return () => errorListeners.delete(fn);
     },
+    // Fired once when the seat is gone for good — signed out, seat taken over,
+    // or the room expired. Unlike onError this is terminal: polling has stopped.
+    onGone(fn) {
+      goneListeners.add(fn);
+      return () => goneListeners.delete(fn);
+    },
     leave() {
       alive = false;
       clearTimeout(timer);
       listeners.clear();
       errorListeners.clear();
+      goneListeners.clear();
       document.removeEventListener('visibilitychange', onVisible);
       // Best-effort: tell the room the seat is free.
       call('leave', { method: 'POST', body: auth }).catch(() => {});
