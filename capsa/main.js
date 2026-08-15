@@ -127,9 +127,9 @@ function hideTurnBanner() {
 }
 
 function announceTurn() {
-  // Title, vibration and the system notification only speak up when the page
-  // is in the background — that check lives in notify.js.
-  notify.turnAlert({ roomCode: el.roomTag.hidden ? null : el.roomTag.textContent });
+  // Title and vibration only speak up when the page is in the background —
+  // that check lives in notify.js.
+  notify.turnAlert();
 
   // The banner answers "I was looking but did not notice". Online it always
   // earns its place; solo the turn comes back every few seconds, so it would
@@ -353,20 +353,8 @@ function renderLobby(view) {
     textContent: MODE_LABEL[lobbyMode],
   }));
 
-  // Waiting in the lobby is the natural moment to offer this: there is time to
-  // read it, and the click is the user gesture the permission prompt needs.
-  const canAsk = notify.supported() && notify.permission() === 'default';
-  $('btn-enable-alerts').hidden = !canAsk;
-
   $('overlay-lobby').hidden = false;
 }
-
-$('btn-enable-alerts').addEventListener('click', async () => {
-  const result = await notify.requestPermission();
-  $('btn-enable-alerts').hidden = true;
-  if (result === 'granted') toast("You'll be alerted when it's your turn");
-  else if (result === 'denied') toast('Alerts blocked — the tab title still changes');
-});
 
 /* ── Session lifecycle ───────────────────────────────────────────────────── */
 

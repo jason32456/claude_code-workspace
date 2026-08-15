@@ -13,14 +13,24 @@ import {
   cardLabel,
 } from './engine.js';
 import { hintMove } from './bot.js';
-import { cardElement, overlapFor } from './cards.js';
+import { cardElement, overlapFor, tightestWidth } from './cards.js';
 import * as sound from './sound.js';
+
+// A card is rankIndex*4 + suitIndex, so its natural numeric order already
+// groups by rank. Grouping by suit is the other arrangement players actually
+// want when hunting for flushes and straights.
+const SORTS = [
+  { id: 'rank', label: '⇅ Rank', key: (card) => card },
+  { id: 'suit', label: '⇅ Suit', key: (card) => (card % 4) * 13 + Math.floor(card / 4) },
+];
 
 export function createTable(el, handlers) {
   let view = null;
   let selected = new Set();
   let hinted = new Set();
+  let sortIndex = 0;
   let lastHandKey = '';
+  let lastDealKey = '';
   let lastPileKey = '';
   let lastTrick = 0;
   let lastHandNo = 0;
@@ -239,8 +249,13 @@ export function createTable(el, handlers) {
   /* ── Hand ──────────────────────────────────────────────────────────────── */
 
   function renderHand() {
-    const hand = view.hand || [];
-    const key = hand.join(',');
+    const sort = SORTS[sortIndex];
+    const hand = [...(view.hand || [])].sort((a, b) => sort.key(a) - sort.key(b));
+
+    // Which cards you hold, independent of how they are arranged — so
+    // re-sorting reorders the fan without being mistaken for a new deal.
+    const dealKey = [...hand].sort((a, b) => a - b).join(',');
+    const key = `${sort.id}|${dealKey}`;
 
     if (key !== lastHandKey) {
       lastHandKey = key;
@@ -250,7 +265,8 @@ export function createTable(el, handlers) {
 
       // A fresh deal fans in with a stagger; picking one card back up out of a
       // hand you already hold should not replay the whole animation.
-      const isFreshDeal = hand.length === 13;
+      const isFreshDeal = hand.length === 13 && dealKey !== lastDealKey;
+      lastDealKey = dealKey;
       if (isFreshDeal) sound.play('deal', hand.length);
       el.hand.replaceChildren(
         ...hand.map((card, i) => {
@@ -262,10 +278,6 @@ export function createTable(el, handlers) {
         }),
       );
     }
-
-    // Re-measured on every render, not just when the cards change, so the
-    // first paint after the table becomes visible corrects itself.
-    sizeHand();
 
     // Which cards could take part in a legal answer — a quiet nudge that stops
     // new players hunting through a hand that cannot beat the table.
@@ -284,6 +296,12 @@ export function createTable(el, handlers) {
       node.classList.toggle('is-playable', usable.has(card));
       node.setAttribute('aria-pressed', String(on));
     }
+
+    // After the classes, never before: the fit depends on how many cards are
+    // selected, so measuring first would size the hand for the previous
+    // selection. Re-measured on every render, not just when the cards change,
+    // so the first paint after the table becomes visible corrects itself.
+    sizeHand();
   }
 
   function sizeHand() {
@@ -298,7 +316,24 @@ export function createTable(el, handlers) {
     if (available < 1) return;
     const cardWidth = el.hand.firstElementChild.offsetWidth;
     if (cardWidth < 1) return;
-    el.hand.style.setProperty('--overlap', `${overlapFor(count, available, cardWidth)}px`);
+
+    // Each selected card opens a gap on both sides so it can be seen whole.
+    // That width has to be paid for out of the same budget, and on a 320px
+    // phone holding thirteen cards there may not be enough: the fan is already
+    // as tightly overlapped as it is allowed to get. So the gap shrinks to
+    // whatever actually fits rather than pushing cards off the screen.
+    const styles = getComputedStyle(el.hand);
+    const wanted = parseFloat(styles.getPropertyValue('--sel-gap-max')) || 0;
+    const slack = available - tightestWidth(count, cardWidth);
+    const gap = selected.size
+      ? Math.max(0, Math.min(wanted, slack / (selected.size * 2)))
+      : wanted;
+
+    el.hand.style.setProperty('--sel-gap', `${gap}px`);
+    el.hand.style.setProperty(
+      '--overlap',
+      `${overlapFor(count, Math.max(cardWidth, available - selected.size * gap * 2), cardWidth)}px`,
+    );
   }
 
   // Any change to the hand's width refits the fan, so a transient measurement
@@ -323,6 +358,13 @@ export function createTable(el, handlers) {
     el.pass.disabled = !yours || !view.current;
     el.hint.disabled = !yours;
     el.sort.disabled = !view.hand || view.hand.length === 0;
+    el.sort.textContent = SORTS[sortIndex].label;
+    el.sort.setAttribute(
+      'aria-label',
+      `Hand sorted by ${SORTS[sortIndex].id} — tap to sort by ${
+        SORTS[(sortIndex + 1) % SORTS.length].id
+      }`,
+    );
 
     el.youName.classList.toggle('is-turn', yours);
     const me = view.seats[view.you];
@@ -378,8 +420,12 @@ export function createTable(el, handlers) {
     handlers.onPass();
   });
   el.hint.addEventListener('click', showHint);
+  // Sort used to redraw the hand in the order it was already in, which is to
+  // say it did nothing. It now cycles the arrangement and says which one is
+  // live. Selections are kept: they are card values, not positions, and the
+  // gold ring follows them wherever they land.
   el.sort.addEventListener('click', () => {
-    clearSelection();
+    sortIndex = (sortIndex + 1) % SORTS.length;
     renderHand();
     renderActions();
   });
@@ -395,6 +441,7 @@ export function createTable(el, handlers) {
     if (key === 'enter' && !el.play.disabled) { event.preventDefault(); el.play.click(); }
     else if (key === ' ' && !el.pass.disabled) { event.preventDefault(); el.pass.click(); }
     else if (key === 'h') showHint();
+    else if (key === 's' && !el.sort.disabled) el.sort.click();
     else if (key === 'escape') { clearSelection(); renderHand(); renderActions(); renderStatus(); }
     else if (/^[0-9]$/.test(key)) {
       const index = key === '0' ? 9 : Number(key) - 1;

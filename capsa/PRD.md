@@ -311,7 +311,8 @@ All three respect a 600–1400 ms randomized think-time so play feels human.
 - Your hand fans across the bottom, overlapped so 13 cards fit at 390 px.
   Tapping a card lifts it; tapping again drops it.
 - A sticky action bar sits above the safe-area inset: **Pass**, **Play** (labelled
-  with what the selection would make — "Play Full House"), and **Sort**.
+  with what the selection would make — "Play Full House"), and **Sort**, which
+  cycles the hand between rank order and suit order.
 - Invalid selections disable **Play** and say why ("needs 5 cards", "flush is too
   low") rather than silently failing.
 
