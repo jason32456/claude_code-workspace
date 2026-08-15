@@ -511,10 +511,17 @@ input:focus-visible, button:focus-visible {
 .you-score { color: var(--ink-faint); }
 
 .hand {
+  --sel-lift: -30px;
+  /* The gap a selected card opens on each side. sizeHand() narrows it to
+     --sel-gap when the fan cannot afford the full amount. */
+  --sel-gap-max: 10px;
+  --sel-gap: 10px;
   display: flex;
   justify-content: center;
-  padding-top: 22px; /* room for a lifted card */
-  min-height: calc(var(--card-h) + 24px);
+  /* Has to clear the lift plus the scale-up, or a selected card is guillotined
+     by the row above it. */
+  padding-top: 38px;
+  min-height: calc(var(--card-h) + 40px);
   min-width: 0;
 }
 
@@ -577,11 +584,31 @@ input:focus-visible, button:focus-visible {
 }
 .hand .card:first-child { margin-left: 0; }
 
+/* A selected card has to be unmistakable at a glance, on a phone, in a fan
+   where its neighbours cover all but a sliver of it. Four cues stack up: it
+   lifts clear of the row, grows slightly, wears a gold ring, and pushes its
+   neighbours apart so the whole card is visible rather than a strip of it. */
 .hand .card.is-selected {
-  transform: translateY(-20px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
-  z-index: 2;
+  transform: translateY(var(--sel-lift, -30px)) scale(1.06);
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 16px 26px rgba(0, 0, 0, 0.55);
+  z-index: 5;
+  margin-left: calc(var(--overlap, -14px) + var(--sel-gap, 10px));
+  margin-right: var(--sel-gap, 10px);
 }
+
+/* The gold cap reads even where a neighbour still overlaps the card body. */
+.hand .card.is-selected::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  border-radius: 7px 7px 0 0;
+  background: var(--gold);
+}
+
+.hand .card:first-child { margin-left: 0; }
 .hand .card.is-hinted {
   box-shadow: 0 0 0 2px var(--gold), 0 6px 14px rgba(232, 196, 119, 0.35);
   z-index: 1;
@@ -605,7 +632,12 @@ input:focus-visible, button:focus-visible {
   from { opacity: 0; transform: translateY(20px) scale(0.9); }
   to { opacity: 1; transform: none; }
 }
-.hand .card { animation: deal-in 0.26s ease both; animation-delay: var(--deal-delay, 0ms); }
+/* `backwards`, emphatically not `both`: with `both` the animation's final
+   keyframe (transform: none) keeps applying after it finishes, and an
+   animation outranks a normal declaration — which silently cancelled the
+   selection lift for the whole of every fresh 13-card hand. `backwards` still
+   holds the first keyframe through the stagger delay, which is all it was for. */
+.hand .card { animation: deal-in 0.26s ease backwards; animation-delay: var(--deal-delay, 0ms); }
 
 /* ── Overlays ────────────────────────────────────────────────────────────── */
 
@@ -768,10 +800,10 @@ input:focus-visible, button:focus-visible {
 
   .play-group { gap: 8px; }
 
-  .hand { padding-top: 26px; }
+  .hand { padding-top: 34px; --sel-lift: -36px; --sel-gap-max: 14px; }
   .hand .card { margin-left: var(--overlap, -6px); }
-  .hand .card:hover:not(.is-selected) { transform: translateY(-9px); z-index: 3; }
-  .hand .card.is-selected { transform: translateY(-24px); }
+  .hand .card:hover:not(.is-selected) { transform: translateY(-11px); z-index: 3; }
+  .hand .card:first-child { margin-left: 0; }
 
   .you { padding: 0; }
   .you-head {
@@ -812,24 +844,27 @@ input:focus-visible, button:focus-visible {
   pointer-events: none;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 9px 18px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, var(--gold), var(--gold-dim));
-  color: #201a08;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
-  animation: turn-banner-in 0.32s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  gap: 8px;
+  /* A quiet pill, not an announcement. It only has to catch the eye of someone
+     already looking at the table. */
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: rgba(10, 26, 22, 0.9);
+  color: var(--gold);
+  border: 1px solid rgba(232, 196, 119, 0.4);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  animation: turn-banner-in 0.28s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 .turn-banner.is-leaving { animation: turn-banner-out 0.28s ease forwards; }
 
 .turn-banner-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #201a08;
+  background: var(--gold);
   animation: turn-dot 1.1s ease-in-out infinite;
 }
 

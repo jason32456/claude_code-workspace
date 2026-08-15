@@ -1,38 +1,16 @@
-// "It's your turn" alerts.
+// Out-of-page half of the "it's your turn" alert.
 //
-// The case that actually matters is the one where you are not looking at the
-// page — waiting on three other people, with the tab in the background. So the
-// alert works in layers, cheapest and most reliable first:
+// Deliberately quiet. The on-screen pill the table shows is the alert; this
+// only covers the case where you are not looking at the page at all, and even
+// then it does nothing a browser has to ask permission for. There is no system
+// notification: a card game interrupting the whole desktop is out of
+// proportion to a turn that will still be there in a minute.
 //
-//   1. the tab title, which needs no permission and is visible in any browser
-//   2. vibration on a phone, where the tab title is not visible at all
-//   3. a system notification, which is the only layer that needs asking for
-//
-// The on-screen banner is handled by the caller, since it belongs to the table.
+// The banner itself belongs to the table, so the caller owns it.
 
 const BASE_TITLE = document.title;
-const TAG = 'capsa-turn';
 
 let titleAlerted = false;
-let live = null;
-
-export const supported = () => typeof Notification !== 'undefined';
-
-export function permission() {
-  if (!supported()) return 'unsupported';
-  return Notification.permission;
-}
-
-// Must be called from a user gesture — browsers reject it otherwise, and
-// Safari only accepts the callback form.
-export async function requestPermission() {
-  if (!supported()) return 'unsupported';
-  try {
-    return await Notification.requestPermission();
-  } catch {
-    return Notification.permission;
-  }
-}
 
 function restoreTitle() {
   if (!titleAlerted) return;
@@ -40,51 +18,28 @@ function restoreTitle() {
   titleAlerted = false;
 }
 
-// A notification for a turn you have already taken is worse than none, so it
-// is dismissed as soon as you look at the page or the turn moves on.
+// An alert for a turn you have already taken is worse than none, so it goes as
+// soon as you look at the page or the turn moves on.
 export function clear() {
   restoreTitle();
-  if (live) {
-    try { live.close(); } catch { /* already gone */ }
-    live = null;
-  }
 }
 
 function vibrate() {
   try {
-    if (navigator.vibrate) navigator.vibrate([90, 60, 90]);
-  } catch { /* unsupported or blocked — the other layers still fire */ }
+    // One short tick, not a pattern — a nudge rather than an alarm.
+    if (navigator.vibrate) navigator.vibrate(35);
+  } catch { /* unsupported or blocked — the pill still shows */ }
 }
 
-function systemNotification(roomCode) {
-  if (!supported() || Notification.permission !== 'granted') return;
-  try {
-    live = new Notification('Your turn', {
-      body: roomCode ? `Capsa · room ${roomCode}` : 'Capsa',
-      tag: TAG,
-      renotify: true,
-      silent: false,
-    });
-    live.onclick = () => {
-      window.focus();
-      clear();
-    };
-  } catch { /* some browsers require a service worker; the title still changed */ }
-}
-
-/**
- * Fire the out-of-page layers. The caller decides when it is your turn.
- * @param {{roomCode?: string|null}} options
- */
-export function turnAlert({ roomCode = null } = {}) {
+/** Fire the out-of-page layers. The caller decides when it is your turn. */
+export function turnAlert() {
   vibrate();
 
-  // Only shout when the page is not being looked at. Doing this while the tab
-  // is focused would just be noise on top of the banner.
+  // Only mark the title when the page is not being looked at. Doing it while
+  // the tab is focused would just be noise on top of the pill.
   if (!document.hidden) return;
   titleAlerted = true;
-  document.title = `🔔 Your turn — ${BASE_TITLE}`;
-  systemNotification(roomCode);
+  document.title = `● Your turn — ${BASE_TITLE}`;
 }
 
 document.addEventListener('visibilitychange', () => {

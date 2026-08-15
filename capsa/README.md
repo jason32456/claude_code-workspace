@@ -150,9 +150,42 @@ another reason the store is worth connecting.
 | **Play** | plays the selection — the label names the combination it makes |
 | **Pass** | give up the trick (disabled when you are leading — there is nothing to beat) |
 | **Hint** | selects the lowest legal play, or tells you that you have to pass |
-| **Sort** | clears the selection and re-tidies the hand |
+| **⇅ Rank / ⇅ Suit** | cycles how the hand is arranged; the label is the arrangement you are in |
 | **📊 Scores** | running totals plus a hand-by-hand breakdown, and the New game button |
 | **🔊 Sound** | mute or unmute; the choice is remembered |
+
+### Selection
+
+A selected card lifts clear of the row, grows slightly, wears a gold ring and a
+gold cap along its top edge, and pushes its neighbours apart so you see the
+whole card rather than the sliver a fan normally leaves. It also paints above
+every other card, so a selection in the middle of a tightly overlapped hand is
+never buried by the card to its right.
+
+The gaps cost width, which a 320 px phone holding thirteen cards does not
+always have. `sizeHand()` works out the widest gap the fan can still absorb at
+maximum overlap and uses that, so selecting five cards narrows the gaps rather
+than pushing the hand off the screen — verified from 320 px up.
+
+> The lift used to do nothing at all. `deal-in` was declared with
+> `animation-fill-mode: both`, so after it finished its last keyframe
+> (`transform: none`) kept applying — and an animation outranks a normal
+> declaration, which silently cancelled `.is-selected`'s transform for the whole
+> of every fresh thirteen-card hand. It is `backwards` now, which still holds
+> the first keyframe through the stagger delay without pinning the last one
+> forever.
+
+### Sorting
+
+**⇅ Rank** groups by rank, low to high. **⇅ Suit** groups by suit, then by rank
+inside each suit — the arrangement you want when hunting for a flush or a
+straight. The button shows the arrangement currently in effect and cycles to the
+other on tap.
+
+Selections survive a re-sort: they are card values rather than positions, so the
+ring follows a card wherever it lands. Re-sorting is not mistaken for a new deal
+either — the deal animation and its sound key off which cards you hold, not the
+order they sit in.
 
 Screenshots of the sign-in and admin screens:
 
@@ -252,29 +285,28 @@ polls once a second stays quiet until something actually happens.
 ## Turn alerts
 
 Waiting on three other people means the moment that matters usually arrives
-while you are looking at something else. The alert works in layers, so it lands
-whether or not you are watching, and none of it is required:
+while you are looking at something else. Every layer is deliberately quiet, and
+none of it asks for permission:
 
 | Layer | When | Needs permission |
 |---|---|---|
-| On-screen banner | your turn, in an online game or after a long wait | no |
+| On-screen pill | your turn, in an online game or after a long wait | no |
 | Two-note sound | every turn | no |
-| Vibration | your turn, on a phone | no |
-| Tab title → `🔔 Your turn — Capsa` | your turn, tab in the background | no |
-| System notification | your turn, tab in the background | yes — offered in the lobby |
+| Short vibration | your turn, on a phone | no |
+| Tab title → `● Your turn — Capsa` | your turn, tab in the background | no |
 
-The banner sits at the foot of the felt, next to the hand you are about to play
+**There is no system notification.** A card game taking over the whole desktop
+is out of proportion to a turn that will still be there in a minute, so the
+alert stays inside the page — which also means nothing to ask for, nothing to
+decline, and no permission prompt on the way into a game.
+
+The pill sits at the foot of the felt, next to the hand you are about to play
 from, rather than at the top where the opposite seat is. It clears the moment
-you play or pass, so it never outlives the turn it announced — as does the title
-and any system notification, which are also cleared as soon as you look at the
-tab again.
+you play or pass, so it never outlives the turn it announced, as does the title,
+which is also restored the moment you look at the tab again.
 
-Permission is asked for **in the lobby**, where there is time to read the offer
-and the click is the user gesture browsers require. Decline it and everything
-except the system notification still works.
-
-Solo play does not show the banner unless the wait ran past four seconds — the
-turn comes back every few seconds against bots, and a banner that often is just
+Solo play does not show the pill unless the wait ran past four seconds — the
+turn comes back every few seconds against bots, and a pill that often is just
 noise. The background layers still fire in solo.
 
 ### One thing this required

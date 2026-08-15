@@ -42,6 +42,10 @@ export function cardElement(card, { button = false } = {}) {
   return el;
 }
 
+// Cards may not hide more than this much of the neighbour beneath them, or the
+// fan stops being readable as individual cards.
+const MAX_OVERLAP = 0.72;
+
 // How far each card should overlap its neighbour so the whole hand fits the
 // width available. Returns a negative pixel margin.
 export function overlapFor(count, containerWidth, cardWidth) {
@@ -49,5 +53,12 @@ export function overlapFor(count, containerWidth, cardWidth) {
   const needed = count * cardWidth;
   if (needed <= containerWidth) return 0;
   const excess = needed - containerWidth;
-  return -Math.min(cardWidth * 0.72, excess / (count - 1));
+  return -Math.min(cardWidth * MAX_OVERLAP, excess / (count - 1));
+}
+
+// The narrowest the fan can ever be, at maximum overlap. Anything a caller
+// wants to add — the gaps around a selected card — has to fit in what is left.
+export function tightestWidth(count, cardWidth) {
+  if (count <= 1) return cardWidth;
+  return cardWidth * (count - MAX_OVERLAP * (count - 1));
 }
