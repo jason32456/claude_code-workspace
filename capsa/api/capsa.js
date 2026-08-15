@@ -20,6 +20,13 @@ const PBKDF2_ROUNDS = 120_000;
 const LOGIN_WINDOW_SECONDS = 15 * 60;
 const LOGIN_MAX_FAILURES = 10;
 const AWAY_AFTER_MS = 25_000;
+// How often a polling seat rewrites its lastSeen. Must stay well under
+// AWAY_AFTER_MS, or a present player would be declared away between beats.
+const HEARTBEAT_MS = 10_000;
+// Validated sessions are held on the instance for this long. Short enough that
+// a sign-out takes effect promptly, long enough that a poll does not spend a
+// store command re-reading the same token every second.
+const SESSION_CACHE_MS = 30_000;
 
 // Shared, role-based credentials — a gate into the game rather than per-person
 // accounts. Players still type a display name when they join a room. Seeded
@@ -183,15 +190,36 @@ async function createSession(role, username) {
   return token;
 }
 
+// Per-instance, so a sign-out elsewhere can linger here until the entry
+// expires. That is the trade: these are shared role credentials guarding a card
+// game, and re-reading the token on every poll is what made the store bill.
+const sessionCache = new Map();
+
+function cacheSession(token, session) {
+  if (sessionCache.size > 500) {
+    const now = Date.now();
+    for (const [k, v] of sessionCache) if (v.until <= now) sessionCache.delete(k);
+  }
+  sessionCache.set(token, { session, until: Date.now() + SESSION_CACHE_MS });
+}
+
 async function readSession(token) {
   if (!token || typeof token !== 'string' || token.length > 200) return null;
+
+  const cached = sessionCache.get(token);
+  if (cached && cached.until > Date.now()) return cached.session;
+
   const raw = await kvGet(sessionKey(token));
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
+  let session = null;
+  if (raw) {
+    try {
+      session = JSON.parse(raw);
+    } catch {
+      session = null;
+    }
   }
+  cacheSession(token, session);
+  return session;
 }
 
 function clientIp(req) {
@@ -271,6 +299,12 @@ function markAway(room) {
 }
 
 // Read → mutate → compare-and-set, retrying when another request wins the race.
+//
+// `apply` may return { skip: true } to mean "nothing changed, do not write".
+// That matters more than it sounds: polling is by far the commonest request,
+// and without an escape hatch every poll would be a write — burning a store
+// command per poll and bumping the version, which makes every client redraw a
+// table that did not move.
 async function mutate(code, apply) {
   for (let attempt = 0; attempt < 5; attempt++) {
     const raw = await readRaw(code);
@@ -279,6 +313,7 @@ async function mutate(code, apply) {
     const room = JSON.parse(raw);
     const outcome = apply(room);
     if (outcome && outcome.error) return outcome;
+    if (outcome && outcome.skip) return { room, result: outcome };
 
     room.version = (room.version || 1) + 1;
     room.updatedAt = Date.now();
@@ -373,7 +408,10 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'logout') {
-      if (authToken) await kvDel(sessionKey(authToken));
+      if (authToken) {
+        sessionCache.delete(authToken);
+        await kvDel(sessionKey(authToken));
+      }
       return send(200, { ok: true });
     }
 
@@ -491,11 +529,21 @@ module.exports = async function handler(req, res) {
       const outcome = await mutate(code, (room) => {
         const seat = authenticate(room, seatIndex, token);
         if (!seat) return { error: 'Not your seat', status: 403 };
-        seat.lastSeen = Date.now();
-        seat.away = false;
-        markAway(room);
-        advanceBots(room, engine, bot);
-        return null;
+
+        // Writing lastSeen on every poll would turn a read into a write. It is
+        // only ever compared against AWAY_AFTER_MS, so refreshing it at a
+        // fraction of that is just as accurate and costs far less.
+        const now = Date.now();
+        let changed = false;
+        if (seat.away || now - (seat.lastSeen || 0) > HEARTBEAT_MS) {
+          seat.lastSeen = now;
+          seat.away = false;
+          changed = true;
+        }
+
+        if (markAway(room)) changed = true;
+        if (advanceBots(room, engine, bot)) changed = true;
+        return changed ? null : { skip: true };
       });
 
       if (outcome.error) return send(outcome.status || 400, { error: outcome.error });
