@@ -49,6 +49,19 @@ export const projects = [
     ]),
   },
   {
+    slug: 'silkfall',
+    name: 'Silkfall',
+    tagline: '3D web-building predator sim',
+    description:
+      'You build the level, then you hunt in it. Spin an orb web out of walkable frame silk and sticky capture silk across a gap between branches, then run its strands to whatever flies into them. The web is a real particle system — strands sag, whip and snap, and a node only exists while silk still leads back to an anchor, so cutting one strand drops the whole limb it held. Snagged prey chews through the strand it hit and sends a vibration pulse travelling the graph as your only sense organ; reach it before the silk gives or lose both. Beetles tear frames, gusts punish long cheap spans, and wasps ignore the web entirely and come for you — a red wind-up glow is your window to drop a dragline. Eight nights, each with a food quota.',
+    stack: ['Three.js', 'Vanilla JS', 'Verlet physics', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/silkfall/',
+    runCommand: 'cd showcase/apps/silkfall && python -m http.server 8080',
+    screenshots: shots('silkfall', ['hunt', 'wasp', 'build', 'gust', 'web', 'dusk', 'dawn', 'title']),
+  },
+  {
     slug: 'crossy-road',
     name: 'Crossy Road',
     tagline: 'Blocky endless hopper in 3D',
