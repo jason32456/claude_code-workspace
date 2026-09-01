@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Silkfall — build the trap, then hunt it</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="vignette"></div>
+  <div id="damage-flash"></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-row hud-top">
+      <div class="hud-block">
+        <div class="label">NIGHT</div>
+        <div class="value"><span id="night-num">1</span><span class="dim">/8</span></div>
+        <div class="sub" id="phase-label">DUSK · BUILD</div>
+      </div>
+
+      <div class="hud-block center">
+        <div class="quota">
+          <span class="label">FOOD</span>
+          <span class="value"><span id="food-num">0</span><span class="dim">/<span id="quota-num">20</span></span></span>
+        </div>
+        <div class="bar quota-bar"><div id="quota-fill"></div></div>
+        <div class="sub"><span id="timer-label">—</span></div>
+        <button id="btn-start-night" class="hidden">START NIGHT ⏎</button>
+      </div>
+
+      <div class="hud-block right">
+        <div class="meter">
+          <span class="label">SILK</span>
+          <div class="bar silk"><div id="silk-fill"></div></div>
+          <span class="num" id="silk-num">60</span>
+        </div>
+        <div class="meter">
+          <span class="label">LIFE</span>
+          <div class="bar life"><div id="life-fill"></div></div>
+          <span class="num" id="life-num">100</span>
+        </div>
+        <div class="sub score">SCORE <span id="score-num">0</span></div>
+      </div>
+    </div>
+
+    <div id="gust-warning" class="hidden">GUST INCOMING <span id="gust-dir">→</span></div>
+
+    <div id="cue" class="hidden"><span id="cue-arrow">▲</span><span id="cue-text">struggling</span></div>
+
+    <div id="action-prompt" class="hidden">
+      <div class="ring"><div id="action-fill"></div></div>
+      <div id="action-text">HOLD E — WRAP</div>
+    </div>
+
+    <div id="build-panel" class="hidden">
+      <div class="build-head">BUILD MODE <span class="dim">· B to exit</span></div>
+      <div class="build-row">
+        <button id="silk-toggle" class="silk-btn capture">CAPTURE SILK <span class="dim">Q</span></button>
+      </div>
+      <div class="build-row hint" id="build-hint">Click a node or strand to start a run</div>
+      <div class="build-row cost hidden" id="build-cost">◇ 0.0 silk</div>
+      <div class="build-row err hidden" id="build-err"></div>
+    </div>
+
+    <div id="toast-wrap"></div>
+
+    <div id="touch" class="hidden">
+      <div id="stick"><div id="stick-knob"></div></div>
+      <div id="touch-buttons">
+        <button id="btn-act">WRAP</button>
+        <button id="btn-drop">DROP</button>
+        <button id="btn-build">BUILD</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div class="panel" id="panel-title">
+      <h1>SILKFALL</h1>
+      <p class="subtitle">build the trap · then hunt it</p>
+      <p class="body">
+        You are an orb-weaver in a gap between branches. Spin your web out of
+        <span class="c-frame">frame silk</span> you can run along and
+        <span class="c-capture">capture silk</span> that holds what flies into it.
+        Then wait. Everything you catch, you built the shape of.
+      </p>
+      <p class="body dim">
+        A moth tears at the strand it hit. Reach it before the strand gives, or lose both.
+        Wasps do not get caught — they come for you.
+      </p>
+      <div class="keyrow">
+        <span><kbd>WASD</kbd> run the silk</span>
+        <span><kbd>B</kbd> build</span>
+        <span><kbd>E</kbd> wrap / feed</span>
+        <span><kbd>Space</kbd> dragline</span>
+      </div>
+      <button class="primary" id="btn-start">BEGIN</button>
+      <p class="foot">best <span id="best-score">0</span></p>
+    </div>
+
+    <div class="panel hidden" id="panel-dusk">
+      <h2 id="dusk-title">DUSK · NIGHT 1</h2>
+      <p class="body" id="dusk-body"></p>
+      <ul class="brief" id="dusk-brief"></ul>
+      <button class="primary" id="btn-dusk">GO AND SPIN</button>
+      <p class="foot">build now — <kbd>B</kbd> toggles build mode · <kbd>Enter</kbd> starts the night when you are ready</p>
+    </div>
+
+    <div class="panel hidden" id="panel-dawn">
+      <h2 id="dawn-title">DAWN</h2>
+      <ul class="tally" id="dawn-tally"></ul>
+      <button class="primary" id="btn-next">NEXT NIGHT</button>
+    </div>
+
+    <div class="panel hidden" id="panel-over">
+      <h2 id="over-title">THE WEB IS EMPTY</h2>
+      <p class="body" id="over-body"></p>
+      <p class="bigscore"><span id="over-score">0</span></p>
+      <button class="primary" id="btn-retry">SPIN AGAIN</button>
+    </div>
+
+    <div class="panel hidden" id="panel-pause">
+      <h2>PAUSED</h2>
+      <div class="help">
+        <div><kbd>WASD</kbd> / <kbd>↑↓←→</kbd><span>run along the silk — you can only go where you built</span></div>
+        <div><kbd>Space</kbd><span>drop a dragline · release to climb · swing into silk to latch</span></div>
+        <div><kbd>E</kbd><span>hold near snagged prey to wrap it · hold on a bundle to feed</span></div>
+        <div><kbd>B</kbd><span>build mode · click node/strand, then click again to spin</span></div>
+        <div><kbd>Q</kbd><span>swap frame ↔ capture silk</span></div>
+        <div><kbd>X</kbd><span>hold in build mode, click a strand to cut it</span></div>
+        <div><kbd>Esc</kbd><span>cancel the current run</span></div>
+        <div><kbd>M</kbd><span>mute</span></div>
+      </div>
+      <button class="primary" id="btn-resume">RESUME</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
