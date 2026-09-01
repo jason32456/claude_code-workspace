@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 38 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 39 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
@@ -49,6 +49,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 | [nightside](./showcase/apps/nightside/) | 3D tower defense on a rotating planet — 642-tile geodesic globe, flow-field pathing, and a solar power grid that half goes dark as the terminator sweeps; the Blight only ever drops on the night side | Three.js · Vanilla JS · ES Modules | ✅ Complete |
 | [windward](./showcase/apps/windward/) | 3D sailing regatta with no throttle — you get a rudder and a sheet, and the wind decides; a real no-go zone forces you to tack upwind, gusts drift across the water as readable dark patches, and 3 AI rivals sail the identical physics | Three.js · Vanilla JS · GLSL · ES Modules | ✅ Complete |
 | [silkfall](./showcase/apps/silkfall/) | 3D web-building predator sim — you build the level, then you hunt in it; spin an orb web from walkable frame silk and sticky capture silk, then run its strands to reach snagged prey before it chews through them. Real verlet web that sags, whips and collapses when the strand holding a limb is cut; vibration pulses travel the graph as your only sense organ; beetles tear frames, gusts punish long spans, and wasps hunt you instead of the web | Three.js · Vanilla JS · Verlet physics · Web Audio API · ES Modules | ✅ Complete |
+| [gambit](./showcase/apps/gambit/) | Full rule-correct chess — click-to-select board, castling, en passant, promotion, check/checkmate/stalemate/draw detection — against a local minimax-with-alpha-beta AI at three difficulties, or pass-and-play; Puzzle Rush drills tactics with a hand-curated puzzle bank that's mechanically verified offline before it ships | Vanilla JS · chess.js · Web Audio API · ES Modules | ✅ Complete |
 
 ## Deployments
 

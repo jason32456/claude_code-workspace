@@ -279,6 +279,19 @@ export const projects = [
     screenshots: shots('typeblitz', ['settled', 'early']),
   },
   {
+    slug: 'gambit',
+    name: 'Gambit',
+    tagline: 'Chess with an AI opponent + tactics trainer',
+    description:
+      'A full, rule-correct chess board — click-to-select, legal-move highlighting, castling, en passant, promotion, and check/checkmate/stalemate/draw detection — playable against a local minimax-with-alpha-beta AI at three difficulties, or pass-and-play with a friend. Puzzle Rush drills tactical vision: timed runs through a hand-curated puzzle bank that’s mechanically verified offline (every FEN parses, every scripted move is legal, and the final position matches its claimed mate or material win) before it ships. Synthesized sound effects, no audio files.',
+    stack: ['Vanilla JS', 'chess.js', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/gambit/',
+    runCommand: 'cd showcase/apps/gambit && python -m http.server 8080',
+    screenshots: shots('gambit', ['play', 'puzzle-rush']),
+  },
+  {
     slug: 'cantilever',
     name: 'Cantilever',
     tagline: 'Build a bridge, then load it',
