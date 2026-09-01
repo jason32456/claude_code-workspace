@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 39 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 40 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
