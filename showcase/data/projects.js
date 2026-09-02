@@ -339,6 +339,19 @@ export const projects = [
     screenshots: shots('gambit', ['play', 'puzzle-rush']),
   },
   {
+    slug: 'last-ember',
+    name: 'Last Ember',
+    tagline: 'Turn-based roguelike, torch-fuel light',
+    description:
+      'Your only light source is a torch that burns down every turn you carry it — how far you can see is a resource you spend, not a fixed camera setting. Nothing in the dungeon moves until you do: every keypress is one turn, for you and for whatever else is down there. Bump-to-attack combat with no miss chance, so a bad fight is always a decision rather than a bad roll. Procedurally generated floors (random rooms, L-shaped corridors, a BFS distance field that places the stairs at the farthest reachable tile from your start) with fog of war over remembered ground. Rats wander and flee, skeletons and ghouls wake on line of sight and path straight at you, bats move twice a turn and erratically. Potions, oil flasks, spare torches, auto-equipping gear, and permadeath — eight floors down to the Warden-guarded Emberheart, with only your deepest floor and win count surviving a death, in localStorage.',
+    stack: ['Vanilla JS', 'Canvas 2D', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/last-ember/',
+    runCommand: 'cd showcase/apps/last-ember && python -m http.server 8080',
+    screenshots: shots('last-ember', ['title', 'torchlight', 'descent']),
+  },
+  {
     slug: 'cantilever',
     name: 'Cantilever',
     tagline: 'Build a bridge, then load it',
