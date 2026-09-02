@@ -44,7 +44,29 @@ export const projects = [
       'title',
     ]),
   },
-
+  {
+    slug: 'leyden',
+    name: 'Leyden',
+    tagline: 'Bait the lightning, carry it home',
+    description:
+      'A 3D storm-flying game where lightning is the resource rather than the enemy. You have no weapon and nothing to shoot \u2014 the only verb is bait. Hold E to drop a conductive streamer from the gondola and you become roughly six times the likeliest thing in the valley; take the strike on your own hull, then run the charge down to the town\u2019s capacitor jars before the heat cooks you, because carrying charge heats the hull and a full one is a twelve-second fuse. No bolt is scripted: a leader walks down from the firing cell 4.6 m at a time, sampling fourteen candidate directions and choosing by the local field gradient raised to a per-storm exponent, so the spire, the rods, the powder mill, the five jars and you are all competing for the same bolt and two runs never play the same. Baiting directly under a live cell attaches 78% of the time and merely loitering up there 32%, while a loaded ship down at delivery height is nearly invisible \u2014 you cannot be near the charge and near the delivery point at once. Everything you don\u2019t catch lands somewhere: a hit on a barn starts a fire that spreads, three at once ends the run, and the church spire is free protection only where its geometry happens to cover. Five storms add crosswind, rain columns that bleed your charge and douse fires, paired cells and finally a supercell sitting over the town. Thunder arrives delayed by distance over 340 m/s, which doubles as the range cue, and every sound in it is synthesised at runtime.',
+    stack: ['Three.js', 'Vanilla JS', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/leyden/',
+    runCommand: 'cd showcase/apps/leyden && python -m http.server 8080',
+    screenshots: shots('leyden', [
+      'strike',
+      'carry',
+      'bait',
+      'deliver',
+      'valley',
+      'fires',
+      'title',
+      'briefing',
+      'result',
+    ]),
+  },
   {
     slug: 'capsa',
     name: 'Capsa',
