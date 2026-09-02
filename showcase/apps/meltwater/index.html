@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Meltwater — shape the valley, then release the melt</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- ------------------------------------------------------------- in-game -->
+  <div id="hud" class="hidden">
+    <div class="panel top-left">
+      <div class="season" id="season-name">First Thaw</div>
+      <div class="sub" id="season-sub">Season 1 · Aldergill</div>
+      <div class="phase-row">
+        <span class="tag" id="phase-tag">SURVEY</span>
+        <span class="clock" id="melt-clock">0:00</span>
+      </div>
+      <div class="bar melt"><div id="melt-fill"></div></div>
+      <div class="sub flow"><span id="flow-num">0.0</span> m³/s from the glacier</div>
+    </div>
+
+    <div class="panel top-right">
+      <div class="panel-title">OBJECTIVES</div>
+      <div id="objectives"></div>
+    </div>
+
+    <div class="panel bottom-right">
+      <div class="budget">
+        <span class="label">SPOIL PILE</span>
+        <span class="num" id="spoil-num">0</span><span class="unit">m³</span>
+      </div>
+      <div class="bar spoil"><div id="spoil-fill"></div></div>
+      <div class="budget">
+        <span class="label">EARTH MOVED</span>
+        <span class="num" id="work-num">0</span><span class="unit">/0</span>
+      </div>
+      <div class="bar work"><div id="work-fill"></div></div>
+      <div class="budget timber-row">
+        <span class="label">TIMBER</span>
+        <span class="num" id="timber-num">0</span><span class="unit">panels</span>
+      </div>
+    </div>
+
+    <div class="panel bottom-left" id="toolbar">
+      <div class="tools">
+        <button class="tool" data-tool="dig"><b>Q</b><span>Dig</span></button>
+        <button class="tool" data-tool="raise"><b>E</b><span>Raise</span></button>
+        <button class="tool" data-tool="dam"><b>R</b><span>Dam</span></button>
+        <button class="tool" data-tool="gate"><b>T</b><span>Gate</span></button>
+        <button class="tool" data-tool="erase"><b>X</b><span>Clear</span></button>
+      </div>
+      <div class="brush-row">
+        <span class="label">BRUSH</span>
+        <button class="mini" id="brush-down">[</button>
+        <div class="bar brush"><div id="brush-fill"></div></div>
+        <button class="mini" id="brush-up">]</button>
+      </div>
+      <div class="hintline" id="tool-hint">Drag to cut a channel. Right-drag orbits.</div>
+    </div>
+
+    <div id="gates" class="hidden"></div>
+
+    <div id="release-wrap">
+      <button id="release-btn">RELEASE THE MELT<span class="key">SPACE</span></button>
+    </div>
+
+    <div id="toasts"></div>
+  </div>
+
+  <!-- ------------------------------------------------------------- screens -->
+  <div id="title" class="screen">
+    <div class="screen-inner">
+      <h1>MELTWATER</h1>
+      <p class="tag-line">Shape the valley. Then release the melt and find out what you actually built.</p>
+      <p class="blurb">
+        The glacier melts on a timer and every drop obeys a shallow-water simulation — it finds
+        the low line by itself, backs up behind what you leave in the way, and does not respawn
+        if you send it the wrong way. You never touch the water. You only move dirt, and the
+        spoil for a levee has to come out of a trench you chose the place of.
+      </p>
+      <div class="season-grid" id="season-grid"></div>
+      <div class="screen-actions">
+        <button id="start-btn" class="primary">BEGIN SEASON 1</button>
+        <button id="how-btn">HOW TO PLAY</button>
+      </div>
+      <p class="foot">Mouse + keyboard. Best on a desktop browser.</p>
+    </div>
+  </div>
+
+  <div id="brief" class="screen hidden">
+    <div class="screen-inner narrow">
+      <div class="brief-season" id="brief-sub">Season 1 · Aldergill</div>
+      <h2 id="brief-name">First Thaw</h2>
+      <p id="brief-text"></p>
+      <div class="brief-stats" id="brief-stats"></div>
+      <div class="brief-hint"><b>SURVEYOR'S NOTE</b><span id="brief-hint"></span></div>
+      <div class="screen-actions">
+        <button id="brief-btn" class="primary">SURVEY THE VALLEY</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result" class="screen hidden">
+    <div class="screen-inner narrow">
+      <div class="result-verdict" id="result-verdict">SEASON COMPLETE</div>
+      <h2 id="result-name">First Thaw</h2>
+      <div class="result-rows" id="result-rows"></div>
+      <div class="result-score"><span>SCORE</span><b id="result-score">0</b></div>
+      <div class="screen-actions">
+        <button id="result-next" class="primary">NEXT SEASON</button>
+        <button id="result-retry">REPLAY SEASON</button>
+        <button id="result-menu">MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="help" class="screen hidden">
+    <div class="screen-inner narrow">
+      <h2>How to play</h2>
+      <div class="help-grid">
+        <div>
+          <h3>The idea</h3>
+          <p>
+            Water runs downhill and conserves volume. Everything else follows from that: a
+            channel dug a metre lower steals the flow, a filled basin spills from its lowest
+            lip, and a dam does not stop water — it delays it, and the delay has to go
+            somewhere.
+          </p>
+          <h3>Cut and fill</h3>
+          <p>
+            Digging adds to your <b>spoil pile</b>; raising spends it. Both count against
+            <b>earth moved</b>, which is capped for the season — and costs triple once the
+            melt is running.
+          </p>
+        </div>
+        <div>
+          <h3>Controls</h3>
+          <table class="keys">
+            <tr><td>Left-drag</td><td>Use the current tool</td></tr>
+            <tr><td>Q / E</td><td>Dig / Raise</td></tr>
+            <tr><td>R / T</td><td>Dam / Sluice gate</td></tr>
+            <tr><td>X</td><td>Clear a structure</td></tr>
+            <tr><td>[ ]</td><td>Brush radius</td></tr>
+            <tr><td>Right-drag</td><td>Orbit · wheel zooms</td></tr>
+            <tr><td>WASD</td><td>Pan the camera</td></tr>
+            <tr><td>Space</td><td>Release the melt</td></tr>
+            <tr><td>1 – 4</td><td>Toggle sluice gates</td></tr>
+            <tr><td>M / Esc</td><td>Mute / menu</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="screen-actions"><button id="help-close" class="primary">BACK</button></div>
+    </div>
+  </div>
+
+  <div id="pause" class="screen hidden">
+    <div class="screen-inner narrow">
+      <h2>Paused</h2>
+      <div class="screen-actions column">
+        <button id="pause-resume" class="primary">RESUME</button>
+        <button id="pause-restart">RESTART SEASON</button>
+        <button id="pause-help">HOW TO PLAY</button>
+        <button id="pause-menu">ABANDON TO MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mute" title="Mute (M)">♪</div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

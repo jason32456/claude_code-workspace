@@ -190,7 +190,7 @@ ES modules require an HTTP server — `file://` URLs will not work.
 
 ## Current projects
 
-`showcase/data/projects.js` is the authoritative list — 37 projects. All but one
+`showcase/data/projects.js` is the authoritative list — 41 projects. All but one
 live under `showcase/apps/`, and most are static sites launchable straight from
 the showcase. The exceptions:
 

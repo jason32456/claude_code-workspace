@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Kessler — zero-thrust EVA salvage</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="vignette"></div>
+  <div id="damage-flash"></div>
+  <div id="void-warning" class="hidden">OUTSIDE WORK ZONE — O2 BURN ×3</div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="hud-block">
+        <div class="label">SHIFT</div>
+        <div class="value"><span id="shift-num">1</span><span class="dim">/5</span></div>
+        <div class="sub" id="objective">RETURN 3 CRATES</div>
+      </div>
+
+      <div class="hud-block center">
+        <div class="meter wide">
+          <span class="label">O<sub>2</sub></span>
+          <div class="bar o2"><div id="o2-fill"></div></div>
+          <span class="num" id="o2-num">240</span>
+        </div>
+        <div class="meter wide">
+          <span class="label">HULL</span>
+          <div class="bar hull"><div id="hull-fill"></div></div>
+          <span class="num" id="hull-num">100</span>
+        </div>
+      </div>
+
+      <div class="hud-block right">
+        <div class="label">BANKED</div>
+        <div class="value"><span id="banked-num">0</span><span class="dim">/<span id="quota-num">3</span></span></div>
+        <div class="sub">RACK <span id="cargo-num">0</span><span class="dim">/6</span> · <span id="mass-num">95</span> kg</div>
+      </div>
+    </div>
+
+    <div id="reticle">
+      <div id="reticle-dot"></div>
+      <div id="closure" class="hidden"><span id="closure-num">0.0</span><span class="unit">m/s</span></div>
+    </div>
+
+    <div id="marker-pro" class="vmarker hidden"><span>▲</span></div>
+    <div id="marker-retro" class="vmarker retro hidden"><span>▼</span></div>
+
+    <div class="hud-bottom">
+      <div class="hud-block">
+        <div class="meter">
+          <span class="label">GAS</span>
+          <div class="bar gas"><div id="gas-fill"></div></div>
+        </div>
+        <div class="sub" id="anchor-state">DRIFTING</div>
+      </div>
+
+      <div class="hud-block center">
+        <div id="charge-wrap" class="hidden">
+          <div class="bar charge"><div id="charge-fill"></div></div>
+          <div class="sub" id="charge-hint">RELEASE TO KICK</div>
+        </div>
+      </div>
+
+      <div class="hud-block right">
+        <div class="label">VELOCITY</div>
+        <div class="value big"><span id="speed-num">0.0</span><span class="dim"> m/s</span></div>
+        <div class="sub" id="tether-state">TETHER READY</div>
+      </div>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+  </div>
+
+  <div id="menu" class="overlay">
+    <div class="panel">
+      <h1>KESSLER</h1>
+      <p class="tag">You have no flight controls. Only momentum you already paid for.</p>
+
+      <div class="brief">
+        <p>Salvage the wreck of Kessler Station. Fill the quota, get back to the
+        airlock before your air does. Nothing out here slows you down but the hull
+        you hit.</p>
+      </div>
+
+      <div class="keys">
+        <div class="krow"><kbd>MOUSE</kbd><span>aim — the camera is your thrust vector</span></div>
+        <div class="krow"><kbd>SPACE</kbd><span>hold while anchored to charge a kick, release to launch</span></div>
+        <div class="krow"><kbd>E</kbd><span>grab / let go of hull</span></div>
+        <div class="krow"><kbd>LMB</kbd><span>fire or release the magnetic tether</span></div>
+        <div class="krow"><kbd>RMB</kbd><span>reel the tether in</span></div>
+        <div class="krow"><kbd>Q</kbd><span>throw a crate — momentum you buy with cargo</span></div>
+        <div class="krow"><kbd>WASD</kbd><span>RCS puffs — costs gas, does not refill in the field</span></div>
+        <div class="krow"><kbd>SHIFT</kbd><span>burn gas to match velocity (stop)</span></div>
+        <div class="krow"><kbd>ESC</kbd><span>pause</span></div>
+      </div>
+
+      <p class="hint">Fly slow. A catch above 6 m/s throws you off the hull.</p>
+      <button id="btn-start">BEGIN SHIFT 1</button>
+      <p class="best" id="best-line"></p>
+    </div>
+  </div>
+
+  <div id="briefing" class="overlay hidden">
+    <div class="panel narrow">
+      <h2 id="brief-title">SHIFT 1</h2>
+      <div class="statgrid">
+        <div><span class="k">QUOTA</span><span class="v" id="brief-quota">3 crates</span></div>
+        <div><span class="k">OXYGEN</span><span class="v" id="brief-o2">240 s</span></div>
+        <div><span class="k">DEBRIS</span><span class="v" id="brief-debris">6 tracked</span></div>
+        <div><span class="k">RING</span><span class="v" id="brief-ring">6 °/s</span></div>
+      </div>
+      <p class="hint" id="brief-hint">Kick off the airlock and cross to the first crate on one impulse.</p>
+      <button id="btn-dive">EGRESS ⏎</button>
+    </div>
+  </div>
+
+  <div id="result" class="overlay hidden">
+    <div class="panel narrow">
+      <h2 id="result-title">SHIFT COMPLETE</h2>
+      <p id="result-line" class="tag"></p>
+      <div class="statgrid">
+        <div><span class="k">BANKED</span><span class="v" id="res-banked">0</span></div>
+        <div><span class="k">O2 LEFT</span><span class="v" id="res-o2">0 s</span></div>
+        <div><span class="k">HULL</span><span class="v" id="res-hull">100%</span></div>
+        <div><span class="k">SCORE</span><span class="v" id="res-score">0</span></div>
+      </div>
+      <button id="btn-next">CONTINUE ⏎</button>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="panel narrow">
+      <h2>PAUSED</h2>
+      <p class="tag">Click the screen to resume.</p>
+      <button id="btn-resume">RESUME ⏎</button>
+      <button id="btn-abort" class="ghost">ABANDON RUN</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
