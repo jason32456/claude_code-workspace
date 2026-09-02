@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 41 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 42 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
@@ -52,6 +52,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 | [silkfall](./showcase/apps/silkfall/) | 3D web-building predator sim — you build the level, then you hunt in it; spin an orb web from walkable frame silk and sticky capture silk, then run its strands to reach snagged prey before it chews through them. Real verlet web that sags, whips and collapses when the strand holding a limb is cut; vibration pulses travel the graph as your only sense organ; beetles tear frames, gusts punish long spans, and wasps hunt you instead of the web | Three.js · Vanilla JS · Verlet physics · Web Audio API · ES Modules | ✅ Complete |
 | [gambit](./showcase/apps/gambit/) | Full rule-correct chess — click-to-select board, castling, en passant, promotion, check/checkmate/stalemate/draw detection — against a local minimax-with-alpha-beta AI at three difficulties, or pass-and-play; Puzzle Rush drills tactics with a hand-curated puzzle bank that's mechanically verified offline before it ships | Vanilla JS · chess.js · Web Audio API · ES Modules | ✅ Complete |
 | [meltwater](./showcase/apps/meltwater/) | 3D valley engineering under a melting glacier — you never touch the water, only the dirt under it; a pipe-model shallow-water sim carries every drop, so it finds the low line itself, backs up behind what you leave in the way, and is gone for good if you send it the wrong way. Cut-and-fill earthworks where the spoil for a levee has to come out of a trench you chose the place of, dams that breach when the head beats their strength, sluice gates you time mid-melt, and soft ground that lets fast water widen its own channel | Three.js · GLSL · Vanilla JS · Web Audio API · ES Modules | ✅ Complete |
+| [docket](./showcase/apps/docket/) | Drag-and-drop Kanban board — multiple boards, columns and cards you drag with a live drop indicator, colored labels, due dates, and an optional WIP limit per column that flags amber once over capacity; a search box fades non-matching cards in place instead of reflowing the board | Vanilla JS · ES Modules · CSS3 · HTML5 Drag and Drop API · localStorage | ✅ Complete |
 
 ## Deployments
 
