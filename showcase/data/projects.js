@@ -23,6 +23,29 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'emberline',
+    name: 'Emberline',
+    tagline: 'Aerial firefighting — cut it off, you cannot put it out',
+    description:
+      'An aerial-firefighting game where retardant never puts a fire out — the red slurry only makes ground unburnable, so the whole game is reading a wind- and slope-driven fire, working out where it will be in two minutes, and painting a line across that ground before it gets there. The opponent is a cellular burn model with fuel, moisture, slope and wind: both the wind and slope responses are exponential, so a fire creeping through a meadow becomes a run the moment it lines up with a draw, and it climbs a face far faster than it comes back down one. Timber is slow to light and then burns four times as long as grass; burning timber lofts embers that arc a couple of hundred metres downwind and light what they land on, so the line you just finished can be jumped from behind. You fly a scooper tanker with 6000 litres — five seconds of drop — and altitude is the risk dial: a pass at 30 m lays a dense narrow line, one at 120 m lays a wide useless smear, and the drop leads the aircraft by however long the slurry falls. Refill by skimming the lake below 40 m at under 62 m/s. Containment is a measurement rather than a score: the fraction of the unburnt country the fire can no longer reach. Three missions, dusk lighting, and no asset files at all — terrain, flame, smoke and every sound are generated at load.',
+    stack: ['Three.js', 'Vanilla JS', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/emberline/',
+    runCommand: 'cd showcase/apps/emberline && python -m http.server 8080',
+    screenshots: shots('emberline', [
+      'front',
+      'drop-run',
+      'holding-line',
+      'tactical',
+      'scoop',
+      'briefing',
+      'debrief',
+      'title',
+    ]),
+  },
+
+  {
     slug: 'capsa',
     name: 'Capsa',
     tagline: 'Big Two with online rooms',
