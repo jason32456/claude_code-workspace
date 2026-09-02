@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Gnomon — stand on the shadows you cast</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="vignette"></div>
+  <div id="flash"></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-row">
+      <div class="hud-block">
+        <div class="label">CHAMBER</div>
+        <div class="value"><span id="chamber-num">1</span><span class="dim">/9</span></div>
+        <div class="sub" id="chamber-name">First Light</div>
+      </div>
+
+      <div class="hud-block center">
+        <div id="seal-wrap" class="hidden">
+          <div class="label">SEAL</div>
+          <div class="seal-bar"><div id="seal-fill"></div><div id="seal-mark"></div></div>
+          <div class="sub" id="seal-read">0% filled · 0% spill</div>
+        </div>
+      </div>
+
+      <div class="hud-block right">
+        <div class="label">TIME</div>
+        <div class="value"><span id="time-num">0.0</span><span class="dim">s</span></div>
+        <div class="sub">PAR <span id="par-num">30</span>s · <span id="mote-num">0</span>/3 motes</div>
+      </div>
+    </div>
+
+    <div id="hint" class="hint"></div>
+
+    <div id="grip" class="grip hidden"></div>
+
+    <div id="touch" class="touch hidden">
+      <button class="tbtn" data-key="left">◀</button>
+      <button class="tbtn" data-key="right">▶</button>
+      <button class="tbtn jump" data-key="jump">JUMP</button>
+    </div>
+  </div>
+
+  <div id="rotate">↻ turn your phone sideways — this room is wider than it is tall</div>
+
+  <div id="title" class="overlay">
+    <div class="panel wide">
+      <h1>GNOMON</h1>
+      <p class="tag">You are a flat thing living on a lit wall, and you are afraid of the light.</p>
+      <p class="body">
+        The platforms are not solid. They are the <em>shadows</em> of glass solids hanging in the room
+        in front of you, thrown by a single lamp. Turn a solid and the ledge you are standing on tips.
+        Push it toward the lamp and the ledge doubles in size and runs away from you.
+        Nothing pauses while you work.
+      </p>
+
+      <div class="controls">
+        <div><kbd>A</kbd><kbd>D</kbd> <span>or</span> <kbd>←</kbd><kbd>→</kbd><em>run</em></div>
+        <div><kbd>Space</kbd> <span>/</span> <kbd>W</kbd><em>jump</em></div>
+        <div><kbd>Drag</kbd><em>turn a solid</em></div>
+        <div><kbd>Shift</kbd>+<kbd>Drag</kbd><em>slide it</em></div>
+        <div><kbd>Wheel</kbd><em>push it toward the lamp</em></div>
+        <div><kbd>R</kbd><em>restart chamber</em></div>
+      </div>
+
+      <div class="chambers" id="chamber-list"></div>
+
+      <button id="play-btn" class="primary">ENTER THE FIRST CHAMBER</button>
+      <div class="foot">Headphones recommended — every sound here is synthesised, none of it is downloaded.</div>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="panel">
+      <h2>PAUSED</h2>
+      <div class="stat-row"><span id="pause-name">First Light</span></div>
+      <button id="resume-btn" class="primary">RESUME</button>
+      <button id="restart-btn" class="ghost">RESTART CHAMBER</button>
+      <button id="mute-btn" class="ghost">SOUND: ON</button>
+      <button id="quit-btn" class="ghost">BACK TO CHAMBERS</button>
+    </div>
+  </div>
+
+  <div id="complete" class="overlay hidden">
+    <div class="panel">
+      <h2 id="complete-title">CHAMBER CLEARED</h2>
+      <div class="stats">
+        <div><span class="k">TIME</span><span class="v" id="c-time">0.0s</span></div>
+        <div><span class="k">PAR</span><span class="v" id="c-par">30s</span></div>
+        <div><span class="k">MOTES</span><span class="v" id="c-motes">0/3</span></div>
+        <div><span class="k">BEST</span><span class="v" id="c-best">—</span></div>
+      </div>
+      <button id="next-btn" class="primary">NEXT CHAMBER</button>
+      <button id="retry-btn" class="ghost">RUN IT AGAIN</button>
+    </div>
+  </div>
+
+  <div id="finale" class="overlay hidden">
+    <div class="panel">
+      <h2>ALL NINE CHAMBERS</h2>
+      <p class="body" id="finale-body"></p>
+      <button id="finale-btn" class="primary">BACK TO CHAMBERS</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

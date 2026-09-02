@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>Last Ember</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <section id="title-screen" class="screen">
+    <h1>LAST EMBER</h1>
+    <p class="tagline">Your torch is the only thing standing between you and the dark.</p>
+    <p class="blurb">
+      Descend eight floors of a forgotten mine. Every turn burns fuel; every
+      step you take is a step you can see, until you can't. Bump monsters to
+      fight them, drink potions to survive, and find the Emberheart before
+      your last torch gutters out for good.
+    </p>
+    <button id="start-btn" class="primary-btn">Light the torch</button>
+    <div id="title-stats" class="title-stats"></div>
+    <div class="controls-hint">
+      <strong>Move / attack:</strong> WASD or Arrow keys &nbsp;·&nbsp;
+      <strong>Wait:</strong> Space / Z / . &nbsp;·&nbsp;
+      <strong>Use item:</strong> 1–9
+    </div>
+  </section>
+
+  <section id="game-screen" class="screen" hidden>
+    <div id="hud-top">
+      <span id="floor-label">Floor 1 / 8</span>
+      <span id="turn-label">Turn 0</span>
+      <span id="gold-label">0g</span>
+    </div>
+
+    <div id="stage">
+      <canvas id="canvas" width="608" height="416"></canvas>
+    </div>
+
+    <div id="bars">
+      <div class="bar-row">
+        <span class="bar-label">HP</span>
+        <div class="bar hp-bar"><div id="hp-fill" class="bar-fill"></div></div>
+        <span id="hp-text" class="bar-text"></span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Torch</span>
+        <div class="bar torch-bar"><div id="torch-fill" class="bar-fill"></div></div>
+        <span id="torch-text" class="bar-text"></span>
+      </div>
+    </div>
+
+    <div id="inventory" class="panel"></div>
+    <div id="log" class="panel"></div>
+
+    <div id="touch-controls">
+      <div class="dpad">
+        <button id="dpad-up" aria-label="Move up">▲</button>
+        <button id="dpad-left" aria-label="Move left">◀</button>
+        <button id="dpad-wait" aria-label="Wait">●</button>
+        <button id="dpad-right" aria-label="Move right">▶</button>
+        <button id="dpad-down" aria-label="Move down">▼</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="end-screen" class="screen" hidden>
+    <h1 id="end-title"></h1>
+    <p id="end-blurb"></p>
+    <div id="end-stats" class="end-stats"></div>
+    <button id="restart-btn" class="primary-btn">Try again</button>
+  </section>
+
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

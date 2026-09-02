@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMBERLINE — you cannot put it out, only cut it off</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<!-- ── flight HUD ──────────────────────────────────────────────────────── -->
+<div id="hud" class="hidden">
+  <div id="hud-tl" class="panel">
+    <div class="load">
+      <div class="bar"><i id="load-fill"></i></div>
+      <div class="cap"><b>RETARDANT</b><span id="load-val">6000 L</span></div>
+    </div>
+    <div class="row">
+      <div class="stat"><span id="speed-val">68</span><em>m/s</em></div>
+      <div class="stat" id="agl-box"><span id="agl-val">190</span><em>m AGL</em></div>
+      <div class="stat dim"><span id="mode-val">CHASE</span><em>camera</em></div>
+    </div>
+  </div>
+
+  <div id="hud-tr" class="panel">
+    <div class="mission"><b id="mission-val">FIRST LIGHT</b><span id="time-val">0:00</span></div>
+    <div class="fire-row"><span>BURNED</span><b><i id="ha-val">0</i> ha</b></div>
+    <div class="fire-row"><span>BUILDINGS</span><b id="struct-val">4/4</b></div>
+    <div class="fire-row"><span>CONTAINMENT</span><b id="cont-val">0%</b></div>
+    <div class="bar thin"><i id="cont-fill"></i></div>
+    <canvas id="minimap" width="208" height="208"></canvas>
+  </div>
+
+  <div id="hud-bl" class="panel">
+    <canvas id="compass" width="92" height="92"></canvas>
+    <div class="wind">
+      <b id="wind-val">6 m/s SSW</b>
+      <span id="forecast">FORECAST STEADY</span>
+    </div>
+  </div>
+
+  <div id="keys">
+    <span><b>W</b>/<b>S</b> pitch</span>
+    <span><b>A</b>/<b>D</b> bank</span>
+    <span><b>SHIFT</b>/<b>CTRL</b> throttle</span>
+    <span><b>SPACE</b> drop · scoop</span>
+    <span><b>M</b> map</span>
+    <span><b>C</b> camera</span>
+    <span><b>R</b> restart</span>
+  </div>
+
+  <div id="warn"></div>
+  <div id="msg"></div>
+  <div id="reticle"></div>
+</div>
+
+<!-- ── title ───────────────────────────────────────────────────────────── -->
+<div id="title" class="overlay">
+  <div class="sheet">
+    <h1>EMBERLINE</h1>
+    <p class="tag">Retardant does not put fire out. It makes ground it cannot cross.<br>
+      Fly the line where the fire <em>will</em> be.</p>
+    <div id="mission-list"></div>
+    <div class="how">
+      <div>
+        <h3>The fire</h3>
+        <p>A cellular burn model with fuel, moisture, slope and wind. It runs uphill and downwind
+          exponentially, throws embers over your lines, and goes out only when every edge of the
+          burn is on ground it cannot cross.</p>
+      </div>
+      <div>
+        <h3>The aircraft</h3>
+        <p>6000 litres — four seconds of continuous drop. Low and slow paints a dense, narrow,
+          effective line; high paints a wide useless smear. Refill by skimming the lake under
+          40&nbsp;m at under 62&nbsp;m/s.</p>
+      </div>
+      <div>
+        <h3>Winning</h3>
+        <p>Keep the buildings. Cut the head off before it reaches them, and hold the flanks with
+          water, rock and old burn. Containment is a fact, not a score.</p>
+      </div>
+    </div>
+    <button id="btn-mute" class="btn ghost small">SOUND ON</button>
+  </div>
+</div>
+
+<div id="loading" class="overlay hidden"><div class="sheet small"><h2>BUILDING THE FIRE GROUND…</h2></div></div>
+
+<!-- ── briefing ────────────────────────────────────────────────────────── -->
+<div id="brief" class="overlay hidden side">
+  <div class="sheet small">
+    <h2 id="brief-name">FIRST LIGHT</h2>
+    <p class="sub" id="brief-sub"></p>
+    <p id="brief-text"></p>
+    <ul class="brief-rows">
+      <li><span>Wind</span><b id="brief-wind"></b></li>
+      <li><span>Forecast</span><b id="brief-shift"></b></li>
+      <li><span>Assets</span><b id="brief-struct"></b></li>
+    </ul>
+    <button id="btn-launch" class="btn">LAUNCH ↵</button>
+    <button id="btn-brief-back" class="btn ghost">Back</button>
+  </div>
+</div>
+
+<!-- ── results ─────────────────────────────────────────────────────────── -->
+<div id="results" class="overlay hidden">
+  <div class="sheet small">
+    <div id="res-grade">A</div>
+    <h2 id="res-title">FIRE CONTAINED</h2>
+    <p id="res-reason"></p>
+    <ul id="res-rows"></ul>
+    <button id="btn-retry" class="btn">Fly it again</button>
+    <button id="btn-title" class="btn ghost">Missions</button>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
