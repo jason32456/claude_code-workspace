@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 43 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 44 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
@@ -12,6 +12,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 |---------|-------------|-------|--------|
 | [showcase](./showcase/) | Arcade-style launcher for every app in this repo — neon cabinet cards, category filters and search, a screenshot-gallery modal, and live "Launch" buttons for the runnable projects | Vanilla JS · CSS3 · ES Modules | ✅ Complete |
 | [capsa](./capsa/) | Capsa / Big Two card game — beat the table with a stronger combination of the same size or pass; cross-device online rooms behind a 4-letter code and a shared server-enforced sign-in, server-authoritative so opponents' cards never reach your browser, empty seats played by a simulation-tuned AI ladder, the trick piling up on the table as it would in person, a running score tracker, synthesised card sounds that ship zero audio files, and a phone-first layout that becomes a real felt table on desktop | Vanilla JS · Web Audio API · ES Modules · Vercel Functions · Upstash Redis | ✅ Complete |
+| [gnomon](./showcase/apps/gnomon/) | 3D shadow platformer — the level is not the geometry, it is the shadow the geometry throws. You live on a lit wall and can only stand on darkness: turn a glass solid and the ledge under you tips, push it toward the lamp and the ledge doubles in size and runs away, overlap two shadows and they become one bridge. The collision polygon *is* the drawn shadow, so the two can never disagree, and a rotating vane carries you along its face. Nine chambers, seals that read a silhouette instead of a key, and no asset files — the wall texture and every sound are generated at load | Three.js · Vanilla JS · Web Audio API · ES Modules | ✅ Complete |
 | [cantilever](./showcase/apps/cantilever/) | Structural engineering puzzle — span a gap with road, beams and cables on a budget, then drive a truck across; members are XPBD constraints carrying real axial forces, so decks sag, cables go slack instead of pushing, long struts buckle first, and overloaded members snap in cascades | Vanilla JS · Canvas 2D · XPBD · ES Modules | ✅ Complete |
 | [particle-life](./showcase/apps/particle-life/) | Real-time emergent particle simulation — species of particles obey pairwise attraction/repulsion rules, self-organizing into lifelike clusters, membranes, and chasers | Vanilla JS · Canvas 2D · ES Modules | ✅ Complete |
 | [focus-pet](./showcase/apps/focus-pet/) | Pomodoro timer fused with a virtual pet — complete focus sessions to feed and evolve your blob creature, time-based decay keeps it real | Vanilla JS · SVG · CSS · localStorage | ✅ Complete |
