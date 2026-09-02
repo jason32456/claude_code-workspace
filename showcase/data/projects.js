@@ -611,6 +611,19 @@ export const projects = [
     screenshots: shots('pit-backtester', ['demo_final', 'settled', 'early']),
     video: 'apps/pit-backtester/screenshots/demo.webm',
   },
+  {
+    slug: 'docket',
+    name: 'Docket',
+    tagline: 'Drag-and-drop Kanban board',
+    description:
+      'A Kanban board — multiple boards, drag-and-drop columns and cards, colored labels, due dates, and an optional WIP limit per column that flags amber once a column is over capacity. A live drop indicator shows exactly where a dragged card will land, column headers themselves can be dragged to reorder, and a search box fades non-matching cards in place instead of reflowing the board. A starter board ships pre-loaded with sample cards across To Do / In Progress / Done so the app is never empty on first load. No sign-up — every board lives in localStorage.',
+    stack: ['Vanilla JS', 'ES Modules', 'CSS3', 'HTML5 Drag and Drop API', 'localStorage'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/docket/',
+    runCommand: 'cd showcase/apps/docket && python -m http.server 8080',
+    screenshots: shots('docket', ['early', 'settled']),
+  },
 ].map((p) => ({
   ...p,
   launchable: Boolean(p.launchHref),
