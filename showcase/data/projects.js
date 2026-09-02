@@ -637,6 +637,19 @@ export const projects = [
     runCommand: 'cd showcase/apps/docket && python -m http.server 8080',
     screenshots: shots('docket', ['early', 'settled']),
   },
+  {
+    slug: 'latticework',
+    name: 'Latticework',
+    tagline: 'Sudoku, graded by the logic it takes to solve it',
+    description:
+      'A Sudoku app where difficulty means something: every puzzle is carved from a full grid with a verified unique solution, then labelled Easy/Medium/Hard/Expert by which human solving techniques — naked and hidden singles, pointing pairs, box-line reduction, naked/hidden pairs and triples, X-Wing — are actually required to finish it, not by how many clues are missing. The hint button runs that same technique search against your current board and explains the one logical step it found instead of just filling in an answer, and says so honestly when no pure logical step exists yet. A Daily Challenge seeds the same Medium puzzle for everyone from the calendar date and tracks a completion streak; practice games remember your notes, timer, and progress across a reload. Puzzle carving for the harder tiers can take over a second, so generation runs in a Web Worker and never freezes the board.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'localStorage'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/latticework/',
+    runCommand: 'cd showcase/apps/latticework && python -m http.server 8080',
+    screenshots: shots('latticework', ['early', 'settled']),
+  },
 ].map((p) => ({
   ...p,
   launchable: Boolean(p.launchHref),
