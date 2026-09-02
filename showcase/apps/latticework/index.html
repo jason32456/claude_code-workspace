@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Latticework — technique-graded Sudoku</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Latticework</h1>
+        <p class="tagline">Sudoku, graded by the logic it actually takes to solve it.</p>
+      </div>
+      <div class="streak" id="streak-display" title="Daily challenge streak">
+        <span class="streak-flame">🔥</span>
+        <span id="streak-count">0</span>
+      </div>
+    </header>
+
+    <section class="controls-top">
+      <label class="difficulty-picker">
+        Difficulty
+        <select id="difficulty-select">
+          <option value="1">Easy</option>
+          <option value="2" selected>Medium</option>
+          <option value="3">Hard</option>
+          <option value="4">Expert</option>
+        </select>
+      </label>
+      <button id="new-game-btn" class="btn btn-primary">New Game</button>
+      <button id="daily-btn" class="btn">Daily Challenge</button>
+    </section>
+
+    <section class="status-bar">
+      <div class="status-item">
+        <span class="status-label">Mode</span>
+        <span id="mode-display" class="status-value">Practice</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Difficulty</span>
+        <span id="tier-display" class="status-value">—</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Time</span>
+        <span id="timer-display" class="status-value">00:00</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Mistakes</span>
+        <span id="mistakes-display" class="status-value">0</span>
+      </div>
+    </section>
+
+    <main class="board-area">
+      <div id="board" class="board" role="grid" aria-label="Sudoku board"></div>
+
+      <aside class="side-panel">
+        <div class="action-row">
+          <button id="undo-btn" class="btn btn-icon" title="Undo (U)">↶ Undo</button>
+          <button id="redo-btn" class="btn btn-icon" title="Redo">↷ Redo</button>
+        </div>
+        <div class="action-row">
+          <button id="notes-btn" class="btn btn-toggle" title="Toggle notes mode (N)">✏️ Notes</button>
+          <button id="erase-btn" class="btn btn-icon" title="Erase (Backspace)">⌫ Erase</button>
+        </div>
+        <div class="action-row action-row-single">
+          <button id="hint-btn" class="btn btn-hint" title="Hint (H)">💡 Hint</button>
+        </div>
+
+        <div class="numpad" id="numpad" aria-label="Digit pad"></div>
+
+        <div id="hint-panel" class="hint-panel" hidden>
+          <div class="hint-technique" id="hint-technique"></div>
+          <div class="hint-reason" id="hint-reason"></div>
+        </div>
+      </aside>
+    </main>
+
+    <p class="hint-tip">
+      Click a cell then type a digit, or use the pad. Toggle <strong>Notes</strong> to
+      pencil in candidates. <strong>Hint</strong> reveals the next logical step and explains
+      the technique — it never just guesses.
+    </p>
+  </div>
+
+  <div id="win-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <h2 id="win-title">Solved!</h2>
+      <div class="modal-stats">
+        <div><span class="modal-stat-label">Time</span><span id="win-time" class="modal-stat-value"></span></div>
+        <div><span class="modal-stat-label">Mistakes</span><span id="win-mistakes" class="modal-stat-value"></span></div>
+        <div><span class="modal-stat-label">Difficulty</span><span id="win-tier" class="modal-stat-value"></span></div>
+      </div>
+      <p id="win-streak" class="modal-streak" hidden></p>
+      <button id="win-close-btn" class="btn btn-primary">Play again</button>
+    </div>
+  </div>
+
+  <div id="loading-overlay" class="modal-overlay" hidden>
+    <div class="modal loading-modal">
+      <div class="spinner"></div>
+      <p>Carving a puzzle that actually needs this difficulty…</p>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

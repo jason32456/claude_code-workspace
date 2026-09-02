@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 43 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 44 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
@@ -54,6 +54,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 | [meltwater](./showcase/apps/meltwater/) | 3D valley engineering under a melting glacier — you never touch the water, only the dirt under it; a pipe-model shallow-water sim carries every drop, so it finds the low line itself, backs up behind what you leave in the way, and is gone for good if you send it the wrong way. Cut-and-fill earthworks where the spoil for a levee has to come out of a trench you chose the place of, dams that breach when the head beats their strength, sluice gates you time mid-melt, and soft ground that lets fast water widen its own channel | Three.js · GLSL · Vanilla JS · Web Audio API · ES Modules | ✅ Complete |
 | [docket](./showcase/apps/docket/) | Drag-and-drop Kanban board — multiple boards, columns and cards you drag with a live drop indicator, colored labels, due dates, and an optional WIP limit per column that flags amber once over capacity; a search box fades non-matching cards in place instead of reflowing the board | Vanilla JS · ES Modules · CSS3 · HTML5 Drag and Drop API · localStorage | ✅ Complete |
 | [last-ember](./showcase/apps/last-ember/) | Turn-based roguelike dungeon crawl — your only light is a torch that burns down every turn you carry it, so how far you can see is a resource you spend, not a fixed camera setting. Nothing moves until you do; bump-to-attack combat has no miss chance, so a bad fight is always a decision. Procedural floors with a BFS-placed exit, fog of war, wandering/fleeing/chasing/erratic monster AI, potions and auto-equipping gear, and permadeath across eight floors down to a Warden-guarded Emberheart | Vanilla JS · Canvas 2D · Web Audio API · ES Modules | ✅ Complete |
+| [latticework](./showcase/apps/latticework/) | Sudoku graded by the logic it actually takes to solve it — every puzzle is carved from a full grid with a verified unique solution, then labelled Easy/Medium/Hard/Expert by which human techniques (singles, pointing pairs, box-line reduction, naked/hidden pairs and triples, X-Wing) are actually required, not by clue count. Hint runs that same technique search on your current board and explains the one logical step it found instead of filling in an answer; a Daily Challenge seeds the same puzzle for everyone from the calendar date and tracks a streak; puzzle carving runs in a Web Worker so the board never freezes | Vanilla JS · ES Modules · Web Workers · localStorage | ✅ Complete |
 
 ## Deployments
 
