@@ -176,3 +176,14 @@ button {
   .hint { bottom: 96px; font-size: 12px; }
   .panel { padding: 24px 20px; }
 }
+
+#rotate {
+  position: fixed; inset: auto 0 0 0; z-index: 9; display: none;
+  padding: 10px 16px; text-align: center; font-size: 12px; letter-spacing: 0.06em;
+  color: #ffd9a6; background: rgba(6, 10, 17, 0.9); border-top: 1px solid rgba(255, 217, 166, 0.22);
+}
+@media (max-aspect-ratio: 4/5) and (pointer: coarse) {
+  #rotate { display: block; }
+  .touch { bottom: 42px; }
+  .hint { bottom: 150px; }
+}

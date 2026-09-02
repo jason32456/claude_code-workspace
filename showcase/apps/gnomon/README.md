@@ -81,6 +81,10 @@ python3 -m http.server 8080
 # http://localhost:8080
 ```
 
+It is built for a mouse and a keyboard. On a phone it works in landscape — three
+touch buttons appear and a solid is turned by dragging it — and a portrait phone is
+asked to rotate, because the room is much wider than it is tall.
+
 No build step and no network: Three.js r163 is vendored in `vendor/`, the wall
 texture is generated into a canvas at load, and every sound — room tone, the drone
 that tracks how fast you are turning something, footsteps, the seal chord — is

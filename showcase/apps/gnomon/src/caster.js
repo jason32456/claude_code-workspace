@@ -191,7 +191,6 @@ export class Caster {
     const near = state !== 'none';
     this.material.opacity = near ? (on ? 0.46 : 0.38) : (this.flags.size ? 0.3 : 0.42);
     this.material.emissive.setHex(on ? 0x2f6f9a : near ? 0x1d4a68 : 0x000000);
-    if (!near) this.material.emissive.setHex(0x000000).addScalar(0);
     this.lineMat.color.setHex(on ? 0x8ef0ff : near ? 0xd6f4ff : (this.flags.size ? 0xdff1ff : 0x8f9ab2));
     this.lineMat.opacity = on ? 1 : near ? 0.9 : (this.flags.size ? 0.75 : 0.4);
   }

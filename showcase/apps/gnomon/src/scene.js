@@ -263,9 +263,12 @@ export class Stage {
     const w = innerWidth, h = innerHeight;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
-    // Keep the whole wall in frame on narrow windows by backing the camera off.
-    const need = 33 / Math.max(0.8, this.camera.aspect);
-    this.camera.position.z = Math.max(26.5, need);
+    // Back the camera off until the whole 33-unit-wide wall fits, but stop before
+    // the wall becomes a postage stamp — a portrait phone gets the rotate hint
+    // instead of an unplayably small room.
+    const halfFov = (this.camera.fov / 2) * (Math.PI / 180);
+    const forWidth = 16.8 / (Math.tan(halfFov) * this.camera.aspect);
+    this.camera.position.z = Math.min(62, Math.max(26.5, forWidth));
     this.camAnchor.z = this.camera.position.z;
     this.camera.updateProjectionMatrix();
   }
