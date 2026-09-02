@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Leyden — catch the lightning, carry it home</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="flash"></div>
+  <div id="vignette"></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="block">
+        <div class="label" id="storm-name">STORM 1</div>
+        <div class="sub" id="storm-sub">One cell at a time</div>
+        <div class="meter wide">
+          <span class="mlabel">GRID</span>
+          <div class="bar quota"><div id="quota-fill"></div></div>
+          <span class="num"><span id="quota-num">0</span><span class="dim">/<span id="quota-target">90</span> kC</span></span>
+        </div>
+      </div>
+
+      <div class="block center">
+        <div class="clock" id="clock">2:30</div>
+        <div class="sub">FIRES <span id="fires-num">0</span><span class="dim">/3</span></div>
+      </div>
+
+      <div class="block right">
+        <div class="label">HULL</div>
+        <div id="hull-pips" class="pips"></div>
+        <div class="sub"><span id="alt-num">0</span> m · <span id="speed-num">0</span> m/s</div>
+      </div>
+    </div>
+
+    <div id="warn-banner" class="hidden">CELL CHARGING</div>
+    <div id="alert" class="hidden">HULL OVERHEATING — SHED CHARGE (R) OR DUMP (Q)</div>
+
+    <div id="warn-marker" class="marker warn hidden"><span>▲</span></div>
+    <div id="jar-marker" class="marker jar hidden"><span>▲</span></div>
+    <div id="dump-prompt" class="hidden">HOLD Q — DUMP CHARGE</div>
+    <div id="toast" class="toast"></div>
+
+    <div class="hud-bottom">
+      <div class="block">
+        <div class="meter">
+          <span class="mlabel">CHARGE</span>
+          <div class="bar charge"><div id="charge-fill"></div></div>
+          <span class="num"><span id="charge-num">0</span><span class="dim"> kC</span></span>
+        </div>
+        <div class="meter">
+          <span class="mlabel">HEAT</span>
+          <div class="bar heat"><div id="heat-fill"></div></div>
+        </div>
+      </div>
+      <div class="block right">
+        <div class="sub" id="bait-state">STREAMER STOWED</div>
+        <div class="sub dim">E bait · Q dump · R bleed</div>
+      </div>
+    </div>
+
+    <div id="touch" class="touch-only">
+      <div id="touch-stick"><div id="touch-knob"></div></div>
+      <div class="touch-buttons">
+        <button id="touch-up">▲</button>
+        <button id="touch-down">▼</button>
+        <button id="touch-bait">BAIT</button>
+        <button id="touch-dump">DUMP</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="menu" class="overlay">
+    <div class="panel">
+      <h1>LEYDEN</h1>
+      <p class="tag">The lightning is not trying to kill you. It is trying to find the shortest way to the ground, and you are going to make sure that is through you.</p>
+      <div class="brief">
+        <p>The town of Leyden runs on charge somebody has to go up and fetch. You fly the
+        Lure: a slow gas envelope with a copper streamer and a hull that starts to smell
+        of ozone about four seconds after a good hit.</p>
+        <p><strong>Drop the streamer under a charging cell</strong> and you become the
+        likeliest thing in the valley. Take the strike, carry it down, dump it into a
+        capacitor jar before the heat cooks you. Everything you don't catch goes into the
+        powder mill.</p>
+      </div>
+      <div class="keys">
+        <div class="krow"><kbd>MOUSE</kbd><span>look — the ship flies where the camera points</span></div>
+        <div class="krow"><kbd>W A S D</kbd><span>prop thrust</span></div>
+        <div class="krow"><kbd>SPACE</kbd><kbd>SHIFT</kbd><span>trim up / vent down — slow on purpose</span></div>
+        <div class="krow"><kbd>E</kbd><span>hold to drop the streamer — this is the bait</span></div>
+        <div class="krow"><kbd>Q</kbd><span>hold near a jar to dump your charge</span></div>
+        <div class="krow"><kbd>R</kbd><span>bleed charge to the air and lose it</span></div>
+        <div class="krow"><kbd>M</kbd><kbd>ESC</kbd><span>mute · pause</span></div>
+      </div>
+      <p class="hint">Carrying charge makes you a bigger target. Greed is a multiplier on both sides.</p>
+      <button id="btn-start">FLY INTO IT</button>
+      <p class="best" id="best-line"></p>
+    </div>
+  </div>
+
+  <div id="briefing" class="overlay hidden">
+    <div class="panel narrow">
+      <h2 id="brief-title">STORM 1 — FIRST CELL</h2>
+      <p class="tag" id="brief-sub">One cell at a time.</p>
+      <div class="statgrid">
+        <div><span class="k">GRID DEMAND</span><span class="v" id="brief-quota">90 kC</span></div>
+        <div><span class="k">STORM PASSES IN</span><span class="v" id="brief-time">150 s</span></div>
+        <div><span class="k">CLOUD</span><span class="v" id="brief-cells">3 cells</span></div>
+        <div><span class="k">TOWN</span><span class="v">3 fires = over</span></div>
+      </div>
+      <p class="hint" id="brief-hint"></p>
+      <button id="btn-dive">CLIMB OUT ⏎</button>
+    </div>
+  </div>
+
+  <div id="result" class="overlay hidden">
+    <div class="panel narrow">
+      <h2 id="result-title">STORM SURVIVED</h2>
+      <p class="tag" id="result-line"></p>
+      <div class="statgrid">
+        <div><span class="k">DELIVERED</span><span class="v" id="res-delivered">0 kC</span></div>
+        <div><span class="k">TIME LEFT</span><span class="v" id="res-time">0 s</span></div>
+        <div><span class="k">FIRES</span><span class="v" id="res-fires">0</span></div>
+        <div><span class="k">HULL</span><span class="v" id="res-hull">3/3</span></div>
+        <div><span class="k">STORM SCORE</span><span class="v" id="res-score">0</span></div>
+        <div><span class="k">RUN TOTAL</span><span class="v" id="res-total">0</span></div>
+      </div>
+      <button id="btn-next">NEXT STORM ⏎</button>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="panel narrow">
+      <h2>PAUSED</h2>
+      <p class="tag">The storm waits. It is the only thing that does.</p>
+      <button id="btn-resume">RESUME ⏎</button>
+      <button id="btn-abort" class="ghost">ABANDON RUN</button>
+    </div>
+  </div>
+
+  <div id="gameover" class="overlay hidden">
+    <div class="panel narrow">
+      <h2 id="over-title">THE LURE WENT DOWN</h2>
+      <p class="tag" id="over-line"></p>
+      <div class="statgrid">
+        <div><span class="k">SCORE</span><span class="v" id="over-score">0</span></div>
+        <div><span class="k">REACHED</span><span class="v" id="over-storm">1 / 5</span></div>
+      </div>
+      <p class="best" id="over-best"></p>
+      <button id="btn-again">FLY AGAIN ⏎</button>
+      <button id="btn-menu" class="ghost">TITLE</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
