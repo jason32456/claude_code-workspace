@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'plumbline',
+    name: 'Plumbline',
+    tagline: 'You are never touching the thing you are aiming',
+    description:
+      'A 3D tower-crane game built on lag. You do not move the column — you move a trolley along a jib, and the eight-tonne column is forty metres below it on a cable, going wherever its own momentum says. The load is a real constrained pendulum with a moving pivot solved five substeps a frame, so everything follows from the physics rather than from rules: accelerate and the load stays behind, then chases you and overshoots; brake while it is swinging *ahead* of the trolley and the swing dies in one move, brake at the wrong phase and you double it. Cable length is a difficulty dial you hold, because the period is 2π√(L/g) and hoisting up during a swing pumps it the way a child on a swing stands up. The crane is rated in tonne-metres, not tonnes, so the load-moment indicator hard-stops the trolley at the rated radius: the 12 t core module can barely leave the mast, while the 1.5 t façade panel — the lightest piece — is by far the hardest, because wind force scales with area and acceleration is force over mass. And your mistakes are the level: every piece is welded in where you actually set it, each floor inherits the average of your errors, the next floor is laid out on the floor you left, and the tower visibly leans until the engineer condemns it at a metre out of plumb. The clock is the sun — one ten-minute shift from sunrise to floodlights, and the building is whatever you left it.',
+    stack: ['Three.js', 'Vanilla JS', 'Constrained pendulum', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/plumbline/',
+    runCommand: 'cd showcase/apps/plumbline && python -m http.server 8080',
+    screenshots: shots('plumbline', ['approach', 'hookcam', 'cab', 'dusk', 'night', 'yard', 'title']),
+  },
+  {
     slug: 'crux',
     name: 'Crux',
     tagline: 'A free solo, one hand at a time',
