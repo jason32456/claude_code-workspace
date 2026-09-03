@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Plumbline — the load is always late</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="vignette"></div>
+  <div id="flash"></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="block">
+        <div class="label">FLOOR</div>
+        <div class="value"><span id="floor">1</span><span class="dim">/12</span></div>
+        <div class="sub">SET <span id="set-count">0</span> OF <span id="set-total">5</span></div>
+        <div class="note" id="height-note">hook 0 m · jib 34 m</div>
+      </div>
+
+      <div class="block center">
+        <div class="label">SHIFT</div>
+        <div class="bar day"><div id="day-fill"></div></div>
+        <div class="sub" id="day-text">first light</div>
+        <div class="note" id="clock">0:00</div>
+      </div>
+
+      <div class="block right">
+        <div class="label">SCORE</div>
+        <div class="value" id="score">0</div>
+        <div class="sub">COMBO <span id="combo">×1.0</span></div>
+        <div class="note">BEST <span id="best">—</span></div>
+      </div>
+    </div>
+
+    <div class="hud-left">
+      <div class="gauge">
+        <div class="gauge-label">LMI</div>
+        <svg class="lmi" viewBox="0 0 80 80">
+          <path class="lmi-track" d="M 12 68 A 40 40 0 1 1 68 68" />
+          <path class="lmi-fill" id="lmi-fill" d="M 12 68 A 40 40 0 1 1 68 68" />
+        </svg>
+        <div class="gauge-num"><span id="lmi-pct">0</span><span class="dim">%</span></div>
+        <div class="gauge-sub" id="lmi-sub">no load</div>
+      </div>
+
+      <div class="gauge plumb">
+        <div class="gauge-label">PLUMB</div>
+        <div class="level"><div class="level-bubble" id="plumb-bubble"></div><div class="level-mid"></div></div>
+        <div class="gauge-num"><span id="plumb-mm">0</span><span class="dim">mm</span></div>
+        <div class="gauge-sub">tol 1000</div>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <div class="sway">
+        <div class="gauge-label">SWAY</div>
+        <div class="sway-box">
+          <div class="sway-ring"></div>
+          <div class="sway-cross-h"></div>
+          <div class="sway-cross-v"></div>
+          <div class="sway-dot" id="sway-dot"></div>
+        </div>
+        <div class="gauge-num"><span id="sway-num">0.00</span><span class="dim">m</span></div>
+      </div>
+
+      <div class="wind">
+        <div class="gauge-label">WIND</div>
+        <div class="wind-bar">
+          <div id="wind-fill"></div>
+          <div id="wind-ahead"></div>
+        </div>
+        <div class="gauge-num"><span id="wind-num">0</span><span class="dim">m/s</span></div>
+        <div class="gauge-sub" id="wind-sub">calm</div>
+      </div>
+    </div>
+
+    <div class="hud-load hidden" id="load-panel">
+      <div class="load-type" id="load-type">COLUMN</div>
+      <div class="load-stats"><span id="load-mass">8.0 t</span> · <span id="load-radius">r 15 m</span></div>
+      <div class="load-yaw">YAW ERR <span id="load-yawerr">0°</span></div>
+    </div>
+
+    <div id="prompt" class="hidden"></div>
+    <div id="toasts"></div>
+    <div id="alarm" class="hidden">OVERLOAD — TROLLEY LOCKED</div>
+    <div id="hookcam-frame" class="hidden"><span>HOOK CAM</span></div>
+
+    <div class="hud-keys" id="keys">
+      <span><b>A/D</b> slew</span><span><b>W/S</b> trolley</span><span><b>R/F</b> hoist</span>
+      <span><b>Q/E</b> rotate</span><span><b>SPACE</b> latch/set</span><span><b>SHIFT</b> precise</span>
+      <span><b>X</b> stop</span><span><b>TAB</b> view</span><span><b>P</b> pause</span>
+    </div>
+  </div>
+
+  <div id="title">
+    <div class="title-inner">
+      <h1>PLUMBLINE</h1>
+      <p class="tag">The load is always late.</p>
+      <div class="brief">
+        <p>You are not moving a column. You are moving a <em>trolley</em>, and the column is
+        forty metres below it on a cable, arriving wherever its own momentum says.
+        Push the stick and the load stays behind. Let go and it catches up, and passes you.</p>
+        <p>The whole game is learning to stop <b>on the beat</b>. Brake exactly one full swing
+        after you started — when the load has run out <em>ahead</em> of you and is coming back —
+        and the sway dies in a single move. Brake half a swing early and you double it.</p>
+        <p>Everything you set is welded in where you actually put it. Sloppy floors lean, and
+        the next floor is built on the one you left. The plumb gauge is what ends the run —
+        that, and the sun going down.</p>
+      </div>
+      <div class="ctrl-grid">
+        <div><b>A</b> <b>D</b><span>slew the jib</span></div>
+        <div><b>W</b> <b>S</b><span>trolley in/out</span></div>
+        <div><b>R</b> <b>F</b><span>hoist up/down</span></div>
+        <div><b>Q</b> <b>E</b><span>rotate load</span></div>
+        <div><b>SPACE</b><span>latch / set</span></div>
+        <div><b>SHIFT</b><span>precision</span></div>
+        <div><b>X</b><span>all stop</span></div>
+        <div><b>TAB</b><span>site ⇄ jib view</span></div>
+      </div>
+      <button id="start">START THE SHIFT</button>
+      <p class="fine">Watch the hook cam, bottom right. You cannot set to 30&nbsp;cm without it.</p>
+    </div>
+  </div>
+
+  <div id="over" class="hidden">
+    <div class="over-inner">
+      <h2 id="over-title">SHIFT OVER</h2>
+      <p id="over-reason"></p>
+      <div class="over-stats">
+        <div><span id="o-score">0</span><small>SCORE</small></div>
+        <div><span id="o-floors">0</span><small>FLOORS</small></div>
+        <div><span id="o-true">0</span><small>SET TRUE</small></div>
+        <div><span id="o-plumb">0</span><small>LEAN mm</small></div>
+      </div>
+      <p id="over-note" class="fine"></p>
+      <button id="again">NEW SHIFT</button>
+    </div>
+  </div>
+
+  <div id="paused" class="hidden"><div>PAUSED<small>P to resume</small></div></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
