@@ -127,9 +127,9 @@ export function drawProfile(canvas, order, glass) {
     maxL = Math.max(maxL, glass.L);
   }
 
-  const pad = 12;
+  const pad = 8;
   const sx = (w - pad * 2) / maxL;
-  const sy = (h / 2 - pad) / maxR;
+  const sy = (h / 2 - pad - 5) / maxR;
   const s = Math.min(sx, sy);
   const ox = (w - maxL * s) / 2;
   const oy = h / 2;
