@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vesper — you are the flock</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div id="hud" class="hidden">
+  <div class="hud-top">
+    <div class="panel count-panel">
+      <div class="label">flock</div>
+      <div class="count"><span id="count">0</span><span id="delta" class="delta"></span></div>
+    </div>
+    <div class="panel meters">
+      <div class="meter">
+        <div class="label">to the roost</div>
+        <div class="bar"><i id="progress"></i></div>
+      </div>
+      <div class="meter">
+        <div class="label">light</div>
+        <div class="bar light"><i id="light"></i></div>
+      </div>
+    </div>
+    <div class="panel threat" id="threat">
+      <div class="label">falcons</div>
+      <div id="threat-list"></div>
+    </div>
+  </div>
+
+  <div class="hud-bottom">
+    <div class="panel">
+      <div class="label">stamina</div>
+      <div class="bar stam"><i id="stamina"></i></div>
+    </div>
+    <div class="panel density-panel">
+      <div class="label">density <span class="key">shift</span></div>
+      <div class="bar dens"><i id="density"></i></div>
+    </div>
+    <div class="panel">
+      <div class="label">flash <span class="key">space</span></div>
+      <div class="bar flash"><i id="flash"></i></div>
+    </div>
+  </div>
+
+  <div id="ring"></div>
+  <div id="banner"></div>
+  <div id="toast"></div>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="sheet" id="sheet">
+    <h1 class="title">VESPER</h1>
+    <p class="sub">You are not a bird in the flock. You are the flock.</p>
+    <div class="body" id="sheet-body"></div>
+    <div class="actions" id="sheet-actions"></div>
+  </div>
+</div>
+
+<div id="loading">generating the valley…</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
