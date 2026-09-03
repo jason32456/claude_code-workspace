@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Gather — one blob of hot glass, ninety seconds</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="heatwash"></div>
+
+  <div id="hud" class="hidden">
+    <section id="order-card">
+      <div class="card-head">
+        <span class="tag">ORDER <b id="order-num">1</b><span class="dim">/5</span></span>
+        <span class="tag right" id="order-form">OPEN FORM</span>
+      </div>
+      <h2 id="order-name">Tumbler</h2>
+      <p id="order-brief">Straight wall, open, flat base.</p>
+      <canvas id="silhouette" width="240" height="120"></canvas>
+      <p id="order-hint" class="hint"></p>
+    </section>
+
+    <section id="shift">
+      <div class="stat"><span class="label">CLOCK</span><span class="value" id="clock">1:30</span></div>
+      <div class="stat"><span class="label">SHIFT</span><span class="value" id="shift-score">0</span></div>
+      <div id="order-pips"></div>
+    </section>
+
+    <section id="gauges">
+      <div class="gauge">
+        <span class="label">TEMP</span>
+        <div class="bar"><div id="temp-fill"></div><i id="temp-soft"></i><i id="temp-melt"></i></div>
+        <span class="num" id="temp-num">1090°</span>
+      </div>
+      <div class="gauge">
+        <span class="label">SPIN</span>
+        <div class="bar"><div id="spin-fill"></div><i id="spin-mid"></i></div>
+        <span class="num" id="spin-num">0.0</span>
+      </div>
+      <div class="gauge">
+        <span class="label">BREATH</span>
+        <div class="bar"><div id="blow-fill"></div></div>
+        <span class="num" id="blow-num">0%</span>
+      </div>
+      <div class="readouts">
+        <span>WALL <b id="wall-num">6.2</b>mm</span>
+        <span>LEN <b id="len-num">9.5</b>cm</span>
+        <span id="sag-warn" class="hidden">SAGGING</span>
+      </div>
+    </section>
+
+    <section id="tools"></section>
+
+    <section id="keys">
+      <div><kbd>A</kbd><kbd>D</kbd> roll the pipe</div>
+      <div><kbd>F</kbd> glory hole &middot; <kbd>SPACE</kbd> blow</div>
+      <div><kbd>1</kbd>–<kbd>5</kbd> tool &middot; <b>mouse</b> + <b>click</b> apply</div>
+      <div><kbd>ENTER</kbd> bench it &middot; <kbd>G</kbd> ghost &middot; <kbd>C</kbd> view</div>
+    </section>
+
+    <div id="toast"></div>
+    <div id="tool-tip"></div>
+  </div>
+
+  <div id="overlay">
+    <div id="title-screen" class="panel">
+      <h1>GATHER</h1>
+      <p class="sub">A hot glass shop. Five orders. One gather each.</p>
+      <div class="rules">
+        <p><b>The glass is always cooling.</b> Below 620&deg;C it will not move, and a
+           tool will crack it. <kbd>F</kbd> puts it back in the fire — hold longer to
+           push deeper and reheat more of it.</p>
+        <p><b>Always be rolling.</b> Gravity pulls on the piece in its own turning
+           frame, so spin cancels it and stopping does not. A piece that droops off
+           its axis scores badly, and far enough falls off the pipe.</p>
+        <p><b>Breath goes where the glass is thinnest and hottest</b>, not where you
+           point. To move the bubble, chill the part you want to keep.</p>
+        <p><b>The shears are one-way.</b> Cutting the tip open ends all blowing —
+           after that the only shaping force left is spin.</p>
+      </div>
+      <button id="btn-start">START THE SHIFT</button>
+      <p class="foot">Sound on. <kbd>M</kbd> mutes.</p>
+    </div>
+
+    <div id="brief-screen" class="panel hidden">
+      <span class="kicker">ORDER <b id="brief-num">1</b> OF 5</span>
+      <h1 id="brief-name">Tumbler</h1>
+      <p class="sub" id="brief-buyer"></p>
+      <p id="brief-body"></p>
+      <canvas id="brief-shape" width="360" height="170"></canvas>
+      <p class="hint" id="brief-hint"></p>
+      <button id="btn-take">TAKE THE GATHER</button>
+    </div>
+
+    <div id="score-screen" class="panel hidden">
+      <span class="kicker" id="score-kicker">BENCHED</span>
+      <h1 id="score-grade">JOURNEYMAN</h1>
+      <div id="score-total"><b>0</b><span>/100</span></div>
+      <canvas id="score-shape" width="400" height="150"></canvas>
+      <p class="legend"><i class="sw want"></i>ordered <i class="sw made"></i>what you made</p>
+      <div id="score-parts"></div>
+      <p class="note" id="score-note"></p>
+      <button id="btn-next">NEXT ORDER</button>
+    </div>
+
+    <div id="end-screen" class="panel hidden">
+      <span class="kicker">END OF SHIFT</span>
+      <h1 id="end-rank">JOURNEYMAN</h1>
+      <div id="end-total"><b>0</b><span>/500</span></div>
+      <div id="end-list"></div>
+      <button id="btn-again">WORK ANOTHER SHIFT</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

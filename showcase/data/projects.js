@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'gather',
+    name: 'Gather',
+    tagline: 'The glass is cooling while you work it',
+    description:
+      'A 3D glassblowing game in which the material is the opponent. You never place a vertex or pick a shape from a menu — you hold a blob of 1100°C glass on the end of a pipe, and it is sagging, cooling and thinning the entire time you touch it. The piece is one deformable body of 64 rings, each carrying a radius, a conserved wall volume, a temperature and a centre offset, and every mechanic is a term in the same update rather than a rule. Heat is the master variable: softness multiplies every deformation, so hot glass moves, warm glass moves slowly, and cold glass does not move and cracks if you touch it with a tool — and thin blown-out walls shed heat far faster than a fresh gather, so each reheat buys you less time than the last. Gravity is applied in the piece\'s own rotating frame and is never cancelled by a rule: spin fast and it sweeps a circle and sums to nothing, stop rolling and it accumulates until the gather droops off its axis and onto the floor, and because surface tension only pulls it back while it is hot, a droop you earn in the fire is still there once it sets. Breath does not go where you point it — it goes wherever the glass is hottest and thinnest, which is a place you created thirty seconds ago, and since expanding thins and thinning accelerates expansion, the only way to steer a bubble is to chill the part you want to keep. The shears are the one-way door: cutting the tip open ends all blowing, and the only shaping force left is centrifugal, so bowls are made of spin and bottles are made of breath. Five orders, one gather each, and the piece you get is the piece you made.',
+    stack: ['Three.js', 'Vanilla JS', 'Thermal + volume sim', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/gather/',
+    runCommand: 'cd showcase/apps/gather && python -m http.server 8080',
+    screenshots: shots('gather', ['bench', 'neck', 'flare', 'glory', 'score', 'title']),
+  },
+  {
     slug: 'plumbline',
     name: 'Plumbline',
     tagline: 'You are never touching the thing you are aiming',
