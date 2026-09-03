@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'crux',
+    name: 'Crux',
+    tagline: 'A free solo, one hand at a time',
+    description:
+      'A 3D climbing game in which the rock does not decide whether you stay on it — the direction you pull does. Every frame the climber’s weight is distributed across whatever is touching stone, up to two hands and two feet, and each contact reports the direction it is being loaded. Every hold carries an ideal pull direction taken from the local surface, and crucially that direction is not world-down but *down the face*, so the tilt of the rock rotates what each hold wants: the same edge reads 0.95 grip on the slab and 0.51 under the roof, because the axis it wants has swung forty degrees away from anywhere you can pull. Your hips are the controller. WASD moves them, which rotates the pull vector on everything you are holding and decides how much of your weight lands in your feet — and the right answer inverts with the angle, because hugging a slab skates your feet off it while hanging away from a roof blows your fingers off a crimp. Hold types want opposite things: crimps want your hips in, underclings want them out with your feet high, sidepulls want you shifted sideways until the pull goes lateral, and sequencing the roof is working out which of those you can satisfy at once. Pump is the only meter that ends runs; past 70 your arms straighten, which literally costs you reach, and the move you could make a minute ago is now out of range. Three cams to spend on a 78 m spire, four bands from slab to headwall, a storm that wets the rock from the top down, and a route generator that builds each line from the stance the previous two holds create, so every seeded wall is climbable by construction.',
+    stack: ['Three.js', 'Vanilla JS', 'Analytic IK', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/crux/',
+    runCommand: 'cd showcase/apps/crux && python -m http.server 8080',
+    screenshots: shots('crux', ['roof', 'face', 'scan', 'headwall', 'slab', 'title']),
+  },
+  {
     slug: 'emberline',
     name: 'Emberline',
     tagline: 'Aerial firefighting — cut it off, you cannot put it out',

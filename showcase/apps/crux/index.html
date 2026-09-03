@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Crux — one hand at a time</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="vignette"></div>
+  <div id="pump-flash"></div>
+
+  <div id="reticle"><span></span></div>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="block">
+        <div class="label">HEIGHT</div>
+        <div class="value"><span id="height">0</span><span class="dim">m</span></div>
+        <div class="sub" id="band">THE SLAB</div>
+        <div class="note" id="band-note">low angle — stand on your feet</div>
+      </div>
+
+      <div class="block center">
+        <div class="label">STORM</div>
+        <div class="bar storm"><div id="storm-fill"></div></div>
+        <div class="sub" id="storm-text">clear</div>
+        <div class="note" id="clock">0:00</div>
+      </div>
+
+      <div class="block right">
+        <div class="label">CAMS</div>
+        <div class="value" id="cams">●●●</div>
+        <div class="sub">CHALK <span id="chalk">4</span></div>
+        <div class="note">SEED <span id="seed">—</span></div>
+      </div>
+    </div>
+
+    <div class="hud-left">
+      <div class="meter">
+        <div class="meter-label">PUMP</div>
+        <div class="vbar"><div id="pump-fill"></div><div class="tick" style="bottom:70%"></div></div>
+        <div class="meter-num" id="pump-num">0</div>
+      </div>
+      <div class="meter small">
+        <div class="meter-label">LEGS</div>
+        <div class="vbar"><div id="legs-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <div class="weight">
+        <div class="label">WEIGHT</div>
+        <div class="split"><div id="feet-share"></div><div id="arms-share"></div></div>
+        <div class="split-legend"><span class="feet">FEET <span id="feet-pct">0%</span></span><span class="arms">ARMS <span id="arms-pct">0%</span></span></div>
+      </div>
+      <div class="hands">
+        <div class="hand" id="hand-left">
+          <div class="hand-key">L</div>
+          <div class="bar hand-bar"><div id="left-fill"></div></div>
+          <div class="hand-type" id="left-type">—</div>
+        </div>
+        <div class="hand" id="hand-right">
+          <div class="hand-key">R</div>
+          <div class="bar hand-bar"><div id="right-fill"></div></div>
+          <div class="hand-type" id="right-type">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="target-info" class="hidden">
+      <div class="t-name"><span id="t-swatch"></span><span id="t-type">Edge</span><span id="t-dist"></span></div>
+      <div class="t-hint" id="t-hint">wants a straight-down pull</div>
+    </div>
+
+    <div id="toast"></div>
+    <div id="cam-prompt" class="hidden">CRACK — <b>F</b> to place a cam</div>
+
+    <div id="hints">
+      <span><b>Q</b>/<b>E</b> hands</span>
+      <span><b>WASD</b> hips</span>
+      <span><b>Space</b> feet</span>
+      <span><b>X</b> shake out</span>
+      <span><b>R</b> chalk</span>
+      <span><b>F</b> cam</span>
+      <span><b>C</b> scan</span>
+      <span><b>Shift</b>+hand = dyno</span>
+    </div>
+  </div>
+
+  <div id="title" class="overlay">
+    <div class="panel">
+      <h1>CRUX</h1>
+      <p class="tag">A free solo. One hand at a time.</p>
+      <p class="body">
+        The rock does not decide whether you stay on it — <em>the direction you pull does</em>.
+        A crimp that spits you off when you hang straight down will hold all day once you get your
+        hips in and stand on your feet. 78 metres, four bands, three cams, and a storm coming in.
+      </p>
+      <div class="legend" id="legend"></div>
+      <div class="controls">
+        <div><b>Q</b> / <b>E</b> — left / right hand to the targeted hold <span class="dim">(or left / right click)</span></div>
+        <div><b>W A S D</b> — shift your hips: in, left, out, right</div>
+        <div><b>Space</b> — press your feet · <b>X</b> — shake out · <b>R</b> — chalk · <b>F</b> — place a cam</div>
+        <div><b>C</b> — scan the route · <b>Shift</b> + hand — dyno to a hold out of reach</div>
+      </div>
+      <div class="seedrow">
+        <label>SEED <input id="seed-input" type="text" value="1" maxlength="9" /></label>
+        <button id="btn-start">CLIMB ⏎</button>
+      </div>
+      <p class="best" id="title-best"></p>
+    </div>
+  </div>
+
+  <div id="result" class="overlay hidden">
+    <div class="panel">
+      <h2 id="result-title">SUMMIT</h2>
+      <div class="stats" id="result-stats"></div>
+      <button id="btn-again">CLIMB AGAIN ⏎</button>
+    </div>
+  </div>
+
+  <div id="paused" class="overlay hidden">
+    <div class="panel small">
+      <h2>PAUSED</h2>
+      <p class="body">Esc or P to continue.</p>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
