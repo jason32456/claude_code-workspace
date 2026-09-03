@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patience — Klondike Solitaire</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="app-header">
+    <h1>Patience</h1>
+    <div class="controls">
+      <div class="dropdown">
+        <button id="new-game-btn" class="btn">New Game ▾</button>
+        <div id="new-game-menu" class="dropdown-menu" hidden>
+          <button data-draw="1">Draw 1</button>
+          <button data-draw="3">Draw 3</button>
+          <hr />
+          <button id="daily-btn">Daily Challenge</button>
+        </div>
+      </div>
+      <button id="undo-btn" class="btn" title="Undo">↶ Undo</button>
+      <button id="hint-btn" class="btn" title="Hint">💡 Hint</button>
+      <button id="auto-finish-btn" class="btn" hidden title="Auto Finish">⏩ Finish</button>
+      <button id="stats-btn" class="btn" title="Stats">📊</button>
+      <button id="sound-btn" class="btn" title="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <div id="status-bar">
+    <span id="mode-label">Draw 1</span>
+    <span class="stat"><span class="label">Score</span> <span id="score">0</span></span>
+    <span class="stat"><span class="label">Moves</span> <span id="moves">0</span></span>
+    <span class="stat"><span class="label">Time</span> <span id="timer">0:00</span></span>
+    <span id="hint-text"></span>
+  </div>
+
+  <main id="board">
+    <div id="top-row">
+      <div id="stock" class="pile" data-zone="stock"></div>
+      <div id="waste" class="pile" data-zone="waste"></div>
+      <div id="top-spacer"></div>
+      <div id="foundations">
+        <div class="pile" data-zone="foundation" data-suit="S"></div>
+        <div class="pile" data-zone="foundation" data-suit="H"></div>
+        <div class="pile" data-zone="foundation" data-suit="D"></div>
+        <div class="pile" data-zone="foundation" data-suit="C"></div>
+      </div>
+    </div>
+    <div id="tableau">
+      <div class="pile" data-zone="tableau" data-pile="0"></div>
+      <div class="pile" data-zone="tableau" data-pile="1"></div>
+      <div class="pile" data-zone="tableau" data-pile="2"></div>
+      <div class="pile" data-zone="tableau" data-pile="3"></div>
+      <div class="pile" data-zone="tableau" data-pile="4"></div>
+      <div class="pile" data-zone="tableau" data-pile="5"></div>
+      <div class="pile" data-zone="tableau" data-pile="6"></div>
+    </div>
+  </main>
+
+  <div id="win-overlay" class="overlay" hidden>
+    <div class="overlay-card">
+      <h2>You win! 🎉</h2>
+      <p id="win-summary"></p>
+      <div class="overlay-actions">
+        <button id="win-new-game" class="btn primary">New Game</button>
+        <button id="win-close" class="btn">Close</button>
+      </div>
+    </div>
+    <canvas id="win-canvas"></canvas>
+  </div>
+
+  <div id="stats-overlay" class="overlay" hidden>
+    <div class="overlay-card">
+      <h2>Stats</h2>
+      <dl id="stats-list"></dl>
+      <div class="overlay-actions">
+        <button id="stats-close" class="btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -733,6 +733,19 @@ export const projects = [
     runCommand: 'cd showcase/apps/latticework && python -m http.server 8080',
     screenshots: shots('latticework', ['early', 'settled']),
   },
+  {
+    slug: 'patience',
+    name: 'Patience',
+    tagline: 'Klondike solitaire with a hint, not a solver',
+    description:
+      'A full Klondike solitaire implementation — drag single cards or whole face-up runs with real pointer physics, snap-back and a shake on an illegal drop, unlimited undo, and double-click to auto-send a card home. A hint button scans every legal move and nudges you toward the single most useful one, biased toward whichever move reveals a hidden card, rather than solving the whole game for you. Auto Finish appears once every tableau card is face up and plays the rest out for you. A seeded Daily Challenge deals everyone the same hand from the calendar date and tracks a streak, alongside a stats panel for games won, best time, and best score. Every sound — deal, flip, place, invalid, win fanfare — is synthesized live via the Web Audio API, no audio files.',
+    stack: ['Vanilla JS', 'ES Modules', 'Pointer Events', 'Web Audio API', 'localStorage'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/patience/',
+    runCommand: 'cd showcase/apps/patience && python -m http.server 8080',
+    screenshots: shots('patience', ['early', 'settled', 'win']),
+  },
 ].map((p) => ({
   ...p,
   launchable: Boolean(p.launchHref),
