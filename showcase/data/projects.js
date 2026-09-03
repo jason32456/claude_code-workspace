@@ -23,6 +23,27 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'vesper',
+    name: 'Vesper',
+    tagline: 'You are not a bird in the flock — you are the flock',
+    description:
+      'A 3D dusk-flight game whose avatar is a murmuration of up to eighteen hundred individually simulated starlings. There is no player object in the scene at all: the cloud is you, and the number of birds still in it is the only health bar you get. Everything follows from that one inversion. Health is mass — falcons eat birds, transmission wires cut a slice straight out of the flock, and below sixteen percent light the dark starts taking whoever has drifted furthest from the centre — so you spend the night sweeping up the wild flocks circling the water meadows to grow the thing you are flying. Defence is a shape rather than a button: a peregrine’s strike collapses against a crowd, the real confusion effect, so density is a continuous state you hold on shift, and the black sun roughly halves your kill probability while costing you 38% of your speed, a heavier stamina burn, and an absolute massacre if you take it through a wire span. And the best move in the game is a shape change made on one frame — flash expansion blows the murmuration apart, and timed inside the last six tenths of a second of a stoop the falcon closes on air, while firing early re-locks it onto the stragglers your own panic just made. Underneath it is Reynolds boids over a spatial hash with per-bird stamina that slides tired birds out of the back of the mass, a falcon that picks its target by exposure cubed, catenary conductors resolved per bird, and the whole flock drawn in a single instanced draw call with the wingbeat evaluated on the GPU. Three nights, no asset files — terrain, birds, sky and every sound are generated at load.',
+    stack: ['Three.js', 'Vanilla JS', 'Boids + spatial hash', 'GPU instancing', 'Web Audio API'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/vesper/',
+    runCommand: 'cd showcase/apps/vesper && python -m http.server 8080',
+    screenshots: shots('vesper', [
+      'murmuration',
+      'blacksun',
+      'wires',
+      'dusk',
+      'roost',
+      'results',
+      'title',
+    ]),
+  },
+  {
     slug: 'gather',
     name: 'Gather',
     tagline: 'The glass is cooling while you work it',
