@@ -1,0 +1,154 @@
+:root {
+  --ink: #05070a;
+  --paper: #d7e3e8;
+  --dim: #7a8d97;
+  --warm: #e0a05e;
+  --good: #7fc9a6;
+  --bad: #d9614f;
+  --line: rgba(160, 195, 210, 0.22);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: var(--ink);
+  color: var(--paper);
+  font-family: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app { position: fixed; inset: 0; }
+#app canvas { display: block; }
+
+#hud { position: fixed; inset: 0; pointer-events: none; }
+
+/* ---- objective ---------------------------------------------------------- */
+.objective {
+  position: absolute; top: 22px; left: 0; right: 0; text-align: center;
+  font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+  text-shadow: 0 2px 10px #000;
+}
+.objective-sub {
+  position: absolute; top: 46px; left: 0; right: 0; text-align: center;
+  font-size: 11.5px; color: var(--dim); text-shadow: 0 2px 8px #000;
+  padding: 0 16px;
+}
+
+/* ---- panels ------------------------------------------------------------- */
+.panel {
+  position: absolute; bottom: 92px;
+  padding: 10px 12px; border: 1px solid var(--line);
+  background: rgba(6, 12, 16, 0.55); backdrop-filter: blur(3px);
+  border-radius: 3px;
+}
+.panel.left { left: 18px; width: 210px; }
+.panel.right { right: 18px; width: 190px; }
+
+.bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.bar-label { width: 56px; font-size: 9.5px; color: var(--dim); letter-spacing: 0.1em; }
+.bar { flex: 1; height: 7px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; overflow: hidden; }
+.fill { height: 100%; width: 100%; transition: width 0.12s linear; border-radius: 2px; }
+.f-oxygen { background: linear-gradient(90deg, #4f9ec4, #8fd6e8); }
+.f-oxygen.critical { background: linear-gradient(90deg, #b43c2c, #e8704f); }
+.f-mantle { background: #5a8ea0; }
+.f-stamina { background: #8a9a58; }
+.f-ink { background: #6a5a84; }
+.f-susp { background: linear-gradient(90deg, #6b7d86, #e0a05e 60%, #d9614f); }
+
+.timer { font-size: 22px; letter-spacing: 0.06em; margin-bottom: 6px; }
+.camo { margin-top: 7px; font-size: 10.5px; color: var(--dim); }
+
+/* ---- arms --------------------------------------------------------------- */
+.armbar {
+  position: absolute; bottom: 22px; left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+}
+.slots { display: flex; gap: 5px; }
+.slot {
+  width: 22px; height: 4px; border-radius: 2px; background: var(--warm);
+  box-shadow: 0 0 8px rgba(224, 160, 94, 0.6);
+}
+.slot.used { background: rgba(255, 255, 255, 0.14); box-shadow: none; }
+
+.pips { display: flex; gap: 5px; }
+.pip {
+  position: relative; width: 21px; height: 44px; border-radius: 2px;
+  border: 1px solid var(--line); background: rgba(6, 12, 16, 0.6);
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.pip-fill { width: 100%; background: #47555e; transition: height 0.1s linear; }
+.pip-n {
+  position: absolute; top: 2px; left: 0; right: 0; text-align: center;
+  font-size: 8.5px; color: rgba(215, 227, 232, 0.55);
+}
+.pip.a-reach .pip-fill { background: var(--warm); }
+.pip.a-hold .pip-fill { background: #4f8f9e; }
+.pip.a-hold.cmd .pip-fill { background: var(--good); }
+.pip.cmd { border-color: rgba(127, 201, 166, 0.75); }
+.pip.tight { box-shadow: 0 0 10px rgba(224, 160, 94, 0.8); }
+
+/* ---- reticle ------------------------------------------------------------ */
+.reticle {
+  position: absolute; left: 50%; top: 50%; width: 7px; height: 7px;
+  margin: -3.5px 0 0 -3.5px; border: 1px solid rgba(215, 227, 232, 0.5);
+  border-radius: 50%; transition: all 0.12s;
+}
+.reticle.actionable {
+  width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
+  border-color: var(--warm); box-shadow: 0 0 12px rgba(224, 160, 94, 0.5);
+}
+.target-label {
+  position: absolute; left: 0; right: 0; top: calc(50% + 18px);
+  text-align: center; font-size: 11px; color: var(--warm);
+  transition: opacity 0.15s; text-shadow: 0 2px 8px #000;
+}
+
+/* ---- log ---------------------------------------------------------------- */
+.log { position: absolute; left: 18px; bottom: 200px; width: 320px; }
+.line { margin: 3px 0; font-size: 11.5px; color: var(--paper); text-shadow: 0 2px 8px #000; }
+.line.warn { color: var(--warm); }
+.line.good { color: var(--good); }
+
+.flash {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(190, 60, 40, 0.75) 100%);
+  transition: opacity 0.25s;
+}
+
+/* ---- overlay ------------------------------------------------------------ */
+#overlay {
+  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 40%, rgba(12, 24, 30, 0.9), rgba(3, 5, 8, 0.97));
+  padding: 24px; overflow-y: auto;
+}
+#overlay.show { display: flex; }
+.card {
+  max-width: 640px; border: 1px solid var(--line); padding: 26px 30px;
+  background: rgba(5, 10, 14, 0.72); border-radius: 4px;
+}
+.card h1 {
+  margin: 0 0 6px; font-size: 34px; letter-spacing: 0.22em; font-weight: 500;
+}
+.card.lost h1 { color: var(--bad); }
+.tag { color: var(--warm); margin: 0 0 16px; font-size: 12px; letter-spacing: 0.04em; }
+.card p { line-height: 1.65; color: #b9c9d1; margin: 10px 0; }
+.card b { color: var(--paper); }
+.keys {
+  margin: 18px 0 10px; padding: 12px 14px; border-left: 2px solid var(--line);
+  font-size: 11.5px; color: var(--dim); line-height: 1.9;
+}
+.keys b { color: var(--warm); font-weight: 500; }
+.go { color: var(--good); margin-top: 18px !important; letter-spacing: 0.08em; }
+
+.score { width: 100%; border-collapse: collapse; margin: 14px 0 4px; font-size: 12px; }
+.score td { padding: 7px 4px; border-bottom: 1px solid var(--line); color: #b9c9d1; }
+.score td:nth-child(2) { text-align: right; color: var(--paper); }
+.score td:nth-child(3) { text-align: right; width: 54px; color: var(--warm); }
+.score tr.tot td { border-bottom: none; padding-top: 12px; font-size: 15px; color: var(--good); }
+
+@media (max-width: 780px) {
+  .panel.left, .panel.right { width: 150px; bottom: 86px; }
+  .log { display: none; }
+  .objective { font-size: 13px; }
+}
