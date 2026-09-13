@@ -23,6 +23,29 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'nine-minds',
+    name: 'Nine Minds',
+    tagline: 'Eight arms, and not one of them takes orders',
+    description:
+      'A 3D escape game in which you play an octopus whose eight arms are eight separate decision-makers. Around two thirds of an octopus\'s neurons are not in its head — each arm carries its own ganglion and grips, tastes, rejects and withdraws without asking the brain — so the game hands you a body you can steer and exactly two points of attention, and makes delegation the entire skill. Commanding an arm holds a focus slot while it reaches; the moment it grips it hands the slot back, and from then on nobody is minding it, so the grip rots at a rate the surface decides — rough rock is nearly free, wet aquarium glass is atrocious. That produces the verb the whole game is made of: set and leave. The grating panel over the channel needs three arms, the outfall shutter needs four across two latches a metre and a half apart, and both have to be assembled out of arms you already let go of and are now racing the decay on — because E hauls every committed arm at once and the force is the sum of their grips, so the failure is never a mistimed press, it is having spent too long on the third one. Meanwhile the arms you are not supervising are not idle: they grip whatever brushes them, which is how you climb without thinking about climbing, they probe crevices and find routes you did not see, and when you are frightened they flinch and knock things over, which is how you get caught. Everything else falls out of that. The body is a capsule whose radius you drive from 0.40 m down to 0.20 m — the beak, the only hard part of the animal — and collision runs against that live radius, so any gap wider than your beak is a door and the building has no keys in it at all. You have about ninety seconds of air on dry concrete and every short route is dry. Camouflage is a rate rather than a state: the skin samples the substrate beneath you and blends, stillness blends fast and speed breaks it, and a watchman accrues suspicion as (1 − match) × illumination × motion / distance², so you are never hidden, you are being seen at some rate and can attack any term in the product. One continuous building — a display tank, a flooded wet room with a night watchman and a light cord, a pump hall with a floor scrubber and an intake that pulls — and no asset files: every box, colour and sound is generated at load.',
+    stack: ['Three.js', 'Vanilla JS', 'Autonomous-limb AI', 'Soft-body collision', 'Web Audio API'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/nine-minds/',
+    runCommand: 'cd showcase/apps/nine-minds && python -m http.server 8080',
+    screenshots: shots('nine-minds', [
+      'tank',
+      'climb',
+      'door',
+      'channel',
+      'watchman',
+      'hall',
+      'shutter',
+      'sea',
+      'title',
+    ]),
+  },
+  {
     slug: 'vesper',
     name: 'Vesper',
     tagline: 'You are not a bird in the flock — you are the flock',
