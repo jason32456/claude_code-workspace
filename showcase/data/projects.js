@@ -842,6 +842,28 @@ export const projects = [
     runCommand: 'cd showcase/apps/patience && python -m http.server 8080',
     screenshots: shots('patience', ['early', 'settled', 'win']),
   },
+  {
+    slug: 'kleene',
+    name: 'Kleene',
+    tagline: 'Compile a regex, then prove two of them are the same',
+    description:
+      'A regular expression is not a string-matching rule \u2014 it is a finite automaton, and the pattern is surface syntax for a machine. Kleene builds that machine in front of you and then asks the question no amount of testing can settle. A pattern is carried through five artifacts, all rendered and cross-linked: tokens with escapes and classes resolved to character sets, a parse tree with precedence made explicit, the \u03b5-NFA from Thompson\u2019s construction, the DFA from subset construction, and the minimal DFA from Hopcroft partition refinement \u2014 and because Thompson\u2019s construction is compositional, clicking a node in the parse tree lights up exactly the NFA states that node produced. The second mode compiles the pattern to one bytecode program and hands it to two machines that differ only in scheduling: a backtracking VM with an explicit continuation stack, which is what PCRE, Python and JavaScript actually run, and a Thompson simulation that advances every reachable instruction in lockstep and never visits a position twice. On (a|a)* against sixteen a\u2019s and an X the first executes 1,376,242 instructions and the second executes 183 \u2014 the same verdict for 7,520x the work, and one more a doubles only one of those numbers, so ReDoS becomes a measurement rather than a folk tale. The third mode is a decision procedure: both patterns are minimized over one shared alphabet partition, the product automaton is built over reachable state pairs, and a breadth-first search looks for a pair that disagrees on acceptance. Nothing reachable disagrees and the languages are equal over all infinitely many strings, which is a proof rather than a sample; something does and the BFS tree yields the shortest string on which they differ. Backreferences and lookaround are refused with the reason, because (a+)\\1 is not a regular language and none of this machinery applies to it. The DFA alphabet is a partition of the code-point space rather than Unicode itself, so [a-z] draws one edge instead of twenty-six, and an in-page fixture suite checks the verdicts against pairs whose answer is known independently.',
+    stack: ['Vanilla JS', 'ES Modules', 'SVG', 'Automata theory'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/kleene/',
+    runCommand: 'cd showcase/apps/kleene && python -m http.server 8080',
+    screenshots: shots('kleene', [
+      'race',
+      'distinguishing-string',
+      'minimal-dfa',
+      'nfa',
+      'parse-tree',
+      'equivalent',
+      'subset-blowup',
+      'not-regular',
+    ]),
+  },
 ].map((p) => ({
   ...p,
   launchable: Boolean(p.launchHref),

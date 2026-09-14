@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kleene — a regular expression, compiled</title>
+<meta name="description" content="Compile a regex into an automaton, race the two matching strategies, and decide whether two patterns are the same language.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2312171e'/%3E%3Ccircle cx='10' cy='16' r='4.5' fill='none' stroke='%233b82f6' stroke-width='2'/%3E%3Ccircle cx='23' cy='16' r='4.5' fill='none' stroke='%235fd0a0' stroke-width='2'/%3E%3Ccircle cx='23' cy='16' r='7' fill='none' stroke='%235fd0a0' stroke-width='1.3'/%3E%3Cpath d='M15 16h3.5' stroke='%238b97a8' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Kleene</h1>
+    <p class="tagline">A regular expression is a machine. Here is the machine.</p>
+  </div>
+  <nav class="modes" role="tablist" aria-label="Mode">
+    <button role="tab" class="mode-tab" data-mode="compile" aria-selected="true">Compile</button>
+    <button role="tab" class="mode-tab" data-mode="race" aria-selected="false">Race</button>
+    <button role="tab" class="mode-tab" data-mode="equiv" aria-selected="false">Equivalence</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ------------------------------------------------------------- COMPILE -->
+<section class="view" id="view-compile" aria-label="Compile">
+  <div class="controls">
+    <label class="field grow">
+      <span class="field-label">Pattern</span>
+      <input id="pattern" class="pattern-input" type="text" spellcheck="false"
+             autocomplete="off" autocapitalize="off" value="(a|b)*abb">
+    </label>
+    <label class="field">
+      <span class="field-label">Examples</span>
+      <select id="preset-compile" class="select"></select>
+    </label>
+  </div>
+
+  <div id="diagnostic" class="diagnostic" hidden></div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="stage-bar" role="tablist" aria-label="Pipeline stage">
+    <button role="tab" class="stage-tab" data-stage="tokens" aria-selected="false">1 · Tokens</button>
+    <button role="tab" class="stage-tab" data-stage="ast" aria-selected="false">2 · Parse tree</button>
+    <button role="tab" class="stage-tab" data-stage="nfa" aria-selected="true">3 · ε-NFA</button>
+    <button role="tab" class="stage-tab" data-stage="dfa" aria-selected="false">4 · DFA</button>
+    <button role="tab" class="stage-tab" data-stage="min" aria-selected="false">5 · Minimal DFA</button>
+  </div>
+
+  <p class="stage-note" id="stage-note"></p>
+
+  <div class="stage-actions" id="stage-actions">
+    <label class="toggle"><input type="checkbox" id="hide-trap" checked> Hide trap state</label>
+    <button class="ghost" id="reset-view">Reset view</button>
+    <span class="hint">drag to pan · scroll to zoom</span>
+  </div>
+
+  <div class="canvas" id="stage-body"></div>
+</section>
+
+<!-- ---------------------------------------------------------------- RACE -->
+<section class="view" id="view-race" aria-label="Race" hidden>
+  <div class="controls">
+    <label class="field grow">
+      <span class="field-label">Pattern</span>
+      <input id="race-pattern" class="pattern-input" type="text" spellcheck="false"
+             autocomplete="off" value="(a|a)*">
+    </label>
+    <label class="field">
+      <span class="field-label">Subject</span>
+      <input id="race-subject" class="pattern-input" type="text" spellcheck="false"
+             autocomplete="off" value="aaaaaaaaaaaaaaaaX">
+    </label>
+    <label class="field">
+      <span class="field-label">Examples</span>
+      <select id="preset-race" class="select"></select>
+    </label>
+  </div>
+
+  <div id="race-diagnostic" class="diagnostic" hidden></div>
+
+  <div class="race-grid">
+    <article class="engine-card" data-engine="backtrack">
+      <header>
+        <span class="swatch" style="background:#c07d20"></span>
+        <h2>Backtracking VM</h2>
+      </header>
+      <p class="engine-sub">One path at a time, unwind on failure. The semantics of
+        PCRE, Python <code>re</code> and JavaScript <code>RegExp</code>.</p>
+      <p class="counter" id="bt-steps">0</p>
+      <p class="counter-unit">instructions executed</p>
+      <dl class="engine-facts">
+        <div><dt>Verdict</dt><dd id="bt-verdict">—</dd></div>
+        <div><dt>Peak stack depth</dt><dd id="bt-stack">—</dd></div>
+      </dl>
+    </article>
+
+    <article class="engine-card" data-engine="thompson">
+      <header>
+        <span class="swatch" style="background:#3b82f6"></span>
+        <h2>Thompson simulation</h2>
+      </header>
+      <p class="engine-sub">Every reachable instruction advanced in lockstep, each
+        visited at most once per position.</p>
+      <p class="counter" id="th-steps">0</p>
+      <p class="counter-unit">instructions executed</p>
+      <dl class="engine-facts">
+        <div><dt>Verdict</dt><dd id="th-verdict">—</dd></div>
+        <div><dt>Peak live threads</dt><dd id="th-threads">—</dd></div>
+      </dl>
+    </article>
+  </div>
+
+  <p class="ratio-line" id="ratio-line"></p>
+
+  <figure class="chart-figure">
+    <figcaption>
+      <h3>Instructions executed as the subject grows</h3>
+      <p id="chart-sub">Same pattern, one more character each step. Log scale —
+        a straight line here is exponential growth.</p>
+    </figcaption>
+    <div class="legend" id="chart-legend"></div>
+    <div class="chart-host" id="chart"></div>
+  </figure>
+</section>
+
+<!-- -------------------------------------------------------- EQUIVALENCE -->
+<section class="view" id="view-equiv" aria-label="Equivalence" hidden>
+  <div class="controls">
+    <label class="field grow">
+      <span class="field-label">Pattern A</span>
+      <input id="eq-a" class="pattern-input" type="text" spellcheck="false"
+             autocomplete="off" value="(a|b)*">
+    </label>
+    <label class="field grow">
+      <span class="field-label">Pattern B</span>
+      <input id="eq-b" class="pattern-input" type="text" spellcheck="false"
+             autocomplete="off" value="(a*b*)*">
+    </label>
+    <label class="field">
+      <span class="field-label">Examples</span>
+      <select id="preset-equiv" class="select"></select>
+    </label>
+  </div>
+
+  <div id="eq-diagnostic" class="diagnostic" hidden></div>
+  <div id="verdict" class="verdict"></div>
+
+  <div class="dual">
+    <figure><figcaption id="cap-a">Pattern A — minimal DFA</figcaption>
+      <div class="canvas short" id="eq-graph-a"></div></figure>
+    <figure><figcaption id="cap-b">Pattern B — minimal DFA</figcaption>
+      <div class="canvas short" id="eq-graph-b"></div></figure>
+  </div>
+
+  <details class="selftest">
+    <summary>Run the fixture suite</summary>
+    <p class="muted">A wrong equivalence verdict is the one failure this app cannot
+      tolerate, so the decision procedure is checked in-page against pairs whose
+      answer is known independently.</p>
+    <button class="primary" id="run-tests">Run</button>
+    <div id="test-output"></div>
+  </details>
+</section>
+
+</main>
+
+<footer class="colophon">
+  <p><strong>Whole-string semantics.</strong> A pattern matches a subject when it
+  matches all of it, which is the semantics under which automaton equivalence is
+  meaningful.</p>
+  <p><strong>No backreferences, no lookaround</strong> — deliberately.
+  <code>(a+)\1</code> is not a regular language, so no finite automaton recognises
+  it and none of the machinery here applies to it. That exclusion is the
+  argument, not a shortcut.</p>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
