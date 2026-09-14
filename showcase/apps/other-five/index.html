@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>The Other Five — you are only one mind of nine</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="water-tint"></div>
+  <div id="vignette"></div>
+  <div id="ink-veil"></div>
+  <div id="hurt-flash"></div>
+  <div id="reticle"><span></span></div>
+
+  <!-- ───────────────────────── HUD ───────────────────────── -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="block">
+        <div class="label">NIGHT <span id="night-num">1</span></div>
+        <div class="value" id="reef-name">THE SHALLOWS</div>
+        <div class="note" id="quota-note">bring 3 back to the den</div>
+      </div>
+
+      <div class="block center">
+        <div class="label">DAWN</div>
+        <div class="bar dawn"><div id="dawn-fill"></div></div>
+        <div class="note" id="clock">—</div>
+      </div>
+
+      <div class="block right">
+        <div class="label">EATEN</div>
+        <div class="value"><span id="food-count">0</span><span class="dim">/<span id="food-quota">3</span></span></div>
+        <div class="note">CARRYING <span id="carry-count">0</span></div>
+      </div>
+    </div>
+
+    <div class="hud-left">
+      <div class="meter">
+        <div class="meter-label">O₂ DEBT</div>
+        <div class="vbar"><div id="debt-fill"></div><div class="tick" style="bottom:75%"></div></div>
+        <div class="meter-num" id="debt-num">0</div>
+      </div>
+      <div class="meter">
+        <div class="meter-label">MATCH</div>
+        <div class="vbar match"><div id="match-fill"></div></div>
+        <div class="meter-num" id="match-num">0</div>
+      </div>
+      <div class="skin-chip" id="skin-chip" title="skin vs substrate">
+        <div id="skin-swatch"></div><div id="ground-swatch"></div>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <div id="threat-panel"></div>
+    </div>
+
+    <div class="hud-bottom">
+      <div class="attention">
+        <div class="label">ATTENTION</div>
+        <div class="pips" id="pips"><i></i><i></i><i></i></div>
+      </div>
+      <div class="arms" id="arm-chips"></div>
+      <div class="ink">
+        <div class="label">INK</div>
+        <div class="pips ink-pips" id="ink-pips"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+
+    <div id="prompt" class="hidden"></div>
+    <div id="toast-stack"></div>
+    <div id="den-marker" class="hidden">DEN <span id="den-dist">0</span>m</div>
+  </div>
+
+  <!-- ───────────────────────── TITLE ───────────────────────── -->
+  <div id="title" class="overlay">
+    <div class="sheet">
+      <h1>THE&nbsp;OTHER&nbsp;FIVE</h1>
+      <p class="tagline">You are one mind of nine. The other five are on their own.</p>
+      <p class="blurb">
+        One brain in the head, one in each arm. You can consciously attend to
+        <b>three arms at a time</b> — the other five grip, probe and snatch on
+        their own. They will find food you never saw. They will also reach into a
+        crevice with a moray in it. Five nights on a reef where everything bigger
+        than you eats things like you.
+      </p>
+
+      <div class="keys">
+        <div class="kcol">
+          <div class="krow"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>crawl — speed scales with planted arms</span></div>
+          <div class="krow"><kbd>MOUSE</kbd><span>look · aim the reticle</span></div>
+          <div class="krow"><kbd>L-CLICK</kbd><span>task an arm at what you are aiming at</span></div>
+          <div class="krow"><kbd>R-CLICK</kbd><span>let go — release every arm</span></div>
+        </div>
+        <div class="kcol">
+          <div class="krow"><kbd>SHIFT</kbd><span>squeeze — fit through gaps, halve your silhouette</span></div>
+          <div class="krow"><kbd>C</kbd><span>focus camouflage</span></div>
+          <div class="krow"><kbd>SPACE</kbd><span>jet — fast, anaerobic, loud</span></div>
+          <div class="krow"><kbd>Q</kbd><span>ink — leaves a decoy shaped like you</span></div>
+          <div class="krow"><kbd>F</kbd><span>eat what you are holding</span></div>
+        </div>
+      </div>
+
+      <p class="fineprint">
+        Squeeze, focus and each arm in transit all cost one of the same three
+        attention pips. You cannot do everything at once — that is the game.
+      </p>
+
+      <button id="btn-start">DESCEND</button>
+      <div class="credit">no images, no audio files — the reef and every sound are generated at load</div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── BRIEFING ───────────────────────── -->
+  <div id="briefing" class="overlay hidden">
+    <div class="sheet narrow">
+      <div class="eyebrow">NIGHT <span id="br-num">1</span></div>
+      <h2 id="br-name">THE SHALLOWS</h2>
+      <p id="br-line" class="brief-line"></p>
+      <div class="brief-stats">
+        <div><span class="k">QUOTA</span><span class="v" id="br-quota">3</span></div>
+        <div><span class="k">ARMS</span><span class="v" id="br-arms">8</span></div>
+        <div><span class="k">NEW</span><span class="v" id="br-new">—</span></div>
+      </div>
+      <button id="btn-go">OUT OF THE DEN</button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── NIGHT END ───────────────────────── -->
+  <div id="nightend" class="overlay hidden">
+    <div class="sheet narrow">
+      <div class="eyebrow" id="ne-eyebrow">FIRST LIGHT</div>
+      <h2 id="ne-title">NIGHT SURVIVED</h2>
+      <p id="ne-line" class="brief-line"></p>
+      <div class="brief-stats">
+        <div><span class="k">EATEN</span><span class="v" id="ne-food">0</span></div>
+        <div><span class="k">ARMS LEFT</span><span class="v" id="ne-arms">8</span></div>
+        <div><span class="k">SCORE</span><span class="v" id="ne-score">0</span></div>
+      </div>
+      <button id="btn-next">NEXT NIGHT</button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── RESULTS ───────────────────────── -->
+  <div id="results" class="overlay hidden">
+    <div class="sheet narrow">
+      <div class="eyebrow" id="rs-eyebrow">THE RUN</div>
+      <h2 id="rs-title">TAKEN</h2>
+      <p id="rs-line" class="brief-line"></p>
+      <table class="scoretable">
+        <tbody>
+          <tr><td>Nights cleared</td><td id="rs-nights">0</td></tr>
+          <tr><td>Prey eaten</td><td id="rs-food">0</td></tr>
+          <tr><td>Arms remaining</td><td id="rs-arms">8</td></tr>
+          <tr><td>Reflex catches</td><td id="rs-reflex">0</td></tr>
+          <tr class="total"><td>SCORE</td><td id="rs-score">0</td></tr>
+        </tbody>
+      </table>
+      <div class="best">BEST <span id="rs-best">0</span></div>
+      <button id="btn-again">AGAIN</button>
+    </div>
+  </div>
+
+  <div id="loading" class="overlay"><div class="sheet narrow"><h2>GENERATING REEF…</h2></div></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
