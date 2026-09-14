@@ -23,17 +23,17 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
-    slug: 'nine-minds',
-    name: 'Nine Minds',
-    tagline: 'An octopus has nine brains. You are one of them.',
+    slug: 'other-five',
+    name: 'The Other Five',
+    tagline: 'You are one mind of nine. The other five are on their own.',
     description:
       'A 3D reef-survival game in which you do not get to drive your own body. An octopus has nine brains — one in the head and one in each arm — so you are the one in the head, you can consciously attend to three arms at a time, and the other five are down there making their own decisions. Every unattended arm runs a reflex ladder each tick: keep hold of what it has, snatch any food that comes within 1.4 m, reach into the nearest unprobed crevice, otherwise join the crawl gait. That single rule is both halves of the game — an arm will find a crab you never saw, and an arm will reach into a hole with a moray in it, and the only difference between those outcomes is whether you were paying attention to it. Attention is the actual resource: one pip for an arm in transit, one for prying, one for focused camouflage, one for squeezing, and only three to spend, so hiding well and working fast are the same three pips. Everything else is the biology taken literally. Camouflage is hue, lightness and papillae drifting toward the substrate you happen to be standing on, faster while you are still. Predators have no vision cone, only an evidence accumulator with a decay floor, which is what makes freezing a real defence and not a delay — and a reef shark weights movement twice as hard as anything else, so you cannot out-hide it, you have to not move. Jetting is anaerobic because an octopus’s hearts stop while it jets, so the sprint is borrowed and the heartbeat in the mix is the bill. Ink leaves a pseudomorph that copies your current skin, so a decoy thrown while badly matched looks exactly as wrong as you do. And when something finally commits, the game asks one question: is any arm gripping rock? If it is, you shed that arm, it writhes for eight seconds while you go, and you carry on with seven. If not, that is the night. Five nights, arms regrowing one at a time, no asset files at all — the reef, the animal and every sound are generated at load.',
     stack: ['Three.js', 'Vanilla JS', 'Verlet arm chains', 'Web Audio API', 'ES Modules'],
     category: 'Games',
     runType: 'static',
-    launchHref: 'apps/nine-minds/',
-    runCommand: 'cd showcase/apps/nine-minds && python -m http.server 8080',
-    screenshots: shots('nine-minds', [
+    launchHref: 'apps/other-five/',
+    runCommand: 'cd showcase/apps/other-five && python -m http.server 8080',
+    screenshots: shots('other-five', [
       'arms',
       'camouflage',
       'moray',

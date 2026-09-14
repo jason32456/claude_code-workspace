@@ -1,4 +1,4 @@
-# Nine Minds — PRD
+# The Other Five — PRD
 
 ## 1. One-liner
 
@@ -16,7 +16,7 @@ the wind decides (Windward), the pendulum decides (Plumbline), the fire decides
 closest to this by making the avatar a crowd, but the crowd has one shared will —
 you steer the whole murmuration with one stick.
 
-Nine Minds is the first project where **the avatar itself is not fully yours**.
+The Other Five is the first project where **the avatar itself is not fully yours**.
 The hard thing is not the reef; it is that half of your own body is improvising.
 An arm you are not attending to will find food you never saw, and it will also
 reach into a crevice with a moray in it. Attention — not health, not stamina — is
@@ -34,6 +34,15 @@ because the biology is already a game design:
 | The systemic hearts **stop** during jet swimming | Sprinting is anaerobic and has to be repaid |
 | Ink is released as a *pseudomorph* — a body-shaped decoy | Ink is a fake octopus, not a smoke bomb |
 | Arm autotomy: an octopus sheds an arm to escape, and the arm keeps writhing | Getting caught costs an arm, and the arm buys you 8 seconds |
+
+**On the sibling project.** `nine-minds` landed on `main` from another session
+while this was being built, and it reaches for the same fact about octopus
+neurology. They are not the same game: that one is a single continuous escape
+from a building, with two focus slots, grip decay by surface, and multi-arm
+mechanisms hauled at once. This one is five timed nights of foraging on a
+procedurally generated reef, with three pips, a predator evidence model,
+autotomy, two-arm prying, morays, fish pots and a dawn deadline. Both are kept
+so the difference is inspectable rather than asserted.
 
 ## 3. Player fantasy
 

@@ -1,4 +1,4 @@
-# Nine Minds
+# The Other Five
 
 A 3D reef-survival game where you are an octopus — and you do **not** get to drive
 your own arms. An octopus has nine brains: one in the head, one in each arm. You
@@ -126,7 +126,7 @@ grey-blue and camouflage stops being enough.
 ## Running it
 
 ```bash
-cd showcase/apps/nine-minds
+cd showcase/apps/other-five
 python -m http.server 8080
 # open http://localhost:8080
 ```

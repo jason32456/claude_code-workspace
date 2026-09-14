@@ -1,4 +1,4 @@
-// Nine Minds — game loop, rules and camera.
+// The Other Five — game loop, rules and camera.
 //
 // The octopus owns its own body; this file owns everything the body bumps into:
 // what an arm found when it arrived, what a probe pulled out of a hole, and
@@ -15,7 +15,7 @@ import { NIGHTS } from './levels.js';
 import { clamp, mulberry32, range } from './rng.js';
 
 const $ = (id) => document.getElementById(id);
-const BEST_KEY = 'nine-minds-best';
+const BEST_KEY = 'other-five-best';
 
 class Game {
   constructor() {
