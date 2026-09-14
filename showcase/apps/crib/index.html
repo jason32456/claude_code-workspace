@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crib — an Enigma machine, and the bombe that breaks it</title>
+<meta name="description" content="Encipher a message on a real Enigma, throw the key away, guess one word, and watch a Turing–Welchman bombe recover the key.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e1319'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23c07d20' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%235fd0a0'/%3E%3Cpath d='M16 4.5v4M16 23.5v4M4.5 16h4M23.5 16h4' stroke='%238b97a8' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Crib</h1>
+    <p class="tagline">The plugboard is not the hard part. It is the way in.</p>
+  </div>
+  <nav class="modes" role="tablist" aria-label="Mode">
+    <button role="tab" class="mode-tab" data-mode="machine" aria-selected="true">Machine</button>
+    <button role="tab" class="mode-tab" data-mode="crib" aria-selected="false">Crib</button>
+    <button role="tab" class="mode-tab" data-mode="bombe" aria-selected="false">Bombe</button>
+    <button role="tab" class="mode-tab" data-mode="proof" aria-selected="false">Proof</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- -------------------------------------------------------------- MACHINE -->
+<section class="view" id="view-machine" aria-label="Machine">
+  <div class="panel-row">
+    <div class="panel grow">
+      <h2>Key sheet</h2>
+      <div class="controls">
+        <label class="field"><span class="field-label">Rotors (left→right)</span>
+          <span class="rotor-selects">
+            <select id="rotor0" class="select"></select>
+            <select id="rotor1" class="select"></select>
+            <select id="rotor2" class="select"></select>
+          </span>
+        </label>
+        <label class="field"><span class="field-label">Reflector</span>
+          <select id="reflector" class="select"><option>B</option><option>C</option></select>
+        </label>
+        <label class="field narrow"><span class="field-label">Rings</span>
+          <input id="rings" class="mono-input" maxlength="3" value="AAA" spellcheck="false"></label>
+        <label class="field narrow"><span class="field-label">Ground</span>
+          <input id="ground" class="mono-input" maxlength="3" value="AAA" spellcheck="false"></label>
+      </div>
+      <label class="field"><span class="field-label">Plugboard (10 pairs is standard)</span>
+        <input id="plugboard" class="mono-input wide" value="AV BS CG DL FU HZ IN KM OW RX" spellcheck="false"></label>
+      <div id="machine-error" class="diagnostic" hidden></div>
+    </div>
+
+    <div class="panel invariants">
+      <h2>Invariants</h2>
+      <p class="note">Measured while you type, never asserted.</p>
+      <div class="stat-line"><span>self-encipherments</span><b id="stat-self">0</b></div>
+      <div class="stat-line"><span>keypresses</span><b id="stat-presses">0</b></div>
+      <div class="stat-line"><span>middle-rotor period</span><b id="stat-period">650</b></div>
+      <div class="stat-line"><span>machine period</span><b id="stat-machine">16,900</b></div>
+      <div class="stat-line"><span>keyspace with plugboard</span><b id="stat-keyspace">—</b></div>
+      <div class="stat-line"><span>positions a bombe tests</span><b>1,054,560</b></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>The scrambler</h2>
+    <div class="machine-stage">
+      <svg id="wiring" viewBox="0 0 900 460" role="img" aria-label="Enigma wiring path"></svg>
+    </div>
+    <div class="machine-foot">
+      <div class="windows" id="windows" aria-label="Rotor windows"></div>
+      <div class="row-actions">
+        <button id="btn-step" class="btn">Step once</button>
+        <button id="btn-double" class="btn">Jump to the double step</button>
+        <button id="btn-reset" class="btn ghost">Reset to ground</button>
+      </div>
+    </div>
+    <div id="step-log" class="step-log" aria-live="polite"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Message</h2>
+    <label class="field"><span class="field-label">Plaintext</span>
+      <textarea id="plaintext" class="mono-area" rows="3" spellcheck="false">KEINEBESONDERENEREIGNISSEWETTERVORHERSAGEBERLINSTOPARMEEOBERKOMMANDOMELDETANGRIFFBEIMORGENGRAUENSTOP</textarea></label>
+    <div class="row-actions">
+      <button id="btn-encipher" class="btn primary">Encipher</button>
+      <button id="btn-discard" class="btn danger">Encipher, then discard the key</button>
+      <span id="discard-note" class="note"></span>
+    </div>
+    <label class="field"><span class="field-label">Ciphertext</span>
+      <textarea id="ciphertext" class="mono-area" rows="3" spellcheck="false" readonly></textarea></label>
+  </div>
+</section>
+
+<!-- ----------------------------------------------------------------- CRIB -->
+<section class="view" id="view-crib" aria-label="Crib" hidden>
+  <div class="panel">
+    <h2>Guess a word</h2>
+    <p class="note">
+      The reflector guarantees no letter ever enciphers to itself. Any offset where the crib
+      would require one is <em>impossible</em> — not unlikely — and dies before a rotor turns.
+    </p>
+    <div class="controls">
+      <label class="field grow"><span class="field-label">Crib</span>
+        <input id="crib" class="mono-input" value="KEINEBESONDERENEREIGNISSE" spellcheck="false"></label>
+      <label class="field"><span class="field-label">Known cribs</span>
+        <select id="crib-preset" class="select"></select></label>
+    </div>
+    <div class="stats" id="crib-stats"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Alignment</h2>
+    <p class="note">Drag the crib, or use ← →. Grey offsets are ruled out by the machine itself.</p>
+    <div id="align-strip" class="align-strip" tabindex="0" role="slider"
+         aria-label="Crib offset" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0"></div>
+    <div class="cipher-band">
+      <div id="band-cipher" class="band mono"></div>
+      <div id="band-crib" class="band mono crib-band"></div>
+    </div>
+    <div id="align-verdict" class="verdict"></div>
+  </div>
+
+  <div class="panel-row">
+    <div class="panel grow">
+      <h2>The menu</h2>
+      <p class="note">
+        Vertices are letters, edges are (plain, cipher) pairs tagged with the scrambler offset.
+        Loops are what kill wrong hypotheses — each one divides the false stops by about 26.
+      </p>
+      <svg id="menu-graph" viewBox="0 0 640 400" role="img" aria-label="Menu constraint graph"></svg>
+    </div>
+    <div class="panel menu-stats">
+      <h2>Topology</h2>
+      <div class="stat-line"><span>edges (E)</span><b id="m-e">—</b></div>
+      <div class="stat-line"><span>vertices (V)</span><b id="m-v">—</b></div>
+      <div class="stat-line"><span>components (C)</span><b id="m-c">—</b></div>
+      <div class="stat-line big"><span>closures (E−V+C)</span><b id="m-closures">—</b></div>
+      <div class="stat-line"><span>scramblers used</span><b id="m-used">—</b></div>
+      <div class="stat-line"><span>test register</span><b id="m-test">—</b></div>
+      <hr>
+      <div class="stat-line big"><span>predicted false stops</span><b id="m-predict">—</b></div>
+      <p class="note" id="m-predict-note"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------------- BOMBE -->
+<section class="view" id="view-bombe" aria-label="Bombe" hidden>
+  <div class="panel">
+    <h2>Run</h2>
+    <div class="controls">
+      <label class="field"><span class="field-label">Rotor orders</span>
+        <select id="order-scope" class="select">
+          <option value="all">all 60 orderings</option>
+          <option value="known">just the one on the key sheet</option>
+        </select></label>
+      <div class="row-actions grow">
+        <button id="btn-run" class="btn primary">Run the bombe</button>
+        <button id="btn-stop" class="btn ghost" disabled>Stop</button>
+      </div>
+    </div>
+    <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+    <div class="stats" id="run-stats"></div>
+  </div>
+
+  <div class="panel-row">
+    <div class="panel">
+      <h2>Diagonal board</h2>
+      <p class="note">
+        Cable <b>X</b> wire <b>Y</b> is the same claim as cable <b>Y</b> wire <b>X</b>, because
+        steckering is an involution. Welchman wired that identity into the machine, and it is
+        what turns one assumed plug into a flood.
+      </p>
+      <svg id="board" viewBox="0 0 420 420" role="img" aria-label="Diagonal board state"></svg>
+      <div id="board-caption" class="note"></div>
+    </div>
+
+    <div class="panel grow">
+      <h2>Stops</h2>
+      <p class="note" id="stops-note">The search has not run yet.</p>
+      <div id="stop-list" class="stop-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------------- PROOF -->
+<section class="view" id="view-proof" aria-label="Proof" hidden>
+  <div class="panel">
+    <h2>Self-test</h2>
+    <p class="note">
+      A subtly wrong Enigma is still a self-consistent reciprocal cipher: it enciphers, it
+      deciphers, the bombe finds stops, plaintext comes out, and every screen looks right while
+      the machine is not Enigma. Correctness cannot be inferred from the app working, so it is
+      checked here against answers known independently of this code.
+    </p>
+    <div class="row-actions">
+      <button id="btn-fixtures" class="btn primary">Run all checks</button>
+      <span id="fixture-summary" class="note"></span>
+    </div>
+    <div id="fixture-list" class="fixture-list"></div>
+  </div>
+
+  <div class="panel">
+    <h2>What the bombe cannot tell you</h2>
+    <p>
+      The bombe recovers the <b>rotor order</b> and the <b>core position</b>. It does not recover
+      the <b>Ringstellung</b>. Only the difference between ring setting and rotor position affects
+      the scrambler, so a whole family of (ring, position) pairs produces identical ciphertext and
+      is indistinguishable by any amount of searching. The ring is pinned only by <em>where the
+      middle rotor's turnover must have occurred</em> — and if the message is too short to contain
+      one, it is genuinely underdetermined.
+    </p>
+    <p class="note">
+      Which is why this app searches at rings AAA and reports the position it finds, rather than
+      picking a member of that family and presenting it as the answer.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <span>Rotor wirings, reflectors and turnover notches are the historical constants. No asset files, no network.</span>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
