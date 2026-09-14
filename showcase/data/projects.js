@@ -23,6 +23,26 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'crib',
+    name: 'Crib',
+    tagline: 'Encipher a message, throw the key away, and take it back',
+    description:
+      'Enigma simulators are everywhere and they teach nothing \u2014 turning rotors and watching lamps light is the least interesting fact about the machine. Crib is the other half. You encipher a message on a correct Wehrmacht Enigma I, the app visibly discards the key, and from then on the solver sees a ciphertext and one guessed word. A Turing\u2013Welchman bombe gets the rest back: 1,054,560 positions tested, 195 stops, exactly one survives plugboard completion, and the rotor order, the ground setting and all ten plugs come out exactly right in about fourteen seconds. Three ideas carry it. The plugboard looks like the hard part and is actually the way in \u2014 it multiplies the keyspace to 158,962,555,217,826,360,000 and the bombe does not search it, because Welchman\u2019s diagonal board encodes one structural fact, that steckering is an involution and so \u201cA is plugged to G\u201d and \u201cG is plugged to A\u201d are the same statement, as physical wiring, which turns a single assumed plug into a flood of implications that either survives or contradicts itself. The machine\u2019s one guarantee is what kills it \u2014 the reflector means no letter ever enciphers to itself, so any crib alignment requiring one is impossible rather than unlikely, and roughly two thirds of alignments die before a rotor turns. And the bombe\u2019s power is topology rather than throughput: two cribs of the same length can differ by three orders of magnitude in false stops, and the difference is the cycle rank of the menu graph, E \u2212 V + C, because each independent loop divides the false stops by about 26 \u2014 so dragging the crib one column breaks a loop and the predicted stop count jumps, which the app predicts before the search and measures after it. The obvious optimisation, holding the middle rotor fixed across the crib, is wrong in a way that is invisible: a crib long enough to carry the right rotor past its turnover shifts every scrambler after that point, which makes the true key unrepresentable, so the search completes, reports stops, and silently fails to find the answer it exists to find. A ten-case self-test runs in-page against answers known independently of the code \u2014 the canonical AAAAA \u2192 BDZGO vector, the ADU \u2192 ADV \u2192 AEW \u2192 BFX double step, a middle-rotor period of 650 rather than 676, zero self-encipherments in twenty thousand keypresses, and the full round trip \u2014 because a subtly wrong Enigma is still a self-consistent reciprocal cipher and every screen would look right while the machine was not Enigma. And what the bombe cannot do is stated rather than hidden: it never recovers the Ringstellung, because only the difference between ring and position affects the scrambler, so a whole family of settings is indistinguishable by any amount of searching.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'SVG', 'Cryptanalysis'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/crib/',
+    runCommand: 'cd showcase/apps/crib && python -m http.server 8080',
+    screenshots: shots('crib', [
+      'recovered',
+      'crib',
+      'machine',
+      'proof',
+      'menu',
+      'running',
+    ]),
+  },
+  {
     slug: 'other-five',
     name: 'The Other Five',
     tagline: 'You are one mind of nine. The other five are on their own.',
