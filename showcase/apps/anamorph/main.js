@@ -243,7 +243,7 @@ const EXPERIMENTS = {
       const dead = r.valley > 0.25;
       return [
         `${r.slantDeg}°`,
-        r.valley === 0 ? '<span class="good">nothing measurable</span>' : `±${(100 * r.valley / 2).toFixed(0)}%`,
+        r.valley === 0 ? '<span class="good">none \u2014 f is pinned</span>' : `\u00b1${(100 * r.valley / 2).toFixed(0)}%`,
         dead ? `<span class="bad">not determined</span> <small>(${r.fErrPct.toFixed(0)}%)</small>`
              : `${r.fErrPct.toFixed(2)}%`,
         !r.score ? '—'
@@ -252,7 +252,7 @@ const EXPERIMENTS = {
       ];
     });
     const el = document.createElement('div');
-    el.innerHTML = table(['target slant', 'focal lengths that fit equally well', 'focal error', 'position error'], body);
+    el.innerHTML = table(['target slant', 'spread of focal lengths that fit as well', 'focal error', 'position error'], body);
     const norm = (r) => r.curve.map((p) => [p.f / r.truthF, p.rms]);
     el.appendChild(chart([
       { pts: norm(flat), colour: '#e2686d', label: 'fronto-parallel (0°)' },
@@ -284,11 +284,11 @@ const EXPERIMENTS = {
     const body = rows.map((r, i) => [
       r.relief.toFixed(2),
       flatness[i] < 1e-6 ? `${flatness[i].toExponential(0)} mm` : `${flatness[i].toFixed(1)} mm`,
-      r.valley === 0 ? '<span class="good">nothing measurable</span>' : `±${(100 * r.valley / 2).toFixed(0)}%`,
+      r.valley === 0 ? '<span class="good">none \u2014 f is pinned</span>' : `\u00b1${(100 * r.valley / 2).toFixed(0)}%`,
       `${r.fErrPct.toFixed(2)}%`,
       r.score ? `${r.score.posErr.toFixed(2)} mm` : '—',
     ]);
-    return table(['relief setting', 'departure from a plane', 'focal lengths that fit equally well', 'focal error', 'position error'], body)
+    return table(['relief setting', 'departure from a plane', 'spread of focal lengths that fit as well', 'focal error', 'position error'], body)
       + verdict(`The plan was that flattening the markers into one plane would make the focal length unrecoverable, and it does not: at <strong>exactly zero relief</strong> — the markers coplanar to ${flatness[0].toExponential(0)} mm — the focal length still comes back to ${Math.abs(rows[0].fErrPct).toFixed(2)}%, and no setting in the sweep is measurably better than any other. The reason is in finding 2: these markers lie on the floor and are seen at a steep angle, and a slanted plane determines the focal length on its own. The experiment was measuring the wrong variable. It is kept here because deleting it would leave finding 2 looking like something this project knew in advance.`, true);
   },
 
