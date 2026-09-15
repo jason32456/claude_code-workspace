@@ -23,6 +23,26 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'anamorph',
+    name: 'Anamorph',
+    tagline: 'Render a scene, throw the camera away, and take it back \u2014 the picture only resolves from one place',
+    description:
+      'A scene is rendered under a camera the app then deletes \u2014 6-DoF pose, focal length, principal point and two radial distortion coefficients \u2014 and a solver that never sees anything but the pixels takes the whole thing back: Otsu threshold, connected components, Moore border following, Douglas\u2013Peucker quad fitting, sub-pixel corners from edge fits rather than corner fits, a searched marker codebook that resolves rotation as well as identity, normalised DLT homographies, plane pose, a focal-length sweep, locally-optimised RANSAC and Levenberg\u2013Marquardt over all eleven parameters with an analytic Jacobian. Position comes back to 0.273 mm and orientation to 0.045\u00b0 with the camera 80 cm away. The proof is not a number: the scene is repainted so that it becomes a picture from the RECOVERED camera and then photographed from the TRUE one, and the two maps compose to the identity exactly when the recovery is right \u2014 so the picture either reassembles or it smears, and a viewer grades a six-degree-of-freedom solve by eye before reading anything. The residual deserves that suspicion: the solver fits its 24 marker corners to 0.087 px and is 8.2 times worse on scene geometry it was never given a correspondence for. Four measurements follow. Off a plane the textbook 3D-to-2D linear solve is not merely adequate but exact, at 9.1e-12 mm and a focal length of 800.000000; lay the same markers flat and three of its twelve singular values collapse to zero and there is no camera to extract, while the homography route \u2014 valid only on a plane, useless in the case the general method handles perfectly \u2014 returns 0.310 mm. Hold a flat target square-on and a 3.1\u00d7 range of focal length fits the photograph with the residual moving 0.000 px in total, the recovered camera sliding from 566 mm to 1718 mm to compensate: not a solver failing but a question the image does not answer. The claim this project was built on died there \u2014 scene relief was supposed to break that tie and does not, because a slanted plane already determines focal length on its own, and the sweep that failed ships alongside the one that worked. Fitting two radial coefficients to a true pinhole lowers the residual in five of five noise levels and leaves the pose unchanged, which was drafted as \u201cdistortion parameters hurt\u201d and withdrawn. And six markers spread across the frame beat six packed into a corner by 2.4\u00d7 with identical residuals, so nothing in the fit reports the problem. Nine checks against ground truth derived outside the solver, including every column of the analytic Jacobian against central finite differences and the planar rank collapse asserted as a rank',
+    stack: ['Vanilla JS', 'ES Modules', 'Software rasteriser', 'Canvas 2D', 'Levenberg\u2013Marquardt'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/anamorph/',
+    runCommand: 'cd showcase/apps/anamorph && python -m http.server 8080',
+    screenshots: shots('anamorph', [
+      'resolved',
+      'smeared',
+      'scoreboard',
+      'focal-ambiguity',
+      'planar-degeneracy',
+      'checks',
+    ]),
+  },
+  {
     slug: 'tofu',
     name: 'Tofu',
     tagline: 'Cut a font down to the characters you use \u2014 and see what it cost',

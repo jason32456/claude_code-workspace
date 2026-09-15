@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anamorph — throw the camera away, then take it back</title>
+<meta name="description" content="Render a scene under a camera the app then deletes, recover it from the pixels alone, and prove it with a painting that only resolves from the recovered viewpoint.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0f16'/%3E%3Cpath d='M6 24 L16 8 L26 24' fill='none' stroke='%23f0a030' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='19' r='3' fill='none' stroke='%235fb8d0' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Anamorph</h1>
+    <p class="tagline">Render a scene, throw the camera away, and take it back — the picture only resolves from one place.</p>
+  </div>
+  <div class="head-actions">
+    <label class="ctl">Scene
+      <select id="layout">
+        <option value="relief">Room — markers on six surfaces</option>
+        <option value="planar">Flat — every marker on the floor</option>
+        <option value="steps">Steps — markers lifted off the floor</option>
+        <option value="grid">Grid — twelve markers</option>
+      </select>
+    </label>
+    <button class="primary" id="run">Run the recovery</button>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+
+<main>
+
+<section class="stage">
+  <figure class="pane">
+    <figcaption>
+      <h2>The photograph</h2>
+      <p>Every pixel the solver gets. It never sees the scene, the camera, or where anything is meant to be.</p>
+    </figcaption>
+    <div class="canvas-wrap"><canvas id="photo" width="800" height="600"></canvas></div>
+    <div class="row">
+      <label class="chk"><input type="checkbox" id="overlay" checked> Show what the detector found</label>
+      <span class="stat" id="detect-stat">—</span>
+    </div>
+  </figure>
+
+  <figure class="pane">
+    <figcaption>
+      <h2>The anamorph</h2>
+      <p>The scene repainted so that it becomes a picture from the <em>recovered</em> camera — then photographed from the <em>true</em> one. The two cancel only if the recovery is right.</p>
+    </figcaption>
+    <div class="canvas-wrap"><canvas id="ana" width="800" height="600"></canvas></div>
+    <div class="row">
+      <label class="slider">Move the viewpoint
+        <input type="range" id="orbit" min="-100" max="100" value="0">
+      </label>
+      <button class="ghost" id="recentre">Back to the true camera</button>
+    </div>
+    <p class="hint" id="orbit-hint">At the true camera the picture is whole. Drag and it comes apart — which is the proof that it is painted on the geometry rather than drawn on the screen.</p>
+  </figure>
+</section>
+
+<section class="board">
+  <h2>What came back</h2>
+  <p class="lede">Ground truth is held back until after the solver has committed. Every number here is measured now, not written into this page.</p>
+  <dl class="scores" id="scores"></dl>
+  <p class="note" id="board-note"></p>
+</section>
+
+<section class="findings">
+  <h2>Five things this turned out to be about</h2>
+
+  <article class="card" id="c-planar">
+    <h3>1 · The easiest target is the one the textbook method cannot solve</h3>
+    <p>Lay every marker flat and the general 3D→2D linear solve — one equation system for the whole camera matrix — loses rank, because a plane has no third dimension to constrain the third column of <code>P</code>. The homography route, which is <em>only</em> valid on a plane, sails through the case that destroys the general one.</p>
+    <div class="run"><button class="ghost" data-exp="planar">Measure it</button><span class="busy" hidden>working…</span></div>
+    <div class="result" hidden></div>
+  </article>
+
+  <article class="card" id="c-slant">
+    <h3>2 · Focal length and distance are the same thing — and relief is not what separates them</h3>
+    <p>This project set out to show that a flat target cannot tell a long lens far away from a short lens close up, and that <em>scene relief</em> is what breaks the tie. The first half is true and the second half is not. The measurement below is of the thing that actually decides it.</p>
+    <div class="run"><button class="ghost" data-exp="slant">Sweep the target angle</button><span class="busy" hidden>working… this renders a scene per step</span></div>
+    <div class="result" hidden></div>
+  </article>
+
+  <article class="card" id="c-relief">
+    <h3>3 · The claim that did not survive</h3>
+    <p>The relief sweep that was supposed to produce finding 2. It is kept because it is the measurement that overturned the plan, and a page that only shows the experiments that worked is not showing its work.</p>
+    <div class="run"><button class="ghost" data-exp="relief">Run the sweep that failed</button><span class="busy" hidden>working…</span></div>
+    <div class="result" hidden></div>
+  </article>
+
+  <article class="card" id="c-distortion">
+    <h3>4 · Two free parameters that always help, and buy nothing</h3>
+    <p>Render a true pinhole — no distortion at all — then fit it with the two radial coefficients free. They have nothing real to find, so anything they do is absorbing noise. The residual must fall. The question this answers is whether the <em>camera</em> gets better.</p>
+    <div class="run"><button class="ghost" data-exp="distortion">Measure it</button><span class="busy" hidden>working…</span></div>
+    <div class="result" hidden></div>
+  </article>
+
+  <article class="card" id="c-spread">
+    <h3>5 · Spread beats count</h3>
+    <p>One photograph of twelve markers, used twice: six chosen spread across the frame, six chosen from one corner. Same image, same marker size, same count, same noise. Only where they sit differs.</p>
+    <div class="run"><button class="ghost" data-exp="spread">Measure it</button><span class="busy" hidden>working…</span></div>
+    <div class="result" hidden></div>
+  </article>
+</section>
+
+<section class="checks">
+  <h2>Checks against answers derived somewhere else</h2>
+  <p class="lede">A pose pipeline that is subtly wrong is still perfectly self-consistent: the residual would be small, every panel would look right, and the camera would be wrong. These are the things that would catch that.</p>
+  <div class="run"><button class="ghost" id="run-checks">Run the checks</button><span class="busy" hidden>working…</span></div>
+  <ol class="checklist" id="checklist"></ol>
+</section>
+
+<footer>
+  <p>No WebGL, no library, no build step. The rasteriser, the marker codebook, the detector, the homography, the RQ decomposition and the Levenberg–Marquardt refinement are all in <code>js/</code>. See <a href="README.md">README.md</a> and <a href="PRD.md">PRD.md</a>.</p>
+</footer>
+
+</main>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
