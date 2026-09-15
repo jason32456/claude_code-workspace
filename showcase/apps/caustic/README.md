@@ -52,7 +52,28 @@ fit can spike at each one and return to a smooth solution in between.
 
 ![Dimension](screenshots/dimension.png)
 
-**5. The peak survives real backpropagation; the second descent does not.** A
+**5. The ridge is not caused by label noise.** This one was written into the
+docs as an assumption and then contradicted by its own measurement. Double
+descent is almost always explained as the model contorting itself to fit *noise*,
+so setting `σ = 0` should flatten the ridge. It does not: at zero label noise the
+peak is still **14.5×**. What it actually tracks is how hard the target is to
+approximate with the features available. Holding noise at exactly zero and
+varying only the target's complexity:
+
+| target | best below threshold | at `P = n` | ratio |
+|---|---|---|---|
+| nearly linear | `0.151` | `1.45` | 9.6× |
+| mildly curved | `0.559` | `4.38` | 7.8× |
+| the default | `1.02` | `67.5` | **66×** |
+| very wiggly | `0.800` | `146` | **182×** |
+
+Adding label noise on top of the default barely moves it (`66× → 89×`). So in
+this setup the dominant driver is **approximation error** — the part of the
+target the model cannot represent — not noise in the labels. An interpolating
+fit is forced through residuals it has no way to express, and that is enough to
+blow it up on its own.
+
+**6. The peak survives real backpropagation; the second descent does not.** A
 two-layer ReLU network trained with plain SGD and momentum, on the same data,
 peaks at the threshold by a factor of **7.0** (`0.127 → 0.890`) with training
 error at `6.8e-14` — genuinely interpolating, not merely fitting well. So the
@@ -79,7 +100,7 @@ Measured at `D = 10`, both optimisers show the peak and **Adam's is the larger**
 
 ## Checks
 
-Ten checks against ground truth derived outside the code under test — a
+Eleven checks against ground truth derived outside the code under test — a
 hand-solved 2×2 normal equation, a planted Cholesky solution, central finite
 differences on every parameter of the network, a Gram–Schmidt construction of the
 null space to confirm the interpolating fit really is the minimum-norm one, and
@@ -106,7 +127,7 @@ is generated from a seeded PRNG, so every figure is reproducible.
 |---|---|
 | `D` | input dimension — the one that decides whether the second descent exists |
 | `n` | training points; the interpolation threshold moves with it |
-| `σ` | label noise; with no noise there is nothing to overfit and no ridge |
+| `σ` | label noise — and turning it to zero does **not** remove the ridge, see below |
 | `λ` | ridge penalty; raise it and watch the peak flatten at unchanged model size |
 | Trials | fits averaged per cell, by median — at the threshold one unlucky draw lands three orders of magnitude out |
 
