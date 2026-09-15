@@ -23,6 +23,27 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'caustic',
+    name: 'Caustic',
+    tagline: 'Add a parameter and the fit gets worse. Add a thousand and it gets better than it ever was.',
+    description:
+      'Double descent, measured rather than illustrated. A least-squares learner is swept across model size and training-set size at once and the result is a bright ridge of failure running exactly along the line where the model has just enough capacity to interpolate its data \u2014 click any cell and the model it learned appears, training points pinned to the diagonal and test predictions sprayed off it. Three of the four things it now claims were not in the plan. The peak at the interpolation threshold is enormous, 91.0 against 1.019 for the best smaller model, 89.4 times worse, and the pane searches for the worst cell rather than assuming where it is. Holding the model fixed and adding training data walks it into that ridge: ten points to forty takes test error from 1.159 to 91.0, so more data made it 78 times worse. And the spike turns out to have nothing to do with parameter count \u2014 a ridge penalty of 1e-2 drops the worst cell to 1.111, 82 times lower, at identical model sizes, so the accurate claim is not that more parameters can hurt but that exact unregularised interpolation can. The headline finding is about dimension. Past the threshold the error falls back below the best underparameterised model, 1.78 times better, which is the celebrated half of the story \u2014 except at D = 1, the one-dimensional curve fit that nearly every explainer of this phenomenon draws, where it never comes back down and ends 331 times worse. All nine higher dimensions swept show the second descent; the picture conventionally used to illustrate benign overfitting is the one case where benign overfitting does not happen, and you can see the mechanism: in one dimension the interpolant has to thrash between densely ordered points and leaves the frame at |f| = 131, while in two it spikes at each point and returns to a smooth solution in between. A negative result this project had already drafted was reversed before shipping \u2014 an early measurement found a backprop-trained network showed no peak at all, but it had been run at D = 1 with Adam, which is to say in the exact regime the dimension finding identifies as the one where the effect is absent, using an optimiser whose per-coordinate normalisation suppresses the norm blow-up that is the mechanism. Re-run at D = 10 with plain SGD, trained to genuine interpolation at 6.8e-14, the peak appears at 7.0 times. The follow-up hypothesis that the optimiser was the confound died too: both optimisers show it and Adam\u2019s peak is the larger. What the network does not reproduce is the second descent, and that is reported as missing rather than implied. Ten checks run in-page against ground truth derived outside the code \u2014 a hand-solved 2\u00d72 normal equation, a planted Cholesky solution, central finite differences on every network parameter, a Gram\u2013Schmidt construction of the null space confirming the interpolating fit really is the minimum-norm one, and two that would fail if the headline claim were an artefact of the sampling grid or the feature scaling.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'Canvas 2D', 'Least squares + backprop'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/caustic/',
+    runCommand: 'cd showcase/apps/caustic && python -m http.server 8080',
+    screenshots: shots('caustic', [
+      'ridge',
+      'off-ridge',
+      'curve',
+      'regularised',
+      'dimension',
+      'backprop',
+      'checks',
+    ]),
+  },
+  {
     slug: 'overtone',
     name: 'Overtone',
     tagline: 'Audio in, chords out \u2014 and a measurement of which stage actually helps',
