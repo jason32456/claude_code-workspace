@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caustic — where the fit goes singular</title>
+<meta name="description" content="Double descent and benign overfitting, measured in the browser: the interpolation ridge, and the one dimension where the textbook picture does not hold.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1218'/%3E%3Cpath d='M3 24c6 0 7-15 13-15s7 15 13 15' fill='none' stroke='%235fd0a0' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M16 4v24' stroke='%23e5484d' stroke-width='1.5' stroke-dasharray='3 3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Caustic</h1>
+    <p class="tagline">Add a parameter and the fit gets worse. Add a thousand and it gets better than it ever was.</p>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Experiments">
+    <button class="tab" data-pane="ridge" role="tab" aria-selected="true">The ridge</button>
+    <button class="tab" data-pane="curve" role="tab" aria-selected="false">The curve</button>
+    <button class="tab" data-pane="dim" role="tab" aria-selected="false">Dimension</button>
+    <button class="tab" data-pane="net" role="tab" aria-selected="false">Backprop</button>
+    <button class="tab" data-pane="checks" role="tab" aria-selected="false">Checks</button>
+  </nav>
+</header>
+
+<main>
+  <aside class="panel">
+    <section class="group">
+      <h2>The problem</h2>
+      <label class="ctl">
+        <span>Input dimension <em>D</em></span>
+        <input type="range" id="D" min="1" max="60" step="1" value="20">
+        <output id="D-out">20</output>
+      </label>
+      <label class="ctl">
+        <span>Training points <em>n</em></span>
+        <input type="range" id="n" min="8" max="140" step="1" value="40">
+        <output id="n-out">40</output>
+      </label>
+      <label class="ctl">
+        <span>Label noise <em>σ</em></span>
+        <input type="range" id="noise" min="0" max="0.6" step="0.01" value="0.15">
+        <output id="noise-out">0.15</output>
+      </label>
+    </section>
+
+    <section class="group">
+      <h2>The learner</h2>
+      <label class="ctl">
+        <span>Ridge <em>λ</em></span>
+        <input type="range" id="lam" min="-13" max="-0.5" step="0.25" value="-13">
+        <output id="lam-out">0 (none)</output>
+      </label>
+      <p class="hint" id="lam-hint">
+        At λ ≈ 0 the fit is forced through every noisy point exactly. That
+        constraint, not the parameter count, is what produces the ridge.
+      </p>
+      <label class="ctl">
+        <span>Trials per cell</span>
+        <input type="range" id="trials" min="1" max="15" step="1" value="5">
+        <output id="trials-out">5</output>
+      </label>
+      <p class="hint">
+        Medians, not means: at the threshold one unlucky draw lands three orders
+        of magnitude out and would drag an average with it.
+      </p>
+    </section>
+
+    <section class="group">
+      <button class="primary" id="run">Run sweep</button>
+      <button class="ghost" id="stop">Stop</button>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <p class="status" id="status">idle</p>
+    </section>
+  </aside>
+
+  <section class="stage">
+
+    <!-- ------------------------------------------------------ the ridge -->
+    <div class="pane" id="pane-ridge">
+      <div class="pane-head">
+        <h2>The interpolation ridge</h2>
+        <p>
+          Model size across, training-set size down, test error as brightness.
+          The bright band is the set of models with <em>exactly enough</em>
+          capacity to interpolate their data. Click any cell to see the function
+          it actually learned.
+        </p>
+      </div>
+      <div class="split">
+        <figure class="fig grow">
+          <canvas id="heat" aria-label="Test error over model size and dataset size"></canvas>
+          <figcaption>
+            <span class="key"><i class="sw" style="background:#0c141e"></i>low error</span>
+            <span class="key"><i class="sw" style="background:#d6942e"></i>high</span>
+            <span class="key"><i class="sw" style="background:#fceed2"></i>divergent</span>
+            <span class="key"><i class="dash"></i>P = n</span>
+          </figcaption>
+        </figure>
+        <figure class="fig side">
+          <canvas id="cell" aria-label="The function learned by the selected cell"></canvas>
+          <figcaption id="cell-cap">Click a cell in the heatmap.</figcaption>
+        </figure>
+      </div>
+      <div class="readout" id="ridge-read"></div>
+    </div>
+
+    <!-- ------------------------------------------------------ the curve -->
+    <div class="pane" id="pane-curve" hidden>
+      <div class="pane-head">
+        <h2>Test error against model size</h2>
+        <p>
+          One horizontal slice of the ridge. The classical U-shaped
+          bias–variance curve is the left half; everything to the right of the
+          threshold is the half the textbooks stop before.
+        </p>
+      </div>
+      <figure class="fig grow">
+        <canvas id="curve" aria-label="Test error against number of parameters"></canvas>
+        <figcaption>
+          <span class="key"><i class="sw" style="background:#c07d20"></i>test error, λ ≈ 0</span>
+          <span class="key"><i class="sw" style="background:#3b82f6"></i>test error, λ as set</span>
+          <span class="key"><i class="sw" style="background:#5fd0a0"></i>training error</span>
+        </figcaption>
+      </figure>
+      <div class="readout" id="curve-read"></div>
+    </div>
+
+    <!-- ------------------------------------------------------- dimension -->
+    <div class="pane" id="pane-dim" hidden>
+      <div class="pane-head">
+        <h2>The second descent needs room</h2>
+        <p>
+          For each input dimension: the best error achievable below the
+          threshold, the error at the threshold, and the error far above it. The
+          second descent is real only where the last bar is shorter than the
+          first.
+        </p>
+      </div>
+      <figure class="fig grow">
+        <canvas id="dim" aria-label="Whether the second descent occurs, by input dimension"></canvas>
+        <figcaption>
+          <span class="key"><i class="sw" style="background:#3b82f6"></i>best below threshold</span>
+          <span class="key"><i class="sw" style="background:#e5484d"></i>at threshold</span>
+          <span class="key"><i class="sw" style="background:#5fd0a0"></i>far above</span>
+        </figcaption>
+      </figure>
+      <div class="split">
+        <figure class="fig"><canvas id="d1" aria-label="Interpolant in one dimension"></canvas>
+          <figcaption>D = 1: forced through every point, and deranged between them.</figcaption></figure>
+        <figure class="fig"><canvas id="d2" aria-label="Interpolant in two dimensions"></canvas>
+          <figcaption>D = 2: forced through every point, and calm between them.</figcaption></figure>
+      </div>
+      <div class="readout" id="dim-read"></div>
+    </div>
+
+    <!-- -------------------------------------------------------- backprop -->
+    <div class="pane" id="pane-net" hidden>
+      <div class="pane-head">
+        <h2>The same experiment, by gradient descent</h2>
+        <p>
+          A real network — two layers, ReLU, trained by backpropagation — swept
+          over width on the same data. If the ridge were an artefact of the
+          closed-form solve, it would not appear here.
+        </p>
+      </div>
+      <figure class="fig grow">
+        <canvas id="net" aria-label="Test error against network width"></canvas>
+        <figcaption>
+          <span class="key"><i class="sw" style="background:#c07d20"></i>test error</span>
+          <span class="key"><i class="sw" style="background:#5fd0a0"></i>training error</span>
+          <span class="key"><i class="dash"></i>parameters = n</span>
+        </figcaption>
+      </figure>
+      <div class="readout" id="net-read"></div>
+    </div>
+
+    <!-- ---------------------------------------------------------- checks -->
+    <div class="pane" id="pane-checks" hidden>
+      <div class="pane-head">
+        <h2>Checks against independent ground truth</h2>
+        <p>
+          A wrong solver draws a plausible curve too. Each check below is
+          answered by something outside the code it tests — a hand calculation,
+          a closed form, finite differences, or a theorem.
+        </p>
+      </div>
+      <div id="checks"></div>
+      <button class="primary" id="run-checks">Run all checks</button>
+    </div>
+
+  </section>
+</main>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
