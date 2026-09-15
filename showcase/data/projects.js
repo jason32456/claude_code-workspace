@@ -23,6 +23,26 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'tofu',
+    name: 'Tofu',
+    tagline: 'Cut a font down to the characters you use \u2014 and see what it cost',
+    description:
+      'Drop in a .ttf, read the bytes a stranger laid out, and cut the font down to the characters you actually use. Tofu is the term of art for the box you get when a font has no glyph for a character \u2014 the precise failure mode of a bad subset, and the thing this tool exists to avoid producing. It reads the container by hand: the table directory, head, hhea, maxp, hmtx, loca, cmap in formats 4 and 12, with no library and no browser decoder anywhere. It reconstructs the outlines itself, quadratic contours with on-curve and off-curve points plus the implied on-curve midpoints the file never stores, and composite glyphs resolved recursively through their transforms \u2014 all three kinds of point drawn, so a parsing error would be visible rather than silent. Then it builds a new font: glyph closure over the retained characters, renumbering with composite component ids patched inside each glyph\u2019s own bytes, rebuilt loca and glyf, a freshly synthesized cmap, trimmed hmtx, and the self-referential checkSumAdjustment that is a checksum written into the buffer it is computed over. Liberation Sans goes from 401 KB to 8.1 KB for a line of accented Latin. What makes it worth building is the oracle: an OpenType implementation nobody here wrote is already in the room, so FontFace.load() either accepts the bytes or throws, with no threshold to tune \u2014 and at 512 px the glyphs filled from our own parsed contours come back pixel-identical to the browser\u2019s rendering of our subset. At 128 px they visibly diverge, which is not a bug but hinting, the exact capability the subset dropped. And unlike most subsetters it names the bill: every removed table with the thing that went with it, GPOS for kerning, GSUB for ligatures, fpgm and prep and cvt for hinting. CFF-flavoured OpenType, collections and WOFF are refused with the reason rather than half-parsed.',
+    stack: ['Vanilla JS', 'ES Modules', 'Binary parsing', 'Canvas 2D', 'FontFace API'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/tofu/',
+    runCommand: 'cd showcase/apps/tofu && python -m http.server 8080',
+    screenshots: shots('tofu', [
+      'big-font',
+      'glyph',
+      'overview',
+      'verification',
+      'bytemap',
+      'refused',
+    ]),
+  },
+  {
     slug: 'caustic',
     name: 'Caustic',
     tagline: 'Add a parameter and the fit gets worse. Add a thousand and it gets better than it ever was.',

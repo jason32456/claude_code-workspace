@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tofu — cut a font down, see what it cost</title>
+<meta name="description" content="Drop in a .ttf, read the bytes a stranger laid out, subset it to the characters you use, and get told exactly what was thrown away.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e1319'/%3E%3Crect x='9' y='7' width='14' height='18' fill='none' stroke='%235fd0a0' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Tofu</h1>
+    <p class="tagline">Cut a font down to the characters you use — and see exactly what that cost.</p>
+  </div>
+  <div class="head-actions">
+    <button class="ghost" id="pick-file">Open a .ttf</button>
+    <span class="drop-hint">or drop one anywhere</span>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+
+<main>
+  <aside class="panel">
+    <section class="group">
+      <h2>Font</h2>
+      <p class="font-name" id="font-name">—</p>
+      <dl class="facts" id="font-facts"></dl>
+    </section>
+
+    <section class="group">
+      <h2>Keep these characters</h2>
+      <textarea id="text" spellcheck="false" rows="3">Hamburgefonstiv 0123</textarea>
+      <div class="preset-row">
+        <button class="chip" data-preset="ascii">ASCII</button>
+        <button class="chip" data-preset="latin1">Latin-1</button>
+        <button class="chip" data-preset="digits">Digits</button>
+        <button class="chip" data-preset="pangram">Pangram</button>
+      </div>
+      <p class="hint" id="retain-note"></p>
+    </section>
+
+    <section class="group">
+      <h2>Result</h2>
+      <div class="size-compare" id="size-compare"></div>
+      <button class="primary wide" id="download" disabled>Download subset</button>
+      <p class="hint">A real .ttf. The browser already loaded it to draw the
+        specimen below, so you know it works before you save it.</p>
+    </section>
+
+    <section class="group">
+      <h2>View</h2>
+      <label class="toggle"><input type="checkbox" id="show-points" checked> Show points</label>
+      <label class="toggle"><input type="checkbox" id="show-metrics" checked> Show metrics</label>
+    </section>
+  </aside>
+
+  <div class="stage">
+    <section class="card">
+      <h3>The bill <span class="sub">what the subset threw away</span></h3>
+      <div id="bill" class="bill"></div>
+    </section>
+
+    <section class="card">
+      <h3>Specimen <span class="sub">original above, your subset below — in the font this page just built</span></h3>
+      <div class="specimen">
+        <p class="specimen-line" id="spec-orig">—</p>
+        <p class="specimen-line" id="spec-sub">—</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>The file as bytes <span class="sub">table directory, by size</span></h3>
+      <div id="bytemap" class="bytemap"></div>
+    </section>
+
+    <section class="card">
+      <h3>Glyphs <span class="sub">drawn from our own parse of the outlines, not by the browser</span></h3>
+      <div id="palette" class="palette"></div>
+      <canvas id="glyph"></canvas>
+      <p class="legend">
+        <span><i class="k-on"></i>on-curve point (stored)</span>
+        <span><i class="k-off"></i>off-curve control (stored)</span>
+        <span><i class="k-imp"></i>on-curve point the file never stored — implied
+          at the midpoint of two consecutive controls</span>
+      </p>
+    </section>
+
+    <section class="card">
+      <h3>Tables <span class="sub">decoded, not summarised</span></h3>
+      <div id="tables" class="tables"></div>
+    </section>
+
+    <section class="card">
+      <h3>Verification <span class="sub">an OpenType implementation nobody here wrote</span></h3>
+      <div id="checks" class="checks"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="colophon">
+  <p><strong>Why a font is worth reading by hand.</strong> It is a directory of
+  four-byte tags pointing at offsets, where glyph outlines live at offsets stored
+  in another table, whose entries are stored <em>halved</em> depending on a flag
+  in a third. Composite glyphs name their parts by glyph id, so renumbering means
+  patching ids inside the glyph's own bytes. And <code>head.checkSumAdjustment</code>
+  is a checksum written into the buffer it is computed over.</p>
+  <p><strong>Subsetting is lossy and most tools don't say so.</strong> Dropping
+  <code>GPOS</code> removes kerning, so your text sets at a different width than
+  before. Dropping <code>GSUB</code> removes ligatures. Dropping
+  <code>fpgm</code>/<code>prep</code>/<code>cvt&nbsp;</code> removes hinting —
+  which you can see here, because our outlines match the browser exactly at
+  512&nbsp;px and visibly diverge at 128&nbsp;px, where hinting does its work.</p>
+  <p class="credit">Demo font: <strong>Erica One</strong> by Miguel Hernandez /
+  LatinoType, SIL Open Font License — bundled in <code>vendor/</code> with its
+  licence. Drop in your own and nothing leaves the page.</p>
+</footer>
+
+<div id="drop-overlay" class="drop-overlay" hidden><p>Drop a .ttf</p></div>
+<input type="file" id="file-input" accept=".ttf,font/ttf,application/x-font-ttf" hidden>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
