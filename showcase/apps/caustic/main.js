@@ -320,31 +320,27 @@ $('run-checks').addEventListener('click', () => {
   for (let i = 0; i < testCount; i++) {
     const el = document.createElement('div');
     el.className = 'check';
-    el.innerHTML = `<div class="verdict wait">···</div><div><h3>—</h3></div>`;
+    el.innerHTML = '<div class="verdict wait">\u00b7\u00b7\u00b7</div><div><h3>waiting\u2026</h3></div>';
     host.appendChild(el);
     rows.push(el);
   }
-  let i = 0;
-  setStatus('running checks…');
-  // Yield between checks so the verdicts appear one at a time rather than
-  // all at once after a frozen second.
-  const results = [];
-  const tick = () => {
-    const all = runSelfTests();
-    all.forEach((r, k) => {
-      rows[k].innerHTML = `
-        <div class="verdict ${r.ok ? 'pass' : 'fail'}">${r.ok ? 'PASS' : 'FAIL'}</div>
-        <div>
-          <h3>${r.name}</h3>
-          <p class="claim">${r.claim}</p>
-          <p class="detail">${r.detail}</p>
-        </div>`;
-      results.push(r);
-    });
-    const passed = all.filter((r) => r.ok).length;
-    setStatus(`${passed}/${all.length} checks passed`);
-  };
-  requestAnimationFrame(tick);
+  setStatus('running checks\u2026');
+  let done = 0, passed = 0;
+  // The suite reports each result as it finishes, so rows fill in order rather
+  // than appearing all at once. The whole run is well under a second; the
+  // placeholder rows exist so the count is visible before any of it starts.
+  runSelfTests((r) => {
+    const el = rows[done++];
+    if (r.ok) passed++;
+    el.innerHTML = `
+      <div class="verdict ${r.ok ? 'pass' : 'fail'}">${r.ok ? 'PASS' : 'FAIL'}</div>
+      <div>
+        <h3>${r.name}</h3>
+        <p class="claim">${r.claim}</p>
+        <p class="detail">${r.detail}</p>
+      </div>`;
+  });
+  setStatus(`${passed}/${done} checks passed`);
 });
 
 /* ----------------------------------------------------------------- tabs */
