@@ -23,6 +23,28 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'ghoti',
+    name: 'Ghoti',
+    tagline: 'Learn to read English aloud from 117,493 examples \u2014 then watch the oldest joke about English spelling die on its own data',
+    description:
+      'gh as in tough, o as in women, ti as in nation, therefore ghoti spells fish. It is the oldest joke about English spelling and it is wrong, and the refutation here is not an argument but a count. The dictionary says knight \u2192 N AY1 T and never says that kn makes N, igh makes AY1 and t makes T \u2014 six letters, three sounds, no correspondence given anywhere in the file \u2014 so recovering it is an unsupervised problem, solved by Expectation\u2013Maximisation over a many-to-many monotone lattice of every legal alignment of every word. What falls out is the spelling system of English as one picture: a letter-by-phone matrix nobody wrote, ordered into a diagonal with the exceptions standing off it. Then counts over every aligned word, a beam decoder for words never seen, and a formant synthesiser written sample by sample so the payoff is audible \u2014 a pronunciation it got right sounds like the word and one it got wrong is wrong in a way nobody needs a number to grade. The joke dies on position, the thing it leaves out. gh makes /f/ 62 times, in tough and laugh and enough, and never once at the start of a word, where in all 49 words it appears it says /g/. ti makes /sh/ 2,162 times and never once at the end of one, where it says T IY as in yeti. Two of the three substitutions are not rare in the position ghoti needs, they are absent; the third survives at 47 in 48,937, one word in a thousand. Handed ghoti the model says G HH OW1 T IY0, and you can listen to it. It also gets women wrong, reading it W OW1 M AH0 N, because having seen 105,744 words it finds o \u2192 /\u026a/ so implausible it will not produce it \u2014 the one word the joke leans on is the exception the model correctly learned to disbelieve. Four claims died in the measuring and ship as they came out. More context stops helping: accuracy climbs to a window of five letters either side and falls back by seven, with the wider model holding strictly more information, and at the sweep\u2019s sample size widths five and six are tied and the page says so rather than picking a winner it cannot support. Nearly all the data is unnecessary \u2014 8,000 words and 8 EM passes reach 48.4%, against 48.6% for 40,000 words and 20. The hard words are not English\u2019s famous irregulars but surnames and loanwords, dussault and zizzo and sciara and apercu, while colonel comes out right. And English is not chaotic: with no rules at all, only examples, 58.1% of unseen pronunciations come back sound for sound. The aligner was wrong twice first, both fixes in the code with reasons attached \u2014 letting two letters spell two sounds lets EM swallow whole syllables and destroys every downstream count, and neither model was normalised over segmentations, so coarser chunkings won by having fewer factors, a bias worth 19 points of accuracy. Twelve self-tests run in the page, each decided by something outside the code it tests: EM monotonicity as a theorem, beam search against exhaustive argmax, alignments verified to tile their letters, a DFT sharing no code with the synthesiser \u2014 and that one failed first, in the test rather than the synth.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'Web Audio API', 'EM + beam search'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/ghoti/',
+    runCommand: 'cd showcase/apps/ghoti && python -m http.server 8080',
+    screenshots: shots('ghoti', [
+      'trial',
+      'system',
+      'read',
+      'context-sweep',
+      'verdict',
+      'misses',
+      'invented',
+      'checks',
+    ]),
+  },
+  {
     slug: 'anamorph',
     name: 'Anamorph',
     tagline: 'Render a scene, throw the camera away, and take it back \u2014 the picture only resolves from one place',

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ghoti — learning to read English aloud</title>
+<meta name="description" content="Learn English pronunciation from 117,493 examples with no supervision, then put Shaw's ghoti joke on trial against the dictionary that is supposed to support it.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1 class="wordmark"><span class="gh">gh</span><span class="o">o</span><span class="ti">ti</span></h1>
+    <p class="strap">
+      <b>gh</b> as in <em>tough</em>, <b>o</b> as in <em>women</em>, <b>ti</b> as in <em>nation</em>.
+      Therefore <b>ghoti</b> spells <b>fish</b> — the oldest joke about English spelling.
+      This page learns to read English aloud from 117,493 pronunciations, with nobody ever
+      saying which letter makes which sound, and then asks the dictionary whether the joke is true.
+    </p>
+    <p class="claimline">It is not. <em>Everything below is measured in your browser, right now, from scratch.</em></p>
+    <div class="loader" id="loader">
+      <div class="bar"><i id="bar"></i></div>
+      <div class="note" id="note">starting…</div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist">
+    <button role="tab" data-view="read" aria-selected="true">Read it aloud</button>
+    <button role="tab" data-view="trial">The trial<span class="badge" id="badge-trial"></span></button>
+    <button role="tab" data-view="system">The system</button>
+    <button role="tab" data-view="score">Scoreboard<span class="badge" id="badge-score"></span></button>
+    <button role="tab" data-view="misses">Where it fails</button>
+    <button role="tab" data-view="checks">Checks<span class="badge" id="badge-checks"></span></button>
+  </nav>
+
+  <section class="view" id="view-read">
+    <div class="panel">
+      <h2>Read it aloud</h2>
+      <p class="lede">
+        Type anything — a real word, a surname, a word that does not exist. The model has never
+        been told a single spelling rule. <b>Press play and listen:</b> a pronunciation it got
+        right sounds like the word, and one it got wrong is wrong in a way you do not need a
+        number to grade.
+      </p>
+      <div class="readbox">
+        <input id="word" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="ghoti" value="ghoti" aria-label="word to pronounce">
+        <button class="act primary" id="say-model" disabled>▶ Hear the model</button>
+        <button class="act" id="say-truth" disabled>▶ Hear the dictionary</button>
+      </div>
+      <div class="chips" id="examples"></div>
+      <div id="read-out"><div class="pending">waiting for the model…</div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-trial" hidden>
+    <div class="panel">
+      <h2>The trial</h2>
+      <p class="lede">
+        Every occurrence of each substitution is found in all 117,493 words, together with
+        <b>where in the word it happens</b> — which is the part the joke leaves out. A substitution
+        that is only ever legal in one position cannot be borrowed for a position it never occupies.
+      </p>
+      <div id="trial-out"><div class="pending">the jury is still counting…</div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-system" hidden>
+    <div class="panel">
+      <h2>The spelling system of English</h2>
+      <p class="lede">
+        Nobody wrote this table. It is what the aligner concluded after looking at the dictionary,
+        with no supervision: for every letter, the probability that it spells each sound. Brighter
+        is more probable. The right-hand column is <b>silence</b> — the letter contributing nothing,
+        which English does a great deal of.
+      </p>
+      <div class="canvwrap"><canvas id="matrix" width="1200" height="640"></canvas></div>
+      <div class="footnote" id="matrix-note"></div>
+    </div>
+    <div class="panel">
+      <h2>What it discovered</h2>
+      <p class="lede">
+        The dictionary says <code>knight → N AY1 T</code> and never says which letters made which
+        sounds. Six letters, three sounds, no correspondence given. These are recovered, not given.
+      </p>
+      <div id="samples-out"><div class="pending">aligning…</div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-score" hidden>
+    <div class="panel">
+      <h2>Held-out score</h2>
+      <p class="lede">
+        Measured only on words excluded from every training pass. <b>Word accuracy</b> means the
+        entire pronunciation came back exactly right, stress marks included.
+      </p>
+      <div id="score-out"><div class="pending">reading unseen words…</div></div>
+    </div>
+    <div class="panel">
+      <h2>How much context helps, and where it stops helping</h2>
+      <p class="lede">
+        The same counts, decoded with progressively wider windows of surrounding letters.
+        More context should keep helping right up until the contexts get so specific that
+        they are memorising training words instead of generalising.
+      </p>
+      <div class="canvwrap"><canvas id="sweep" width="1100" height="420"></canvas></div>
+      <div id="sweep-out"></div>
+    </div>
+    <div class="panel">
+      <h2>The aligner converging</h2>
+      <p class="lede">
+        EM's log-likelihood is guaranteed by theorem to never decrease. That makes it a genuine
+        correctness check rather than a progress bar: a dip here is a bug, and the suite asserts it.
+      </p>
+      <div class="canvwrap"><canvas id="emcurve" width="1100" height="300"></canvas></div>
+      <div class="footnote" id="em-note"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-misses" hidden>
+    <div class="panel">
+      <h2>Where it fails</h2>
+      <p class="lede">
+        The held-out words it got worst. Both readings are playable, so you can hear exactly how
+        far off it was. The interesting question is whether these are English's famous irregulars
+        or something much more boring.
+      </p>
+      <div id="misses-out"><div class="pending">collecting failures…</div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-checks" hidden>
+    <div class="panel">
+      <h2>Checks</h2>
+      <p class="lede">
+        Each of these is decided by something derived outside the code it tests — a theorem, a
+        brute-force oracle, a structural invariant, or a table the routine under test never reads.
+        A subtly wrong aligner is still perfectly self-consistent, and every screen on this page
+        would look convincing while the model was quietly not a model.
+      </p>
+      <div id="checks-out"><div class="pending">not yet run…</div></div>
+    </div>
+  </section>
+
+</div>
+<script type="module" src="main.js"></script>
+</body>
+</html>
