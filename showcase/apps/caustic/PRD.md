@@ -37,6 +37,16 @@ one-dimensional curve is easy to approximate with eight features, at `0.032`.
 That is exactly why the interpolating fit has so far to fall, and why the gap is
 so much larger here than in any higher dimension.
 
+**The ridge is not caused by label noise, which is how it is nearly always
+explained.** This was written into an earlier draft of this document as an
+assumption — that `σ = 0` would leave nothing to overfit and flatten the ridge —
+and the measurement contradicted it. At zero label noise the peak is still
+`14.5×`, and what it tracks is how hard the target is to approximate with the
+available features: holding noise at zero, a nearly linear target peaks by
+`9.6×` and a very wiggly one by `182×`. Adding label noise on top of the default
+moves it only from `66×` to `89×`. The dominant driver here is approximation
+error, not label noise.
+
 **A negative result this project had already written down turned out to be
 wrong, and was reversed before shipping.** An early measurement found that a
 network trained by backpropagation showed no peak at all, which suggested the
@@ -69,6 +79,7 @@ Defaults are `D = 20`, `n = 40`, `σ = 0.15`, medians over 9 trials.
 | …but only with enough dimension | `D = 1`: **no second descent**, `331×` worse. All nine `D ≥ 2` values: present |
 | The peak survives real backpropagation | trained net at `D = 10`, `n = 120`: `0.127 → 0.890`, **7.0×** |
 | The second descent does **not** survive it | widest net (1081 params, `0.631`) never beats its best underparameterised width (`0.127`) |
+| The ridge does **not** require label noise | at `σ = 0` the peak is still `14.5×`; it scales with target complexity (`9.6×` → `182×`) instead |
 
 ## The experiment
 
@@ -105,7 +116,7 @@ factorisation succeed and reports how much it needed.
    interpolant thrashing to `|f| = 131` beside a calm `D = 2` slice.
 4. **Backprop** — the control arm. A real two-layer ReLU network, plain SGD with
    momentum and gradient clipping, swept over width.
-5. **Checks** — ten tests against ground truth derived outside the code.
+5. **Checks** — eleven tests against ground truth derived outside the code.
 
 ## Declared limits
 
@@ -150,5 +161,5 @@ from a seeded PRNG, so every figure is reproducible.
 - Every quantitative claim in the interface is computed from the current sweep,
   not written into the copy.
 - The dimension pane can come out the other way and would be shipped if it did.
-- 10/10 checks pass, including two that would fail if the headline claim were an
+- 11/11 checks pass, including three that would fail if the headline claim were an
   artefact of the sampling grid or the feature scaling.

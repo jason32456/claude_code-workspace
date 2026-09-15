@@ -3,7 +3,7 @@ import { solveSPD } from './linalg.js';
 import { makeProblem, makeFeatures, fit, mse, norm2, runCell } from './model.js';
 import { makeNet, makeGrad, gradient, predict } from './mlp.js';
 
-// Ten checks against ground truth derived WITHOUT the code under test — by hand,
+// Eleven checks against ground truth derived WITHOUT the code under test — by hand,
 // in closed form, or by an independent method. A double-descent curve is a
 // plausible-looking shape; a solver that is quietly wrong produces a plausible-
 // looking shape too. These are the difference between a measurement and a
@@ -205,6 +205,20 @@ test('Ridge removes the peak it was predicted to remove', 'same sweep, λ=1e−2
   return {
     ok: ridged < bare / 5 && ridged < baseline * 4,
     detail: `at P=n: λ≈0 gives ${bare.toExponential(2)}, λ=1e−2 gives ${ridged.toExponential(2)} (${(bare / ridged).toFixed(0)}× lower)`,
+  };
+});
+
+test('The ridge survives zero label noise', 'set \u03c3 = 0 and the peak is still there \u2014 it is approximation error, not noise', () => {
+  const n = 30, D = 20;
+  const med = (v) => v.slice().sort((x, y) => x - y)[v.length >> 1];
+  const at = (P) => med(Array.from({ length: 7 }, (_, t) => Math.min(runCell({ D, n, P, noise: 0, lambda: 1e-13, seed: 601 + t * 3313 }).test, 1e12)));
+  const base = at(8), peak = at(n);
+  // Double descent is nearly always explained as the model contorting itself to
+  // fit noisy labels. With no noise at all there is still a peak, because the
+  // interpolant is forced through residuals the features cannot represent.
+  return {
+    ok: peak > base * 3,
+    detail: `\u03c3 = 0: best below threshold ${base.toExponential(2)}, at P=n ${peak.toExponential(2)} \u2014 ${(peak / base).toFixed(1)}\u00d7 with zero label noise`,
   };
 });
 
