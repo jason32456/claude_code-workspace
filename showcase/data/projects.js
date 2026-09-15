@@ -23,6 +23,27 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'overtone',
+    name: 'Overtone',
+    tagline: 'Audio in, chords out \u2014 and a measurement of which stage actually helps',
+    description:
+      'A chord transcriber that listens. Audio goes in \u2014 synthesized, dropped as a file, or straight off the microphone \u2014 and a chord chart and a downloadable MIDI file come out, with every stage of the estimator drawn on one shared time axis: a log-frequency spectrogram, the whitened spectrum, a 12-bin chromagram, and the 25-state chord posterior with the Viterbi path traced over it. It was built to demonstrate that chord estimation needs harmonic summation, because a C major chord\u2019s spectrum already contains a strong E and G as overtones of the C itself, so raw chroma ought to confuse C with A minor. The overtone leak is real and you can see it in a single frame. The fix is not. Measured before it was written up, harmonic summation makes accuracy worse at every difficulty setting and collapses from 94% to zero on a hard signal, because it runs the leak backwards: salience at A collects the energy at E\u00d73, so a played E donates to A and a C major chord grows a phantom A \u2014 precisely the confusion the technique was meant to prevent. It ships as a toggle, off by default, with its invented pitch classes drawn in red. What survives is better than the thesis that died. A transition prior is nearly worthless when the per-frame evidence is clean, worth eight accuracy points when it is degraded, and sharply negative when it is hopeless, because a confident prior applied to garbage locks the decoder onto a smooth, coherent, wrong answer \u2014 a curve you reproduce by dragging the noise slider while the readout recomputes and turns red as the gain inverts. The demo synthesizer is deliberately hard to transcribe, with a real overtone series, per-partial decay, stiff-string inharmonicity and a noise floor, all exposed as sliders. Accuracy is reported only where ground truth exists: hand it a file or the microphone and the number disappears rather than being invented. The FFT is checked against an independently written naive DFT and the MIDI writer against a reader that parses its own bytes back.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Audio API', 'FFT + Viterbi', 'Canvas 2D'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/overtone/',
+    runCommand: 'cd showcase/apps/overtone && python -m http.server 8080',
+    screenshots: shots('overtone', [
+      'overview',
+      'ghosts',
+      'smoothing-helps',
+      'smoothing-collapses',
+      'posterior',
+      'analysis',
+      'selftest',
+    ]),
+  },
+  {
     slug: 'crib',
     name: 'Crib',
     tagline: 'Encipher a message, throw the key away, and take it back',
