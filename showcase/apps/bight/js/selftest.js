@@ -180,9 +180,16 @@ export function runAll() {
   // 8. Projection-direction invariance. This is the check that caught the
   //    crossing-dropping bug, because a bad projection changes the answer.
   {
-    const bad = [];
+    const bad = [], cover = [];
     for (const id of ['trefoil', 'figure8', 'cinquefoil', 'sevenOne']) {
-      const pts = buildCurve(id);
+      // Projected from the KMT-REDUCED curve, which is the same knot and the
+      // thing the app actually measures. Sweeping directions on the full
+      // 280-vertex curve cost 5.7 of this suite's 6.3 seconds: crossing
+      // detection is O(n^2) per direction, and a grazing projection of 7_1 at
+      // full resolution yields 15-16 crossings, so the bracket then sums tens
+      // of thousands of states for a diagram nobody looks at. The invariance
+      // being asserted is identical either way.
+      const pts = kmtReduce(buildCurve(id)).points;
       const seen = new Set();
       let valid = 0, minN = Infinity, maxN = 0;
       for (let k = 0; k < 24; k++) {
@@ -201,9 +208,10 @@ export function runAll() {
       }
       if (seen.size !== 1) bad.push(`${curveInfo(id).label}: ${seen.size} distinct V over ${valid} projections`);
       else if (valid < 3) bad.push(`${curveInfo(id).label}: only ${valid} valid projections`);
+      else cover.push(`${curveInfo(id).label}: ${valid} projections, ${minN}–${maxN} crossings`);
     }
     t.push(ok('V is identical across every valid projection direction, though crossing counts differ widely',
-      bad.length === 0, bad.length ? bad.join(' | ') : 'trefoil, 4₁, 5₁, 7₁ — one value each'));
+      bad.length === 0, bad.length ? bad.join(' | ') : cover.join('; ')));
   }
 
   // 9. A perturbed embedding of the trefoil is still the trefoil.
