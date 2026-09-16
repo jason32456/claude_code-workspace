@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bight — Knot Notary</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="firm">BIGHT &middot; OFFICE OF THE KNOT NOTARY</div>
+    <h1>Is it actually knotted?</h1>
+    <p class="tagline">
+      Pull a cable out of the drawer and find out it is not knotted — and that the
+      question was not well-posed until you decided how to close it.
+    </p>
+  </div>
+  <div class="head-actions">
+    <label class="ctl">Specimen
+      <select id="specimen"></select>
+    </label>
+    <button id="regen" class="btn">New tangle</button>
+  </div>
+</header>
+
+<p class="premise">
+  <strong>The difficulty.</strong> Knot type is an invariant of embeddings of the
+  <em>circle</em>. A cable is an <em>arc</em>, and every open arc in space can be pulled
+  straight without cutting it — so every open cable is unknotted, and the question has
+  the same answer for all of them. To get a non-trivial answer at all you must first
+  <em>close</em> the arc, and the closure is a choice you are making rather than a fact
+  about the cable. This office therefore certifies closures, not cables.
+</p>
+
+<main>
+
+<!-- 1 --------------------------------------------------------------- -->
+<section class="panel" id="p-verdict">
+  <div class="panel-head">
+    <h2>Certificate</h2>
+    <div class="sub" id="specimen-line"></div>
+  </div>
+
+  <div class="cert-grid">
+    <div class="cert-figs">
+      <figure>
+        <canvas id="cable" width="620" height="440"></canvas>
+        <figcaption id="cable-cap">the cable as it came out of the drawer</figcaption>
+      </figure>
+      <figure>
+        <canvas id="diagram" width="620" height="440"></canvas>
+        <figcaption id="diagram-cap">the same object as an over/under diagram</figcaption>
+      </figure>
+    </div>
+
+    <div class="cert-body">
+      <div class="verdict" id="verdict">
+        <div class="verdict-label" id="verdict-label">—</div>
+        <div class="verdict-note" id="verdict-note"></div>
+      </div>
+
+      <div class="poly">
+        <div class="poly-row">
+          <span class="poly-name">V(t)</span>
+          <span class="poly-val" id="v-jones">—</span>
+        </div>
+        <div class="poly-row">
+          <span class="poly-name">&Delta;(t)</span>
+          <span class="poly-val" id="v-alex">—</span>
+        </div>
+      </div>
+
+      <table class="facts" id="facts"></table>
+
+      <div class="bridge" id="bridge"></div>
+    </div>
+  </div>
+
+  <p class="finding" id="f-certificate"></p>
+</section>
+
+<!-- 2 --------------------------------------------------------------- -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>The collapse</h2>
+    <div class="sub">
+      Deleting a vertex whose triangle the rest of the cable stays clear of is an ambient
+      isotopy, so the knot cannot change. Watch the tangle lose vertices while the
+      polynomial refuses to move. Reaching a triangle is a <em>proof</em> of unknottedness
+      that no polynomial was consulted for.
+    </div>
+  </div>
+  <canvas id="collapse" width="1480" height="300"></canvas>
+  <div class="legend" id="collapse-legend"></div>
+</section>
+
+<!-- 3 --------------------------------------------------------------- -->
+<section class="panel accent">
+  <div class="panel-head">
+    <h2>Which way did you close it?</h2>
+    <div class="sub">
+      The same open cable, closed toward infinity in many directions. Each closure is a
+      genuine knot with a genuine type. If the histogram has more than one bar, the
+      cable does not have a knot type &mdash; your closure does.
+    </div>
+  </div>
+  <div class="two-col">
+    <canvas id="spectrum" width="740" height="330"></canvas>
+    <div>
+      <table class="mini" id="spectrum-table"></table>
+      <p class="finding tight" id="f-closure"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 --------------------------------------------------------------- -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Looking tangled and being knotted</h2>
+    <div class="sub">
+      An ensemble of confined cable loops. Horizontal: how tangled it <em>looks</em>
+      &mdash; crossings in the best projection before any simplification. Vertical: what
+      it <em>is</em>. Run in a worker; the page stays live.
+    </div>
+  </div>
+  <canvas id="ensemble" width="1480" height="380"></canvas>
+  <div class="ens-status" id="ens-status">idle</div>
+  <p class="finding" id="f-ensemble"></p>
+</section>
+
+<!-- 5 --------------------------------------------------------------- -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Three roads to one integer</h2>
+    <div class="sub">
+      The determinant of a knot, reached by machinery with nothing in common: the Jones
+      polynomial at &minus;1, the Alexander polynomial at &minus;1, and counting Fox
+      colourings. Two polynomials that share no code have to agree.
+    </div>
+  </div>
+  <div class="oracles" id="oracles"></div>
+</section>
+
+<!-- 6 --------------------------------------------------------------- -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Checks</h2>
+    <div class="sub">
+      Each decided by something outside the code it tests. Three real bugs in this
+      project produced perfectly self-consistent wrong answers, and every one was caught
+      by a check on this list rather than by reading the code.
+    </div>
+  </div>
+  <div id="checks" class="checks"><div class="pending">running…</div></div>
+</section>
+
+<footer>
+  <div>
+    <strong>Bight</strong> — no build step, no dependencies, no network. Kauffman bracket
+    state sum in exact &#8484; Laurent arithmetic, Alexander polynomial by Fox calculus,
+    KMT reduction, Fox colourings. Every diagram is extracted from coordinates; no planar
+    diagram code is typed by hand anywhere.
+  </div>
+  <div class="foot-note" id="foot-timing"></div>
+</footer>
+
+</main>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
