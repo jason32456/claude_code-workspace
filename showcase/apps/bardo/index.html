@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bardo — Underwriting Desk</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="firm">BARDO &amp; CO. &middot; OFFICE OF ACTUARIAL VALUATION</div>
+    <h1>Whole-Life, Unbounded Term</h1>
+    <p class="tagline">
+      A policy covering every life rather than this one. Name a doctrine of rebirth,
+      and the desk returns a price — then tells you which part of your doctrine the
+      price actually depended on.
+    </p>
+  </div>
+  <div class="head-actions">
+    <label class="ctl">Doctrine
+      <select id="doctrine"></select>
+    </label>
+    <label class="ctl">Station at issue
+      <select id="start"></select>
+    </label>
+  </div>
+</header>
+
+<p class="disclaimer">
+  <strong>What this is.</strong> Each doctrine below is a <em>specification</em> — an
+  ordered set of stations, a drift, a dispersion, and an exit probability. It is not a
+  description of anyone's belief and the desk takes no view on whether any of it
+  obtains. The app derives consequences from a spec. It does not adjudicate cosmology.
+</p>
+
+<main>
+
+<!-- 1 ------------------------------------------------------------------ -->
+<section class="panel" id="p-schedule">
+  <div class="panel-head">
+    <h2>Policy schedule</h2>
+    <div class="sub" id="schedule-doctrine"></div>
+  </div>
+
+  <div class="quote-grid">
+    <div class="quote-main">
+      <div class="verdict" id="verdict">
+        <div class="verdict-label" id="verdict-label">—</div>
+        <div class="verdict-note" id="verdict-note"></div>
+      </div>
+
+      <table class="schedule">
+        <tbody>
+          <tr><th>Level premium, continuous</th><td class="num big" id="q-premium">—</td><td class="unit">per year, per unit benefit</td></tr>
+          <tr><th>APV of death benefits</th><td class="num" id="q-apv">—</td><td class="unit">present value, all future lives</td></tr>
+          <tr><th>APV of premium annuity</th><td class="num" id="q-annuity">—</td><td class="unit">discounted years of exposure</td></tr>
+          <tr class="rule"><th>Expected lives covered</th><td class="num" id="q-lives">—</td><td class="unit">before liberation</td></tr>
+          <tr><th>Expected years covered</th><td class="num" id="q-term">—</td><td class="unit">undiscounted lifespan, all lives</td></tr>
+          <tr><th>&rho;(DP)</th><td class="num" id="q-rho">—</td><td class="unit">spectral radius; &lt; 1 ⇒ priceable</td></tr>
+          <tr><th>max&#8202;&#7522; d&#7522;</th><td class="num" id="q-maxd">—</td><td class="unit">the bound that makes it so</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="quote-side">
+      <div class="knobs">
+        <label class="slider">
+          <span>Force of interest &delta; <b id="v-delta"></b></span>
+          <input type="range" id="delta" min="0" max="100" value="62" step="1">
+          <small id="delta-note"></small>
+        </label>
+        <label class="slider">
+          <span>Rebirth dispersion &sigma; <b id="v-sigma"></b></span>
+          <input type="range" id="sigma" min="30" max="300" value="115" step="5">
+          <small>How unpredictable the next station is</small>
+        </label>
+        <label class="slider">
+          <span>Death benefit <b id="v-benefit"></b></span>
+          <input type="range" id="benefit" min="1" max="100" value="1" step="1">
+          <small>Sum assured per life</small>
+        </label>
+      </div>
+      <div class="stamp" id="stamp">
+        <div class="stamp-inner">
+          <div class="stamp-top">PRICED</div>
+          <div class="stamp-mid" id="stamp-rho">&rho; &lt; 1</div>
+          <div class="stamp-bot">BARDO &amp; CO.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="finding" id="f-withdrawn"></p>
+  <p class="finding" id="f-identity"></p>
+</section>
+
+<!-- 2 ------------------------------------------------------------------ -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>The doctrine, as compiled</h2>
+    <div class="sub">A specification becomes a stochastic matrix. Row <em>i</em>, column <em>j</em>: the probability that a soul dying in station <em>i</em> is next born into <em>j</em>.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <canvas id="matrix" width="760" height="470"></canvas>
+    </div>
+    <div>
+      <table class="stations" id="stations"></table>
+      <div class="classify" id="classify"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 ------------------------------------------------------------------ -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Where a cohort goes</h2>
+    <div class="sub">Six thousand souls released from the station at issue, tracked life by life. Occupancy, not probability &mdash; this is simulated, not solved.</div>
+  </div>
+  <canvas id="flow" width="1480" height="340"></canvas>
+  <div class="legend" id="flow-legend"></div>
+</section>
+
+<!-- 4 ------------------------------------------------------------------ -->
+<section class="panel accent">
+  <div class="panel-head">
+    <h2>The result</h2>
+    <div class="sub">Both legs of the policy against the force of interest, log&ndash;log. The two curves that diverge are the ones you would expect to matter. The flat one is the price.</div>
+  </div>
+  <canvas id="sweep" width="1480" height="430"></canvas>
+  <p class="finding" id="f-converge"></p>
+</section>
+
+<!-- 5 ------------------------------------------------------------------ -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Does the doctrine matter?</h2>
+    <div class="sub">Every shipped doctrine, priced at &delta; = 10&#8315;&#8309;. Present values on the left, premiums on the right, same five specifications.</div>
+  </div>
+  <canvas id="compare" width="1480" height="380"></canvas>
+  <p class="finding" id="f-bound"></p>
+</section>
+
+<!-- 6 ------------------------------------------------------------------ -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Dispersion</h2>
+    <div class="sub">Claim C6 shipped with no predicted direction. This is what it turned out to be.</div>
+  </div>
+  <div class="two-col">
+    <canvas id="disp" width="740" height="320"></canvas>
+    <div>
+      <table class="mini" id="disp-table"></table>
+      <p class="finding tight" id="f-disp"></p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 ------------------------------------------------------------------ -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Three routes to one price</h2>
+    <div class="sub">A linear solve, a trajectory simulation, and a renewal&ndash;reward limit. They share the model and nothing else &mdash; no matrix, no quadrature, no solve in common.</div>
+  </div>
+  <div class="oracles" id="oracles"></div>
+</section>
+
+<!-- 8 ------------------------------------------------------------------ -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Checks</h2>
+    <div class="sub">Each decided by something outside the code it tests. Run in this page, now.</div>
+  </div>
+  <div id="checks" class="checks"><div class="pending">running…</div></div>
+</section>
+
+<footer>
+  <div>
+    <strong>Bardo</strong> — no build step, no dependencies, no network. Gompertz&ndash;Makeham
+    mortality, a semi-Markov chain over stations of rebirth, and two dense Gauss&ndash;Jordan
+    solves that share a matrix.
+  </div>
+  <div class="foot-note" id="foot-timing"></div>
+</footer>
+
+</main>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
