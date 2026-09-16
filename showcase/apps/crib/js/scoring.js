@@ -7,7 +7,7 @@
 // are a couple of dozen constants, so the app ships no corpus.
 
 import { N, ord, chr, Enigma, ROTORS } from './enigma.js';
-import { posIndex, cribPositions, deduceSteckers } from './bombe.js';
+import { cribPositions, deduceSteckers } from './bombe.js';
 
 /** German letter frequencies, per cent. The only "corpus" in the app. */
 export const GERMAN_FREQ = [
@@ -46,25 +46,19 @@ export function germanScore(text) {
 }
 
 /**
- * Recover the ground setting that reaches `position` after `offset` keypresses.
+ * The ground setting a stop implies.
  *
- * Stepping backwards through the double step is fiddly and easy to get wrong,
- * so this searches the 17,576 candidates forwards instead. It runs once per
- * stop the user expands, never in the hot loop, and it cannot be subtly wrong.
+ * `menu.js` tags every edge with its absolute position in the message
+ * (`t: offset + i`, not `i`), and `cribPositions` steps from `[l, m, r]`
+ * starting at `t = 0` regardless of where the crib's edges actually start.
+ * So the `[l, m, r]` a stop reports is already the state before the
+ * message's first keypress — the ground setting itself — for every crib
+ * offset, not just offset 0. No forward-stepping adjustment is needed; a
+ * crib placed away from the start of the message (the normal case) was
+ * being handed a corrupted ground by that adjustment.
  */
-export function groundFor(order, position, offset) {
-  if (offset === 0) return [...position];
-  const target = posIndex(...position);
-  const seq = new Int32Array(offset);
-  for (let l = 0; l < N; l++) {
-    for (let m = 0; m < N; m++) {
-      for (let r = 0; r < N; r++) {
-        cribPositions(order, l, m, r, offset, seq);
-        if (seq[offset - 1] === target) return [l, m, r];
-      }
-    }
-  }
-  return null;
+export function groundFor(order, position) {
+  return [...position];
 }
 
 /**
@@ -140,8 +134,7 @@ export const plugSpec = (pairs) => pairs.map(([a, b]) => chr(a) + chr(b)).join('
  */
 export function evaluateStop(stop, { menu, cipher, crib, offset, reflector }) {
   const { order, position, testReg } = stop;
-  const ground = groundFor(order, position, offset);
-  if (!ground) return null;
+  const ground = groundFor(order, position);
   const groundStr = ground.map(chr).join('');
 
   // The closure narrows the test register's stecker but rarely pins it. There
