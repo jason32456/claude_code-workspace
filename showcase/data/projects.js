@@ -23,6 +23,27 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'wake',
+    name: 'Wake',
+    tagline: 'A wind tunnel in a browser tab \u2014 paint an obstacle, dial the Reynolds number, read drag and lift off the fluid',
+    description:
+      'A lattice-Boltzmann wind tunnel written from scratch: nine populations per cell, collide toward equilibrium, stream to the neighbours, bounce back off solids. Pick a cylinder, a NACA airfoil at any angle of attack, a flat plate, a square, or paint a shape with the mouse; dial the Reynolds number from 20 to 2,000 while it runs; watch the K\u00e1rm\u00e1n vortex street peel off in vorticity, speed or pressure with a smoke rake threading through it. Drag and lift are not modelled but measured \u2014 momentum exchange on every bounce-back link touching the obstacle, every step \u2014 and the Strouhal number is timed off the lift signal\u2019s zero crossings. A worker sweeps the angle of attack, eight fresh simulations plotted as they land, so the lift polar bends over into stall in front of you. Then the bench: the same solver run against answers it did not produce. Poiseuille\u2019s parabola to 0.48 %, Couette\u2019s line to 0.009 %, Ghia\u2019s lid-driven cavity to an RMS of 0.003 on a 64\u00d764 grid, the Sch\u00e4fer\u2013Turek cylinder drag to 0.5 %, Roshko\u2019s shedding law to 5.7 % in a channel whose blockage explains the excess. The boundary conditions turned out to be the whole project: an equilibrium inlet let the flow rate decay until the channel drag read the free-stream value, Zou\u2013He went unstable when the start-up pulse hit it, a pinned-pressure outlet set up a standing wave that swung the drag between \u22121 and +3, and what ships is non-equilibrium extrapolation in and a convective condition out. And a coarse benchmark is a lottery on grid phase: moving the reference cylinder by the 0.6 cells the benchmark specifies changes which cells are solid, jumps the drag by 8 % and invents a lift nine times the reference, pointing the wrong way \u2014 so the page places it dead centre, gets a lift of exactly zero by symmetry, and says so in the row.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'Canvas 2D', 'Lattice-Boltzmann D2Q9'],
+    category: 'Simulations',
+    runType: 'static',
+    launchHref: 'apps/wake/',
+    runCommand: 'cd showcase/apps/wake && python -m http.server 8080',
+    screenshots: shots('wake', [
+      'street',
+      'airfoil',
+      'speed',
+      'square',
+      'forces',
+      'polar',
+      'bench',
+    ]),
+  },
+  {
     slug: 'ghoti',
     name: 'Ghoti',
     tagline: 'Learn to read English aloud from 117,493 examples \u2014 then watch the oldest joke about English spelling die on its own data',

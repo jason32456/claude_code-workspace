@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wake — a wind tunnel in a browser tab</title>
+<meta name="description" content="A lattice-Boltzmann wind tunnel written from scratch: paint an obstacle, dial the Reynolds number, watch the vortex street form, read drag and lift off the fluid, and run the solver against textbook benchmarks.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0f16'/%3E%3Ccircle cx='9' cy='16' r='4' fill='%23dfe7f2'/%3E%3Cpath d='M14 12c3-3 6 0 9-3M14 20c3 3 6 0 9 3M14 16h13' fill='none' stroke='%235fb8d0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Wake</h1>
+    <p class="tagline">A wind tunnel in a browser tab — a lattice-Boltzmann solver written from scratch, an obstacle you can pitch or paint, and gauges that read drag and lift off the fluid itself.</p>
+  </div>
+  <div class="head-actions">
+    <label class="ctl">Obstacle
+      <select id="shape"></select>
+    </label>
+    <label class="ctl">Show
+      <select id="view">
+        <option value="vorticity">Vorticity</option>
+        <option value="speed">Speed</option>
+        <option value="pressure">Pressure</option>
+      </select>
+    </label>
+    <button class="primary" id="restart">Restart the flow</button>
+  </div>
+</header>
+
+<main>
+
+<section class="stage">
+  <div class="tunnel-wrap">
+    <canvas id="tunnel" width="1200" height="480"></canvas>
+    <div class="tunnel-hud">
+      <span id="hud-left">painting: drag to add solid, shift-drag to erase</span>
+      <span id="hud-right"></span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label class="slider">Reynolds number <output id="re-out">150</output>
+      <input type="range" id="re" min="0" max="1000" value="437">
+    </label>
+    <label class="slider" id="aoa-wrap">Angle of attack <output id="aoa-out">6°</output>
+      <input type="range" id="aoa" min="-10" max="30" value="6">
+    </label>
+    <label class="slider">Steps per frame <output id="spf-out">8</output>
+      <input type="range" id="spf" min="1" max="24" value="8">
+    </label>
+    <label class="chk"><input type="checkbox" id="smoke" checked> Smoke rake</label>
+    <label class="chk"><input type="checkbox" id="pause"> Pause</label>
+    <button class="ghost" id="clear">Clear painted solid</button>
+  </div>
+
+  <div class="gauges">
+    <div class="gauge"><span class="k">Re</span><span class="v" id="g-re">—</span><span class="u">U·L/ν</span></div>
+    <div class="gauge"><span class="k">C<sub>d</sub></span><span class="v" id="g-cd">—</span><span class="u">drag</span></div>
+    <div class="gauge"><span class="k">C<sub>l</sub></span><span class="v" id="g-cl">—</span><span class="u">lift</span></div>
+    <div class="gauge"><span class="k">St</span><span class="v" id="g-st">—</span><span class="u">f·L/U</span></div>
+    <div class="gauge"><span class="k sym">τ</span><span class="v" id="g-tau">—</span><span class="u" id="g-les">relaxation</span></div>
+    <div class="gauge"><span class="k">time</span><span class="v" id="g-t">—</span><span class="u">t·U/L, convective</span></div>
+    <div class="gauge"><span class="k">steps/s</span><span class="v" id="g-sps">—</span><span class="u" id="g-cells">cells</span></div>
+  </div>
+
+  <figure class="pane chart-pane">
+    <figcaption><h2>Force on the obstacle</h2><p>Momentum exchange on every bounce-back link, every step. Drag in amber, lift in cyan; the lift oscillates at the shedding frequency, which is where the Strouhal number comes from.</p></figcaption>
+    <canvas id="strip" width="1200" height="180"></canvas>
+  </figure>
+</section>
+
+<section class="two">
+  <figure class="pane">
+    <figcaption>
+      <h2>Lift polar</h2>
+      <p>Each point is a fresh simulation of the chosen airfoil at that angle of attack, run in a worker at the current Reynolds number. The plan said the curve would bend over into stall. At Re 500 it does not: the flow separates and the lift keeps climbing, the way a flat plate's does, while the drag climbs faster — so what peaks is the lift-to-drag ratio, and the stat below says where.</p>
+    </figcaption>
+    <canvas id="polar" width="600" height="360"></canvas>
+    <div class="row">
+      <button class="primary" id="sweep">Sweep angle of attack</button>
+      <span class="stat" id="sweep-stat">—</span>
+    </div>
+  </figure>
+
+  <figure class="pane">
+    <figcaption>
+      <h2>How the solver works</h2>
+    </figcaption>
+    <div class="prose">
+      <p>Every cell holds nine numbers: the amount of fluid heading in each of nine directions (still, four axes, four diagonals). A time step is two moves. <strong>Collide</strong> relaxes the nine toward the equilibrium that the cell's own density and velocity imply, at a rate set by τ, and that rate is the viscosity: ν = (τ − ½)/3. <strong>Stream</strong> hands each population to the neighbour it was heading for. That is the whole Navier–Stokes solver; the pressure is the density and the momentum flux takes care of itself.</p>
+      <p>A solid cell does not stream. A population that would enter one turns around, which puts a no-slip wall halfway between the last fluid cell and the first solid one, and the momentum it gives up on the way is the force on the obstacle. Drag and lift are that sum over every link touching the obstacle, so they are measured, not modelled.</p>
+      <p>The grid is <span id="p-grid">400 × 160</span> cells at an inlet speed of <span id="p-u">0.08</span> lattice units per step. Above Re ≈ <span id="p-les">400</span> the relaxation time gets close to ½, where the plain scheme goes unstable on a coarse grid, and a Smagorinsky eddy viscosity (C<sub>s</sub> = 0.1) is switched on. The τ gauge says when. It is a stabiliser, not a claim about turbulence; none of the benchmarks below use it.</p>
+    </div>
+  </figure>
+</section>
+
+<section class="bench" id="bench">
+  <div class="bench-head">
+    <div>
+      <h2>The bench</h2>
+      <p>The solver run against answers it did not produce: closed-form channel flows, Ghia's cavity table, the Schäfer–Turek cylinder benchmark and Roshko's shedding law. Each row shows what was expected, what came out, and whether it passed. The long ones take a minute in a worker.</p>
+    </div>
+    <div class="row">
+      <button class="primary" id="run-bench">Run the bench</button>
+      <span class="stat" id="bench-stat">—</span>
+    </div>
+  </div>
+  <ol class="tests" id="tests"></ol>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p>D2Q9 lattice-Boltzmann, BGK collision, Guo forcing, halfway bounce-back, momentum-exchange forces. No libraries, no build step, no GPU compute: the solver is plain typed arrays and runs unchanged in the page, in the worker and under Node (<code>node tests.mjs</code>).</p>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
