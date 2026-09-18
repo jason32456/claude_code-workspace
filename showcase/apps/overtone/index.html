@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overtone — audio in, chords out</title>
+<meta name="description" content="A chord transcriber that listens: FFT, chroma, and Viterbi decoding, with every stage measured against ground truth.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1218'/%3E%3Cpath d='M4 22c2 0 2-12 4-12s2 12 4 12 2-9 4-9 2 9 4 9 2-6 4-6 2 6 4 6' fill='none' stroke='%235fd0a0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Overtone</h1>
+    <p class="tagline">Audio in, chords out — and a measurement of which stage actually helps.</p>
+  </div>
+  <div class="sources" role="group" aria-label="Audio source">
+    <button class="src-btn" data-source="demo" aria-pressed="true">Synth demo</button>
+    <button class="src-btn" data-source="file">Drop a file</button>
+    <button class="src-btn" data-source="mic">Microphone</button>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+
+<main>
+  <aside class="panel">
+    <section class="group">
+      <h2>Transport</h2>
+      <div class="row">
+        <button class="primary" id="play">Play</button>
+        <button class="ghost" id="stop">Stop</button>
+      </div>
+      <p class="src-label" id="src-label">synthesized demo</p>
+    </section>
+
+    <section class="group" id="difficulty-group">
+      <h2>Signal difficulty</h2>
+      <p class="hint">The demo is synthesized, so the ground truth is exact. Turn
+        these up and watch the estimator come apart.</p>
+      <label class="slider"><span>Partials <b id="v-partials">6</b></span>
+        <input type="range" id="partials" min="1" max="16" step="1" value="6"></label>
+      <label class="slider"><span>Partial decay <b id="v-decay">0.55</b></span>
+        <input type="range" id="decay" min="0.3" max="0.92" step="0.01" value="0.55"></label>
+      <label class="slider"><span>Inharmonicity <b id="v-inharm">4e-4</b></span>
+        <input type="range" id="inharm" min="0" max="30" step="1" value="4"></label>
+      <label class="slider"><span>Noise <b id="v-noise">0.012</b></span>
+        <input type="range" id="noise" min="0" max="800" step="5" value="12"></label>
+      <label class="slider"><span>Chord length <b id="v-len">2.0s</b></span>
+        <input type="range" id="chordlen" min="5" max="30" step="1" value="20"></label>
+    </section>
+
+    <section class="group">
+      <h2>Pipeline stages</h2>
+      <label class="toggle"><input type="checkbox" id="whiten" checked>
+        Spectral whitening</label>
+      <label class="toggle"><input type="checkbox" id="harmsum">
+        Harmonic summation <span class="warn-tag">hurts</span></label>
+      <label class="toggle"><input type="checkbox" id="useviterbi" checked>
+        Viterbi decoding</label>
+      <label class="slider"><span>Self-transition <b id="v-self">0.96</b></span>
+        <input type="range" id="selfprob" min="50" max="999" step="1" value="960"></label>
+    </section>
+
+    <section class="group">
+      <h2>Export</h2>
+      <button class="primary wide" id="export-midi">Download MIDI</button>
+      <p class="hint">A real SMF type 0 file — it opens in a DAW and plays.</p>
+    </section>
+  </aside>
+
+  <div class="stage">
+    <section class="card accuracy-card">
+      <div class="acc-grid">
+        <div class="acc">
+          <span class="acc-label"><i style="background:#c07d20"></i>Per-frame argmax</span>
+          <p class="acc-value" id="acc-argmax">—</p>
+        </div>
+        <div class="acc">
+          <span class="acc-label"><i style="background:#3b82f6"></i>Viterbi decoded</span>
+          <p class="acc-value" id="acc-viterbi">—</p>
+        </div>
+        <div class="acc">
+          <span class="acc-label">Smoothing gain</span>
+          <p class="acc-value" id="acc-gain">—</p>
+        </div>
+      </div>
+      <p class="acc-note" id="acc-note"></p>
+    </section>
+
+    <section class="card">
+      <h3>Chord chart</h3>
+      <div class="chart" id="chart"></div>
+    </section>
+
+    <section class="card">
+      <h3>Spectrogram <span class="sub">log frequency, dB</span></h3>
+      <canvas id="spectrogram"></canvas>
+    </section>
+
+    <section class="card">
+      <h3>Chromagram <span class="sub">12 pitch classes, octave-folded</span></h3>
+      <canvas id="chromagram"></canvas>
+    </section>
+
+    <section class="card">
+      <h3>Chord posterior <span class="sub">25 states, Viterbi path in blue</span></h3>
+      <canvas id="posterior"></canvas>
+      <p class="scrub-hint">Click anywhere on a strip to inspect that frame.</p>
+    </section>
+
+    <section class="card">
+      <h3>Frame inspector <span class="sub" id="frame-label">—</span></h3>
+      <canvas id="bars"></canvas>
+      <p class="hint" id="ghost-note"></p>
+    </section>
+
+    <details class="card selftest">
+      <summary>Run the self-test</summary>
+      <p class="hint">The FFT has an exact oracle — an independently written
+        naive DFT — and the MIDI writer has one too, a reader that parses its
+        own output back. Both are checked here rather than assumed.</p>
+      <button class="primary" id="run-tests">Run</button>
+      <div id="test-output"></div>
+    </details>
+  </div>
+</main>
+
+<footer class="colophon">
+  <p><strong>The textbook fix makes it worse.</strong> Harmonic summation asks
+  each pitch to collect its own overtones — but that runs the leak backwards.
+  Salience at A collects the energy at E&times;3, so a played E <em>donates</em>
+  to A, and a C major chord grows a phantom A: exactly the A&nbsp;minor confusion
+  the technique was meant to prevent. It ships here as a toggle, off by default,
+  with its invented pitch classes drawn in red.</p>
+  <p><strong>Measured on synthesized audio.</strong> Accuracy is reported only
+  where ground truth exists. Drop a file or use the microphone and the number
+  disappears rather than being invented — those are signals this app has never
+  seen, which is the whole reason they are here.</p>
+</footer>
+
+<div id="drop-overlay" class="drop-overlay" hidden><p>Drop an audio file</p></div>
+<input type="file" id="file-input" accept="audio/*" hidden>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
