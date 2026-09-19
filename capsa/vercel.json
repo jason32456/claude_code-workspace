@@ -3,5 +3,6 @@
     "api/capsa.js": {
       "includeFiles": "js/**"
     }
-  }
+  },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
 }

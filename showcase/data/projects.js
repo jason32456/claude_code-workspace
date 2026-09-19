@@ -12,7 +12,7 @@ const REPO = 'https://github.com/jason32456/claude_code-workspace/tree/main/show
 // while the showcase stays a plain static site. Paste its deployment URL here
 // to switch the card's Launch button on; while this is empty the card renders
 // as a gallery-only card and nothing breaks. Source: /capsa (repo root).
-const CAPSA_URL = '';
+const CAPSA_URL = 'https://capsa-beige.vercel.app';
 
 // Screenshots are read in place from each app's own screenshots/ folder.
 const shots = (slug, files) => files.map((f) => `apps/${slug}/screenshots/${f}.png`);
