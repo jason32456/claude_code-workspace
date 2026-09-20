@@ -7,4 +7,4 @@ node_modules/
 .claude/skills/
 
 # Intermediate render-verification frames, not deliverables.
-brag-output/composition/snapshots/
+brag-output*/composition/snapshots/

@@ -1,0 +1,5 @@
+Most games give you an avatar and a health bar. Vesper gives you 1,800 starlings and the number of them still alive.
+
+You don't steer a bird — you steer the murmuration. Defence isn't a button, it's a shape: crowd tight and a peregrine's strike collapses, because that's what actually happens to real ones. The counter to a dive is blowing your own flock apart at the right instant.
+
+Runs in a browser. No build step, no assets — the valley, the birds and every sound are generated at load.

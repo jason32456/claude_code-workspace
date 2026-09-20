@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Vesper — brag</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        overflow: hidden;
+        background: #05070c;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #05070c;
+        color: #e7e0d6;
+        font-family: system-ui, sans-serif;
+      }
+
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+
+      /* Each scene's still sits in its own frame and is pushed into slowly.
+         The wrapper is what GSAP scales, so the image itself never fights a
+         CSS transform. */
+      .shot {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        /* Push in from the top edge, so the HUD stays pinned in frame while
+           the valley grows downward. */
+        transform-origin: 50% 0%;
+      }
+      .shot img {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 1920px;
+        height: 1200px;
+        margin-left: -960px;
+        display: block;
+      }
+
+      /* Bottom scrim so the type always clears the art underneath it. */
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(5, 7, 12, 0.16) 0%,
+          rgba(5, 7, 12, 0) 26%,
+          rgba(5, 7, 12, 0) 40%,
+          rgba(5, 7, 12, 0.72) 76%,
+          rgba(5, 7, 12, 0.93) 100%
+        );
+      }
+
+      /* Type block, lower third. */
+      .caption {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 104px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      .line {
+        width: 100%;
+        text-align: center;
+        font-size: 58px;
+        font-weight: 500;
+        letter-spacing: -0.012em;
+        color: #e7e0d6;
+        text-shadow: 0 2px 26px rgba(5, 7, 12, 0.95);
+        white-space: nowrap;
+      }
+      .line.sm { font-size: 46px; color: #c9c2b6; }
+
+      /* Scene 6 — the wordmark on black. */
+      #s6 { background: #05070c; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; }
+      #s6-mark {
+        font-size: 148px;
+        font-weight: 300;
+        letter-spacing: 0.34em;
+        text-indent: 0.34em;
+        color: #e7e0d6;
+      }
+      #s6-tag {
+        margin-top: 54px;
+        font-size: 33px;
+        font-weight: 500;
+        letter-spacing: 0.17em;
+        text-indent: 0.17em;
+        text-transform: uppercase;
+        color: #e0a35c;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="24.6"
+    >
+      <!-- ── Scene 1 — you are the flock — 0.0 → 5.0 ──────────────────── -->
+      <section id="s1" class="clip" data-start="0" data-duration="5.6" data-track-index="0">
+        <div class="shot" data-layout-allow-overflow id="s1-shot"><img src="assets/img/murmuration.jpg" alt="" data-layout-allow-overflow /></div>
+        <div class="scrim"></div>
+        <div class="caption">
+          <div class="line" id="s1-a">You are not a bird in the flock.</div>
+          <div class="line" id="s1-b">You are the flock.</div>
+        </div>
+      </section>
+
+      <!-- ── Scene 2 — birds are the health bar — 5.0 → 9.6 ───────────── -->
+      <section id="s2" class="clip" data-start="5.6" data-duration="4.6" data-track-index="0">
+        <div class="shot" data-layout-allow-overflow id="s2-shot"><img src="assets/img/wires.jpg" alt="" data-layout-allow-overflow /></div>
+        <div class="scrim"></div>
+        <div class="caption">
+          <div class="line sm" id="s2-a">1,800 starlings, each one simulated.</div>
+          <div class="line" id="s2-b">The birds are the health bar.</div>
+        </div>
+      </section>
+
+      <!-- ── Scene 3 — density is armour — 9.6 → 14.4 ─────────────────── -->
+      <section id="s3" class="clip" data-start="10.2" data-duration="4.8" data-track-index="0">
+        <div class="shot" data-layout-allow-overflow id="s3-shot"><img src="assets/img/blacksun.jpg" alt="" data-layout-allow-overflow /></div>
+        <div class="scrim"></div>
+        <div class="caption">
+          <div class="line sm" id="s3-a">A peregrine&rsquo;s strike collapses against a crowd.</div>
+          <div class="line" id="s3-b">Density is your armour.</div>
+        </div>
+      </section>
+
+      <!-- ── Scene 4 — the parry — 14.4 → 19.0 ────────────────────────── -->
+      <section id="s4" class="clip" data-start="15" data-duration="4.6" data-track-index="0">
+        <div class="shot" data-layout-allow-overflow id="s4-shot"><img src="assets/img/roost.jpg" alt="" data-layout-allow-overflow /></div>
+        <div class="scrim"></div>
+        <div class="caption">
+          <div class="line" id="s4-a">Flash expansion is your parry.</div>
+          <div class="line sm" id="s4-b">Time it right and the falcon closes on air.</div>
+        </div>
+      </section>
+
+      <!-- ── Scene 5 — counted — 19.0 → 21.4 ──────────────────────────── -->
+      <section id="s5" class="clip" data-start="19.6" data-duration="2.4" data-track-index="0">
+        <div class="shot" data-layout-allow-overflow id="s5-shot"><img src="assets/img/results.jpg" alt="" data-layout-allow-overflow /></div>
+        <div class="scrim"></div>
+      </section>
+
+      <!-- ── Scene 6 — wordmark — 21.4 → 24.0 ─────────────────────────── -->
+      <section id="s6" class="clip" data-start="22" data-duration="2.6" data-track-index="0">
+        <div id="s6-mark">VESPER</div>
+        <div id="s6-tag">You are not a bird in the flock. You are the flock.</div>
+      </section>
+
+      <!-- ── Audio ────────────────────────────────────────────────────── -->
+      <!-- Synthesised D-minor bed. Unmetred on purpose: nothing in this edit
+           snaps to a beat, because there is no beat to snap to. -->
+      <audio
+        id="bed"
+        src="assets/music/dusk-pad.mp3"
+        data-start="0"
+        data-duration="24.6"
+        data-track-index="10"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0.5},{"t":4,"v":0.62},{"t":10,"v":0.62},{"t":10.8,"v":0.78},{"t":14.8,"v":0.78},{"t":15.6,"v":0.6},{"t":20,"v":0.6},{"t":22.2,"v":0.34},{"t":24.6,"v":0}]}]}'
+      ></audio>
+
+      <!-- Three warm low cues in twenty-four seconds, and nothing else. -->
+      <audio id="sfx-flock" src="assets/sfx/impact/impactSoft_heavy_002.ogg" data-start="3.2" data-duration="0.57" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="sfx-sun" src="assets/sfx/impact/impactSoft_heavy_000.ogg" data-start="10.3" data-duration="0.51" data-volume="0.34" data-track-index="11"></audio>
+      <audio id="sfx-card" src="assets/sfx/impact/impactSoft_medium_001.ogg" data-start="19.7" data-duration="0.18" data-volume="0.28" data-track-index="11"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const OUT = "power2.out";
+
+      /* A slow push on a still, held for the whole scene. The wrapper scales,
+         never the <img>, so nothing fights a CSS transform. */
+      function push(sel, at, dur, from, to) {
+        tl.fromTo(sel, { scale: from }, { scale: to, duration: dur, ease: "none" }, at);
+      }
+
+      /* Scenes dip through black rather than hard-cutting: the art is the whole
+         point, so nothing about the edit should be faster than the birds. */
+      function scene(id, at, dur) {
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.42, ease: OUT }, at);
+        tl.to(id, { opacity: 0, duration: 0.36, ease: "power2.in" }, at + dur - 0.36);
+      }
+
+      /* A caption row rises into its own reserved slot and stays there, so the
+         second line never lands on top of the first. */
+      function line(sel, at) {
+        tl.fromTo(sel, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.62, ease: OUT }, at);
+      }
+
+      /* ── Scene 1 — you are the flock — 0.0 → 5.6 ─────────────────────── */
+      scene("#s1", 0, 5.6);
+      push("#s1-shot", 0, 5.6, 1.0, 1.032);
+      line("#s1-a", 0.6);               // settled 1.22 → 5.24
+      line("#s1-b", 3.2);               // settled 3.82 → 5.24
+
+      /* ── Scene 2 — birds are the health bar — 5.6 → 10.2 ─────────────── */
+      scene("#s2", 5.6, 4.6);
+      push("#s2-shot", 5.6, 4.6, 1.0, 1.030);
+      line("#s2-a", 6.0);               // settled 6.62 → 9.84
+      line("#s2-b", 7.8);               // settled 8.42 → 9.84
+
+      /* ── Scene 3 — density is armour — 10.2 → 15.0 ───────────────────── */
+      scene("#s3", 10.2, 4.8);
+      push("#s3-shot", 10.2, 4.8, 1.0, 1.034);
+      line("#s3-a", 10.6);              // settled 11.22 → 14.64
+      line("#s3-b", 12.8);              // settled 13.42 → 14.64
+
+      /* ── Scene 4 — the parry — 15.0 → 19.6 ───────────────────────────── */
+      scene("#s4", 15.0, 4.6);
+      push("#s4-shot", 15.0, 4.6, 1.0, 1.030);
+      line("#s4-a", 15.4);              // settled 16.02 → 19.24
+      line("#s4-b", 16.6);              // settled 17.22 → 19.24
+
+      /* ── Scene 5 — counted — 19.6 → 22.0 ─────────────────────────────── */
+      scene("#s5", 19.6, 2.4);
+      tl.set("#s5-shot", { transformOrigin: "50% 50%" }, 0);
+      push("#s5-shot", 19.6, 2.4, 1.0, 1.075);
+
+      /* ── Scene 6 — wordmark — 22.0 → 24.6 ────────────────────────────── */
+      tl.fromTo("#s6-mark", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: OUT }, 22.3);
+      tl.fromTo("#s6-tag", { opacity: 0 }, { opacity: 1, duration: 0.7, ease: OUT }, 22.8);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
