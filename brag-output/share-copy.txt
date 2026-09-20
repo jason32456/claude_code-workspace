@@ -1,0 +1,5 @@
+"gh as in tough, o as in women, ti as in nation — therefore ghoti spells fish" is the oldest joke about English spelling, and it's wrong.
+
+I taught a model to read English aloud from 117,493 pronunciations, with nobody ever saying which letter makes which sound, then asked it. gh makes /f/ in 0 of 49 word-initial words. ti makes /ʃ/ in 0 of 276 word-final ones.
+
+Handed "ghoti", it says G HH OW1 T IY0. It does not say fish, and it never could.

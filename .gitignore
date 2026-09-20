@@ -1,2 +1,10 @@
 .vercel/
 node_modules/
+
+# Agent skills installed via `npx skills add` — reproducible from skills-lock.json,
+# and the brag skill alone carries ~17 MB of bundled CC0 music and SFX.
+.agents/
+.claude/skills/
+
+# Intermediate render-verification frames, not deliverables.
+brag-output/composition/snapshots/

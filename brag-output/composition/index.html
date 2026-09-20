@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>ghoti — brag</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        overflow: hidden;
+        background: #0c0e11;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0c0e11;
+        color: #e9e5dd;
+        font-family: system-ui, sans-serif;
+      }
+
+      /* Every timed scene is a full-frame centred box. */
+      .clip {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mono { font-family: monospace; }
+
+      /* ── Scene 1 — the joke ─────────────────────────────────────────── */
+      #s1-mark {
+        font-family: monospace;
+        font-size: 190px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        line-height: 1;
+      }
+      #s1-mark .gh, #s1-mark .ti { color: #e8a33d; }
+      #s1-mark .o { color: #4dbcaa; }
+
+      #s1-frags {
+        display: flex;
+        gap: 54px;
+        margin-top: 58px;
+        font-size: 34px;
+        color: #8b939e;
+      }
+      #s1-frags b { color: #e9e5dd; font-family: monospace; font-weight: 700; }
+      #s1-frags i { color: #8b939e; font-style: italic; }
+
+      #s1-payoff {
+        margin-top: 64px;
+        font-size: 54px;
+        color: #e9e5dd;
+        letter-spacing: -0.01em;
+      }
+
+      /* ── Scene 2 — the refusal ──────────────────────────────────────── */
+      #s2-line {
+        font-size: 150px;
+        font-weight: 600;
+        color: #e9e5dd;
+        letter-spacing: -0.02em;
+      }
+      #s2-sub {
+        margin-top: 56px;
+        font-family: monospace;
+        font-size: 36px;
+        color: #8b939e;
+      }
+
+      /* ── Scene 3 — the trial ────────────────────────────────────────── */
+      #s3-kicker {
+        font-family: monospace;
+        font-size: 24px;
+        letter-spacing: 0.34em;
+        color: #5c646e;
+        margin-bottom: 46px;
+      }
+      .row {
+        width: 1300px;
+        background: #14181e;
+        border: 1px solid #262d36;
+        border-radius: 10px;
+        padding: 26px 34px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .row .sub {
+        font-family: monospace;
+        font-size: 38px;
+        color: #e8a33d;
+        width: 300px;
+        flex: none;
+      }
+      .row .needs {
+        font-size: 24px;
+        color: #8b939e;
+        flex: 1;
+        white-space: nowrap;
+      }
+      .row .count {
+        font-family: monospace;
+        font-size: 36px;
+        color: #e9e5dd;
+        width: 250px;
+        text-align: right;
+        flex: none;
+      }
+      .row .count em { font-style: normal; color: #6e767f; font-size: 26px; }
+      .badge {
+        font-family: monospace;
+        font-size: 19px;
+        letter-spacing: 0.1em;
+        color: #e2624e;
+        border: 1px solid #e2624e;
+        border-radius: 999px;
+        padding: 7px 16px;
+        width: 186px;
+        text-align: center;
+        flex: none;
+      }
+      .badge.rare { color: #8b939e; border-color: #3a424d; }
+      #s3-close {
+        margin-top: 34px;
+        font-size: 38px;
+        color: #e9e5dd;
+      }
+
+      /* ── Scene 4 — the verdict ──────────────────────────────────────── */
+      #s4-card {
+        width: 1320px;
+        border: 2px solid #e8a33d;
+        border-radius: 16px;
+        background: #14181e;
+        padding: 56px 40px 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #s4-kicker {
+        font-size: 27px;
+        color: #8b939e;
+        text-align: center;
+      }
+      #s4-word {
+        font-family: monospace;
+        font-size: 138px;
+        font-weight: 700;
+        color: #e8a33d;
+        margin-top: 26px;
+        letter-spacing: 0.04em;
+        min-height: 150px;
+      }
+      #s4-chips { display: flex; gap: 16px; margin-top: 30px; }
+      #s4-chips .chip {
+        font-family: monospace;
+        font-size: 34px;
+        color: #4dbcaa;
+        background: #0c0e11;
+        border: 1px solid #262d36;
+        border-radius: 8px;
+        padding: 12px 24px;
+      }
+      #s4-verdict {
+        margin-top: 40px;
+        font-size: 40px;
+        color: #e9e5dd;
+      }
+
+      /* ── Scene 5 — the flex ─────────────────────────────────────────── */
+      /* Both scene-5 blocks occupy the same centred frame and hand over. */
+      #s5-stat, #s5-close {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #s5-num {
+        font-family: monospace;
+        font-size: 210px;
+        font-weight: 700;
+        color: #e8a33d;
+        line-height: 1;
+      }
+      #s5-sub {
+        margin-top: 40px;
+        font-size: 40px;
+        color: #8b939e;
+      }
+      #s5-mark {
+        font-family: monospace;
+        font-size: 104px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        line-height: 1;
+      }
+      #s5-mark .gh, #s5-mark .ti { color: #e8a33d; }
+      #s5-mark .o { color: #4dbcaa; }
+      #s5-line {
+        margin-top: 46px;
+        font-size: 44px;
+        color: #e9e5dd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="23"
+    >
+      <!-- ── Scene 1 — the joke, stated straight — 0.0 → 4.2 ──────────── -->
+      <section id="s1" class="clip" data-start="0" data-duration="4.2" data-track-index="0">
+        <h1 id="s1-mark" class="mono"><span class="gh">gh</span><span class="o">o</span><span class="ti">ti</span></h1>
+        <div id="s1-frags">
+          <div class="frag"><b>gh</b> as in <i>tough</i></div>
+          <div class="frag"><b>o</b> as in <i>women</i></div>
+          <div class="frag"><b>ti</b> as in <i>nation</i></div>
+        </div>
+        <div id="s1-payoff">This spells &ldquo;fish.&rdquo;</div>
+      </section>
+
+      <!-- ── Scene 2 — the refusal — 4.2 → 7.6 ────────────────────────── -->
+      <section id="s2" class="clip" data-start="4.2" data-duration="3.4" data-track-index="0">
+        <div id="s2-line">It doesn&rsquo;t.</div>
+        <div id="s2-sub">117,493 pronunciations. No rules given.</div>
+      </section>
+
+      <!-- ── Scene 3 — the trial — 7.6 → 13.6 ─────────────────────────── -->
+      <section id="s3" class="clip" data-start="7.6" data-duration="6" data-track-index="0">
+        <div id="s3-kicker">THE TRIAL</div>
+        <div class="row" id="s3-r1">
+          <div class="sub">gh &rarr; /f/</div>
+          <div class="needs">needs to work word-initial</div>
+          <div class="count">0 <em>of 49</em></div>
+          <div class="badge">NEVER HAPPENS</div>
+        </div>
+        <div class="row" id="s3-r2">
+          <div class="sub">o &rarr; /&#618;/</div>
+          <div class="needs">needs to work word-medial</div>
+          <div class="count">47 <em>of 48,937</em></div>
+          <div class="badge rare">0.096%</div>
+        </div>
+        <div class="row" id="s3-r3">
+          <div class="sub">ti &rarr; /&#643;/</div>
+          <div class="needs">needs to work word-final</div>
+          <div class="count">0 <em>of 276</em></div>
+          <div class="badge">NEVER HAPPENS</div>
+        </div>
+        <div id="s3-close">Position is the part the joke leaves out.</div>
+      </section>
+
+      <!-- ── Scene 4 — the verdict — 13.6 → 18.0 ──────────────────────── -->
+      <section id="s4" class="clip" data-start="13.6" data-duration="4.4" data-track-index="0">
+        <div id="s4-card">
+          <div id="s4-kicker">So when a model that has read 117,493 English words is handed the word</div>
+          <div id="s4-word" class="mono"><span>g</span><span>h</span><span>o</span><span>t</span><span>i</span></div>
+          <div id="s4-chips">
+            <div class="chip">G</div>
+            <div class="chip">HH</div>
+            <div class="chip">OW1</div>
+            <div class="chip">T</div>
+            <div class="chip">IY0</div>
+          </div>
+          <div id="s4-verdict">it does not say fish, and it never could.</div>
+        </div>
+      </section>
+
+      <!-- ── Scene 5 — the real flex — 18.0 → 23.0 ────────────────────── -->
+      <section id="s5" class="clip" data-start="18" data-duration="5" data-track-index="0">
+        <div id="s5-stat">
+          <div id="s5-num">47.4%</div>
+          <div id="s5-sub">of unseen words, exactly right.</div>
+        </div>
+        <div id="s5-close">
+          <div id="s5-mark" class="mono"><span class="gh">gh</span><span class="o">o</span><span class="ti">ti</span></div>
+          <div id="s5-line">Not chaos. A system with exceptions.</div>
+        </div>
+      </section>
+
+      <!-- ── Audio ────────────────────────────────────────────────────── -->
+      <!-- Music bed: fade in, duck for the refusal, lift into the verdict, fade to silence. -->
+      <audio
+        id="bgm"
+        src="assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.mp3"
+        data-start="0"
+        data-duration="23"
+        data-track-index="10"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.9,"v":0.22},{"t":4.3,"v":0.22},{"t":4.9,"v":0.13},{"t":7.5,"v":0.13},{"t":8.1,"v":0.22},{"t":15.2,"v":0.22},{"t":15.8,"v":0.27},{"t":20.1,"v":0.27},{"t":21.8,"v":0.19},{"t":23,"v":0}]}]}'
+      ></audio>
+
+      <!-- Scene 1: one barely-there accent per fragment. -->
+      <audio id="sfx-f1" src="assets/sfx/ui/rollover2.ogg" data-start="1.37" data-duration="0.06" data-volume="0.18" data-track-index="11"></audio>
+      <audio id="sfx-f2" src="assets/sfx/ui/rollover2.ogg" data-start="1.9" data-duration="0.06" data-volume="0.18" data-track-index="11"></audio>
+      <audio id="sfx-f3" src="assets/sfx/ui/rollover2.ogg" data-start="2.46" data-duration="0.06" data-volume="0.18" data-track-index="11"></audio>
+
+      <!-- Scene 3: one tick per count row — evidence being entered. Beat-aligned. -->
+      <audio id="sfx-r1" src="assets/sfx/interface/bong_001.ogg" data-start="8.22" data-duration="0.12" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="sfx-r2" src="assets/sfx/interface/bong_001.ogg" data-start="9.29" data-duration="0.12" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="sfx-r3" src="assets/sfx/interface/bong_001.ogg" data-start="10.38" data-duration="0.12" data-volume="0.3" data-track-index="11"></audio>
+
+      <!-- Scene 4: five hand-picked keypresses (fixed, not randomised — renders must be deterministic). -->
+      <audio id="sfx-k1" src="assets/sfx/keyboard/keypress-003.wav" data-start="14.2" data-duration="0.3" data-volume="0.28" data-track-index="12"></audio>
+      <audio id="sfx-k2" src="assets/sfx/keyboard/keypress-019.wav" data-start="14.33" data-duration="0.3" data-volume="0.26" data-track-index="13"></audio>
+      <audio id="sfx-k3" src="assets/sfx/keyboard/keypress-007.wav" data-start="14.46" data-duration="0.3" data-volume="0.29" data-track-index="14"></audio>
+      <audio id="sfx-k4" src="assets/sfx/keyboard/keypress-026.wav" data-start="14.59" data-duration="0.3" data-volume="0.26" data-track-index="12"></audio>
+      <audio id="sfx-k5" src="assets/sfx/keyboard/keypress-012.wav" data-start="14.72" data-duration="0.3" data-volume="0.28" data-track-index="13"></audio>
+
+      <!-- Scene 4: crisp tick per phoneme chip. -->
+      <audio id="sfx-c1" src="assets/sfx/interface/click_003.ogg" data-start="15.28" data-duration="0.01" data-volume="0.22" data-track-index="12"></audio>
+      <audio id="sfx-c2" src="assets/sfx/interface/click_003.ogg" data-start="15.4" data-duration="0.01" data-volume="0.22" data-track-index="12"></audio>
+      <audio id="sfx-c3" src="assets/sfx/interface/click_003.ogg" data-start="15.52" data-duration="0.01" data-volume="0.22" data-track-index="12"></audio>
+      <audio id="sfx-c4" src="assets/sfx/interface/click_003.ogg" data-start="15.64" data-duration="0.01" data-volume="0.22" data-track-index="12"></audio>
+      <audio id="sfx-c5" src="assets/sfx/interface/click_003.ogg" data-start="15.76" data-duration="0.01" data-volume="0.22" data-track-index="12"></audio>
+
+      <!-- Scene 4: one low, restrained hit on the verdict. The last SFX in the video. -->
+      <audio id="sfx-verdict" src="assets/sfx/impact/impactSoft_heavy_002.ogg" data-start="16.2" data-duration="0.57" data-volume="0.42" data-track-index="12"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const EASE = "power3.out";
+
+      /* ── Scene 1 — 0.0 → 4.2 ─────────────────────────────────────────
+         The joke, delivered completely straight. Wordmark, then the three
+         fragments on the beat grid, then the payoff line held long. */
+      tl.fromTo("#s1-mark", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.85, ease: EASE }, 0.2);
+
+      // beat-grid: frag 1 at 1.37s, frag 2 at 1.90s, frag 3 at 2.46s
+      tl.fromTo("#s1-frags .frag:nth-child(1)", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE }, 1.37);
+      tl.fromTo("#s1-frags .frag:nth-child(2)", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE }, 1.9);
+      tl.fromTo("#s1-frags .frag:nth-child(3)", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE }, 2.46);
+
+      // beat-grid: payoff at 3.01s — settled 3.46 → 4.2 plus the cross-fade tail.
+      tl.fromTo("#s1-payoff", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE }, 3.01);
+      tl.to("#s1 > *", { opacity: 0, duration: 0.28, ease: "power2.in" }, 3.95);
+
+      /* ── Scene 2 — 4.2 → 7.6 ─────────────────────────────────────────
+         Two elements, both held long. The empty space is the point. */
+      // beat-grid: 4.64s
+      tl.fromTo("#s2-line", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: EASE }, 4.64);
+      // beat-grid: 5.74s — settled 6.14 → 7.6 = 1.46s for five words.
+      tl.fromTo("#s2-sub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: EASE }, 5.74);
+      tl.to("#s2 > *", { opacity: 0, duration: 0.28, ease: "power2.in" }, 7.35);
+
+      /* ── Scene 3 — 7.6 → 13.6 ────────────────────────────────────────
+         The argument. Rows land on every other beat (~1.07s apart) so each
+         one clears the reading floor, then all three hold together. */
+      // beat-grid: 7.79s
+      tl.fromTo("#s3-kicker", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: EASE }, 7.79);
+
+      // beat-grid: row 1 at 8.22s, row 2 at 9.29s, row 3 at 10.38s
+      tl.fromTo("#s3-r1", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 8.22);
+      tl.fromTo("#s3-r2", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 9.29);
+      tl.fromTo("#s3-r3", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 10.38);
+
+      // beat-grid: 11.47s — settled 11.92 → 13.6.
+      tl.fromTo("#s3-close", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE }, 11.47);
+      tl.to("#s3 > *", { opacity: 0, duration: 0.3, ease: "power2.in" }, 13.3);
+
+      /* ── Scene 4 — 13.6 → 18.0 ───────────────────────────────────────
+         The app's own verdict panel: type the word, land the phonemes,
+         resolve the line. */
+      tl.fromTo("#s4-card", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.5, ease: EASE }, 13.64);
+
+      // Typed character by character — fixed timings, one keypress SFX each.
+      const KEY_TIMES = [14.2, 14.33, 14.46, 14.59, 14.72];
+      KEY_TIMES.forEach(function (t, i) {
+        tl.fromTo(
+          "#s4-word span:nth-child(" + (i + 1) + ")",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.01 },
+          t
+        );
+      });
+
+      // Phoneme chips land left to right, each with its own tick.
+      const CHIP_TIMES = [15.28, 15.4, 15.52, 15.64, 15.76];
+      CHIP_TIMES.forEach(function (t, i) {
+        tl.fromTo(
+          "#s4-chips .chip:nth-child(" + (i + 1) + ")",
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.3, ease: EASE },
+          t
+        );
+      });
+
+      // The verdict, with the one low hit. Settled 16.65 → 18.0.
+      tl.fromTo("#s4-verdict", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE }, 16.2);
+      tl.to("#s4-card", { opacity: 0, duration: 0.3, ease: "power2.in" }, 17.7);
+
+      /* ── Scene 5 — 18.0 → 23.0 ───────────────────────────────────────
+         The stat, then the close. Ends in silence. */
+      // beat-grid: 18.01s — stat holds 18.5 → 20.19.
+      tl.fromTo("#s5-stat", { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 18.01);
+
+      // beat-locked: 20.19s (strongCue, strength 1.00) — the turn into the close.
+      // #s5-close needs no opacity of its own: its two children start hidden via
+      // fromTo, so the block is effectively invisible until they animate in.
+      tl.to("#s5-stat", { opacity: 0, y: -18, duration: 0.42, ease: "power2.in" }, 20.19);
+      tl.fromTo("#s5-line", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 20.62);
+
+      // beat-grid: 21.28s — the wordmark settles and holds to the end.
+      tl.fromTo("#s5-mark", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55, ease: EASE }, 21.28);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
