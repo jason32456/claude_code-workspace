@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Furnace — a path tracer that has to prove it</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>Furnace</h1>
+    <p class="lede">A Monte Carlo path tracer, and a test it cannot fake. Put a pure white sphere
+      inside a void that glows pure white, and the sphere has to <em>disappear</em> — every photon
+      that lands on it leaves again, so it can be neither brighter nor darker than what is behind
+      it. If you can still see it, the renderer is losing energy. Most cannot pass this.</p>
+    <p class="verdict">
+      <span class="chip ok" id="chip-1">furnace deviation: exactly 0</span>
+      <span class="chip ok" id="chip-2">convergence exponent −0.553</span>
+      <span class="chip ok" id="chip-3">every bounce traced, no approximation</span>
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="render">
+  <div class="stage">
+    <div class="canvaswrap">
+      <canvas id="view" width="480" height="270"></canvas>
+      <div class="hud" id="hud"><b id="spp">0</b> samples · <span id="rate">—</span></div>
+    </div>
+
+    <aside class="panel">
+      <div class="segs" id="scenes">
+        <button data-scene="gallery" class="on">Gallery</button>
+        <button data-scene="caustic">Caustics</button>
+        <button data-scene="bleed">Bleeding</button>
+        <button data-scene="furnace">The furnace</button>
+      </div>
+
+      <div class="field">
+        <label>Max bounces <output id="depth-out">16</output></label>
+        <input type="range" id="depth" min="1" max="32" value="16">
+      </div>
+
+      <label class="check"><input type="checkbox" id="rr" checked> Russian roulette</label>
+      <label class="check"><input type="checkbox" id="cos" checked> Cosine importance sampling</label>
+      <label class="check"><input type="checkbox" id="ms" checked> Multiple-scattering GGX</label>
+
+      <div class="break">
+        <label class="check danger"><input type="checkbox" id="broken"> Break the sampling basis</label>
+        <p>The bug this shipped with. Permute Duff's orthonormal basis around the wrong axis and
+          half the hemisphere samples point into the surface. The pictures still look fine — turn it
+          on and watch the furnace stop being flat.</p>
+      </div>
+
+      <div class="furnacebox" id="furnacebox" hidden>
+        <h3>Furnace reading</h3>
+        <label class="check"><input type="checkbox" id="dev"> Show the error, &times;20</label>
+        <dl>
+          <dt>mean</dt><dd id="f-mean">—</dd>
+          <dt>darkest pixel</dt><dd id="f-min">—</dd>
+          <dt>brightest pixel</dt><dd id="f-max">—</dd>
+          <dt>worst deviation</dt><dd id="f-dev">—</dd>
+        </dl>
+        <p id="f-verdict" class="verdictline">—</p>
+      </div>
+
+      <button id="restart" class="run">Restart the render</button>
+    </aside>
+  </div>
+  <p class="note" id="scene-note"></p>
+</section>
+
+<section id="energy">
+  <h2>Where rough metal loses its light</h2>
+  <p class="note">The same furnace, with a GGX microfacet metal of albedo 1 instead of a diffuse
+    sphere. Single scattering cannot pass: the Smith masking term removes the light a microfacet
+    blocks and never puts it back, so a surface that should return everything returns two thirds
+    less of it. This is not a bug in the implementation — it is what single-scatter GGX <em>is</em>,
+    and it is why the compensation term exists.</p>
+  <button id="run-energy" class="run">Measure it</button>
+  <div id="energy-chart"></div>
+</section>
+
+<section id="bench">
+  <h2>The bench</h2>
+  <p class="note">A path tracer is the easiest kind of program to be wrong about, because wrong
+    renders look fine. Each check is decided by something that is not an opinion about an image: a
+    closed-form answer, a convergence rate that follows from the central limit theorem, or an
+    identity two configurations must satisfy whatever the picture looks like.</p>
+  <button id="run-bench" class="run">Run the bench</button>
+  <div id="bench-out" class="bench"></div>
+</section>
+
+<footer>
+  <p>Spheres and a plane, intersected analytically. Lambertian, conductor, dielectric and GGX
+    microfacet surfaces; cosine-weighted hemisphere sampling; Russian roulette; ACES tone mapping.
+    No acceleration structure, because the scenes are small enough that a BVH would be more code
+    than it saved. The tracer runs unchanged in the page, in the workers that draw it, and under
+    Node for the bench.</p>
+</footer>
+
+</main>
+<script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1075,6 +1075,27 @@ export const projects = [
       'masthead',
     ]),
   },
+  {
+    slug: 'furnace',
+    name: 'Furnace',
+    tagline: 'A path tracer, and a test it cannot fake \u2014 a white sphere in a white furnace has to disappear',
+    description:
+      'A Monte Carlo path tracer written from scratch, and the one test that makes a renderer prove it. Put a sphere of albedo 1 inside a void of uniform radiance 1: every photon that lands on it leaves again, so it can be neither brighter nor darker than what is behind it and the correct render is flat, with the sphere not visible at all. There is nothing to tune and nothing to eyeball \u2014 either it disappears or the renderer is losing energy, and the amount it fails by is the amount it loses. This one disappears exactly: deviation zero, every pixel, every sample, because a convex sphere of albedo 1 returns the same number from every path and the estimator has no variance to hide in. That matters because a path tracer is the easiest kind of program to be wrong about: a wrong render still looks fine. This one shipped with Duff\u2019s orthonormal basis permuted around the wrong axis, so a share of every hemisphere sample pointed into the surface \u2014 glass still refracted, metal still reflected, shadows were still soft, and the furnace put a number on it in one run. The bug is left in as a switch, with an amplified error view beside it, so the failure can be watched rather than described. Six more checks, none of them an opinion about an image: a grey sphere returns exactly its albedo by arithmetic; error falls as N^-0.5 with a measured exponent of -0.553, which is what the central limit theorem requires of a mean; Russian roulette and cosine importance sampling are each confirmed to move the variance and not the answer, the latter worth 1.57\u00d7 less error at equal samples. Then the finding that does not flatter anything: single-scatter GGX cannot pass the furnace at all, because the Smith masking term removes the light a microfacet blocks and never puts it back \u2014 a rough conductor of albedo 1 comes back 23% short at roughness 0.6 and 69% short at roughness 1.0. A Kulla\u2013Conty compensation recovers nearly all of it below 0.6 and only about half at 1.0, because the added lobe carries the specular pdf rather than its own, and that residual ships as measured. There is no next-event estimation either, and the cost is left visible rather than denoised away: paths find the light by wandering into it, which is why colour bleeding is still grainy at 1,500 samples and the caustic under the glass sphere at 4,500. Spheres and a plane intersected analytically, Lambertian, conductor, dielectric and GGX surfaces, a sampled aperture for real depth of field, and an inner loop that allocates nothing and sustains four to eleven million primary rays a second across a pool of workers in a tab',
+    stack: ['Vanilla JS', 'Web Workers', 'ES Modules', 'Monte Carlo path tracing', 'GGX microfacets'],
+    category: 'Simulations',
+    runType: 'static',
+    launchHref: 'apps/furnace/',
+    runCommand: 'cd showcase/apps/furnace && python -m http.server 8080',
+    screenshots: shots('furnace', [
+      'gallery',
+      'caustic',
+      'bleed',
+      'furnace-error-broken',
+      'energy',
+      'render',
+      'bench',
+    ]),
+  },
 ].map((p) => ({
   ...p,
   launchable: Boolean(p.launchHref),
