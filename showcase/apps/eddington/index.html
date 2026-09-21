@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eddington — light bent by a black hole, and the bench that grades it</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>eddington</h1>
+  <p class="sub">Every pixel is a null geodesic of the Schwarzschild metric, integrated backwards from the camera. Nothing here is a shader trick: the bending, the shadow, the ring, the lopsided disk and the copies of the sky all come out of one equation, <code>u&Prime; = 3u² − u</code>. Delete the <code>3u²</code> and you have Newton, and everything below moves to exactly half.</p>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-pane="render" class="on">Render</button>
+  <button data-pane="deflection">Deflection</button>
+  <button data-pane="rings">Photon ring</button>
+  <button data-pane="shadow">Shadow</button>
+  <button data-pane="doppler">Doppler</button>
+  <button data-pane="checks">Bench</button>
+</nav>
+
+<main>
+<section class="pane on" id="pane-render">
+  <div class="render-wrap">
+    <div class="stage">
+      <canvas id="view"></canvas>
+      <div class="status" id="status">idle</div>
+    </div>
+    <aside class="rail">
+      <label>Inclination <span class="val" id="v-inc">75°</span>
+        <input type="range" id="c-inc" min="1" max="89" step="1" value="75"></label>
+      <label>Camera distance <span class="val" id="v-dist">45 M</span>
+        <input type="range" id="c-dist" min="10" max="120" step="1" value="45"></label>
+      <label>Field of view <span class="val" id="v-fov">24°</span>
+        <input type="range" id="c-fov" min="6" max="70" step="1" value="24"></label>
+      <label>Disk inner edge <span class="val" id="v-rin">6.0 M</span>
+        <input type="range" id="c-rin" min="3" max="14" step="0.5" value="6"></label>
+      <label>Disk outer edge <span class="val" id="v-rout">16 M</span>
+        <input type="range" id="c-rout" min="8" max="40" step="1" value="16"></label>
+      <label>Exposure <span class="val" id="v-exp">1.00</span>
+        <input type="range" id="c-exp" min="-2" max="2.4" step="0.05" value="0"></label>
+
+      <div class="seg">
+        <span>Sky</span>
+        <button data-sky="stars" class="on">stars</button>
+        <button data-sky="grid">grid</button>
+        <button data-sky="none">none</button>
+      </div>
+      <div class="seg">
+        <span>Disk shading</span>
+        <button data-shade="full" class="on">full</button>
+        <button data-shade="nobeam">no beaming</button>
+        <button data-shade="flat">flat</button>
+      </div>
+      <div class="seg">
+        <span>Quality</span>
+        <button data-q="draft" class="on">draft</button>
+        <button data-q="full">full</button>
+        <button data-q="aa">4×AA</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="c-disk" checked> accretion disk</label>
+      <button class="go" id="c-render">Render</button>
+      <p class="note">The disk is a Shakura–Sunyaev thin disk, <code>F ∝ r⁻³(1−√(r_in/r))</code>, emitting isotropically in its own rest frame. What reaches you is <code>g⁴F</code> with the observed temperature <code>gT</code>, <code>g</code> the full redshift factor. Switch shading to <em>no beaming</em> to remove only the Doppler term and see what it was doing.</p>
+    </aside>
+  </div>
+  <div class="read" id="render-read"></div>
+</section>
+
+<section class="pane" id="pane-deflection">
+  <h2>How far light bends, and the factor of two that made Eddington famous</h2>
+  <p>A ray arriving from infinity with impact parameter <code>b</code> turns through <code>α(b)</code>. Newton's gravity acting on corpuscles moving at <code>c</code> — the calculation Soldner published in 1801 — gives <code>α = 2M/b</code>. General relativity gives <code>4M/b</code> in the same weak field, and diverges at <code>b = 3√3 M</code> where Newton's formula is still perfectly finite and perfectly wrong.</p>
+  <canvas class="plot" id="p-defl"></canvas>
+  <div id="defl-tables"></div>
+</section>
+
+<section class="pane" id="pane-rings">
+  <h2>The photon ring, and why it is exactly <code>e<sup>−π</sup></code></h2>
+  <p>Rays with <code>b</code> a hair above <code>3√3 M</code> loop the hole before they leave, so the sky appears again and again in ever thinner rings pressed against the shadow. The spacing is not a fitted constant. Linearise the orbit equation about the photon sphere, <code>u = 1/3 + δ</code>, and the <code>3u²</code> term gives <code>δ&Prime; = δ</code> — one e-folding per radian of orbit, for every black hole that has ever existed. Each extra half-turn is π radians, so successive rings close on the shadow edge by <code>e<sup>−π</sup></code>.</p>
+  <canvas class="plot" id="p-rings"></canvas>
+  <div id="rings-tables"></div>
+</section>
+
+<section class="pane" id="pane-shadow">
+  <h2>The dark patch is not the hole</h2>
+  <p>Everyone calls it the event horizon. It is not: it is the set of directions whose rays end on the horizon, and it is <code>3√3 M</code> across in impact parameter against a horizon at <code>2M</code>. The bench measures it from the renderer, by bisecting on the camera's own viewing angle until the ray stops coming back.</p>
+  <canvas class="plot" id="p-shadow"></canvas>
+  <div id="shadow-tables"></div>
+</section>
+
+<section class="pane" id="pane-doppler">
+  <h2>Why one side is brighter</h2>
+  <p>The inner disk orbits at a serious fraction of <code>c</code>, so the limb coming toward you is beamed and blueshifted and the limb going away is dimmed and reddened. Specific intensity over frequency cubed is a Lorentz invariant, so the bolometric brightness scales as <code>g⁴</code> and a modest shift becomes a large brightness ratio.</p>
+  <canvas class="plot" id="p-doppler"></canvas>
+  <div id="doppler-tables"></div>
+</section>
+
+<section class="pane" id="pane-checks">
+  <h2>Bench</h2>
+  <p>Each row is decided by something the integrator did not produce: a closed form, a conservation law, a published measurement, or a convergence rate that a correct RK4 has no choice about. They run live, in this page, against the same code the renderer uses.</p>
+  <button class="go" id="run-checks">Run the bench</button>
+  <div id="checks-out"></div>
+</section>
+</main>
+
+<footer>Geometric units, <code>G = c = M = 1</code>. Vanilla JS, ES modules, Web Workers, Canvas 2D. No dependencies, no assets, no network.</footer>
+<script type="module" src="main.js"></script>
+</body>
+</html>

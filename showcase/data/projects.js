@@ -23,6 +23,29 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'eddington',
+    name: 'Eddington',
+    tagline: 'Every pixel is a null geodesic \u2014 the shadow, the photon ring and the lopsided disk all fall out of one equation, and a bench grades them against answers it did not produce',
+    description:
+      'A Schwarzschild ray tracer in which nothing is a shader trick. The bending, the shadow, the ring, the disk bent up over the top of the hole and the endless copies of the sky behind you are all consequences of one second-order ODE in the orbit angle, u\u2033 = 3u\u00b2 \u2212 u, and the 3u\u00b2 is the entire difference between Einstein and Newton: delete it and every deflection halves, the photon sphere disappears, and the shadow goes with it. The camera is a static observer hovering at r\u2080 and its three axes are that observer\u2019s own tetrad, so a pixel direction is a real local viewing angle and the impact parameter taken from it is the conserved L/E rather than a flat-space cross product \u2014 a distinction invisible in the picture and wrong by M/r in every number. Point it at a plain 15\u00b0 celestial grid with the disk off and the claim becomes legible: the whole sky, the part behind the camera included, is compressed into a band at the shadow\u2019s edge and repeated there without limit. Then the bench, fourteen rows each decided by something outside the code it tests. The critical impact parameter is bisected out of the renderer at 5.196152423 from every camera radius between 3.5 M and 1000 M, against 3\u221a3 M, worst error 1.4e-11 \u2014 so the dark patch is not the horizon, it is 2.598076\u00d7 wider in radius and 6.75\u00d7 in solid angle, and at the photon sphere its angular radius is exactly 90\u00b0, half the sky. The photon ring closes on that edge by exactly e^(\u2212\u03c0): linearising about the photon sphere gives \u03b4\u2033 = \u03b4, one e-folding per radian for every black hole that has ever existed, and bisecting for bending of \u03c0 through 6\u03c0 gives ratios 0.0405953, 0.0430575, 0.0432052, 0.0432135, 0.0432139, converging on a constant the computation was never told. The same equation has a closed-form solution, u = \u22121/6 + \u00bdtanh\u00b2(\u03c6/2), which makes that e-folding the asymptotics of an exact solution rather than a linear approximation and grades the stepper with no reference integration at all. Weak-field deflection lands 0.11 ppm from the post-Newtonian series; Einstein \u00f7 Newton reads 2.000058907, and the 29 ppm is the second-order term, not an error. Three things were wrong first and ship with the reasons attached. The renderer painted concentric false arcs across the whole sky because a ray leaving the hole was called escaped on a fixed threshold in u, while the step in u near infinity is about h/b \u2014 so small-b rays walked straight over the window, went negative and were logged as captured, periodically in b; treating the zero crossing as the escape and releasing on atan2(u, \u2212w) fixed it and made the renderer 3.5\u00d7 faster, because the spurious captures were the expensive rays. The Doppler pane was drafted reporting that the obvious flat-space limb estimate breaks down at high inclination, and it does not \u2014 on a fixed grid the 6 M annulus at 89\u00b0 catches 28 rays and the ratio reads 32, half the value at 85\u00b0, a clean turnover that is pure undersampling; refined locally until the extremum stops moving it climbs monotonically to 81\u00d7, and the estimate turns out exact edge-on for a reason, its worst error being +13% face-on where the annulus\u2019s width has no Doppler to hide behind. And two bench rows failed, one of them legitimately: the convergence order read \u22121.8 while it was measuring the stopping rule rather than RK4. The 1919 eclipse is graded both ways, and Eddington\u2019s own Pr\u00edncipe plate sits 0.47 \u03c3 from Einstein and only 2.45 \u03c3 from Newton, which on its own rejects nothing.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'Canvas 2D', 'Schwarzschild null geodesics'],
+    category: 'Simulations',
+    runType: 'static',
+    launchHref: 'apps/eddington/',
+    runCommand: 'cd showcase/apps/eddington && python -m http.server 8080',
+    screenshots: shots('eddington', [
+      'disk',
+      'grid',
+      'faceon',
+      'nobeam',
+      'deflection',
+      'rings',
+      'shadow',
+      'doppler',
+      'bench',
+    ]),
+  },
+  {
     slug: 'wake',
     name: 'Wake',
     tagline: 'A wind tunnel in a browser tab \u2014 paint an obstacle, dial the Reynolds number, read drag and lift off the fluid',
