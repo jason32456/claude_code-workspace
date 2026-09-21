@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Badness — brag</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #0c0e13; }
+
+      #root {
+        position: relative; width: 100%; height: 100%; overflow: hidden;
+        background: #0c0e13; color: #e9e5dc;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+
+      /* Every scene is a centred column, so two lines of type can never land
+         on top of each other however the timing moves. */
+      .stack {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 46px; padding: 70px 90px;
+      }
+
+      /* The still sits in its own frame and is pushed into slowly. The wrapper
+         is what GSAP scales so the image never fights a CSS transform. */
+      .shot { position: relative; transform-origin: 50% 50%; }
+      .shot img { display: block; border-radius: 4px; }
+      .shot.sheet img { width: 1280px; height: 584px; }
+      .shot.wide img { width: 1560px; height: 364px; }
+
+      .cap { text-align: center; }
+      .line { font-size: 52px; font-weight: 500; letter-spacing: -0.015em; color: #e9e5dc; }
+      .line.sm { font-size: 38px; color: #b9bec7; font-weight: 400; margin-top: 16px; }
+
+      /* The one number each comparison scene is really about. */
+      .badge {
+        display: inline-flex; align-items: baseline; gap: 16px;
+        padding: 14px 28px; border-radius: 10px;
+        border: 1px solid #2b3140; background: #151923;
+      }
+      .badge b { font-size: 46px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .badge i { font-style: normal; font-size: 24px; letter-spacing: 0.1em;
+                 text-transform: uppercase; color: #8b929e; }
+      .badge.bad b { color: #d9776a; }
+      .badge.good b { color: #86bf86; }
+
+      .stats { display: flex; gap: 74px; }
+      .stat { text-align: center; }
+      .stat b { display: block; font-size: 82px; font-weight: 600; letter-spacing: -0.02em;
+                font-variant-numeric: tabular-nums; color: #d9a441; }
+      .stat i { font-style: normal; font-size: 25px; color: #a9afb9; letter-spacing: 0.015em; }
+
+      .finding {
+        border-left: 4px solid #d9a441; padding-left: 30px; max-width: 1280px; text-align: left;
+      }
+      .mono {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 30px; color: #8b929e; margin-top: 20px; letter-spacing: 0.01em;
+      }
+      .mono b { color: #e9e5dc; font-weight: 600; }
+
+      #s7 { background: #0c0e13; }
+      #s7-mark { font-size: 142px; font-weight: 300; letter-spacing: 0.16em;
+                 text-indent: 0.16em; color: #e9e5dc; }
+      #s7-tag { font-size: 30px; letter-spacing: 0.12em; text-indent: 0.12em;
+                text-transform: uppercase; color: #d9a441; }
+    </style>
+  </head>
+
+  <body>
+    <div id="root" data-composition-id="main" data-start="0"
+         data-width="1920" data-height="1080" data-duration="25">
+
+      <!-- 1 — the hook: this is what you are reading in ────────────────── -->
+      <section id="s1" class="clip" data-start="0" data-duration="4" data-track-index="0">
+        <div class="stack">
+          <div class="shot sheet" data-layout-allow-overflow id="s1-shot">
+            <img src="assets/img/clean.png" alt="" data-layout-allow-overflow />
+          </div>
+          <div class="cap" id="s1-cap">
+            <div class="line">Every browser breaks a paragraph</div>
+            <div class="line">one line at a time.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 — what greedy does ─────────────────────────────────────────── -->
+      <section id="s2" class="clip" data-start="4" data-duration="4" data-track-index="0">
+        <div class="stack">
+          <div class="shot sheet" data-layout-allow-overflow id="s2-shot">
+            <img src="assets/img/greedy.png" alt="" data-layout-allow-overflow />
+          </div>
+          <div class="cap" id="s2-cap">
+            <div class="line">Longest line that fits. Then it forgets.</div>
+          </div>
+          <div id="s2-badge"><span class="badge bad"><b>465</b><i>worst line</i></span></div>
+        </div>
+      </section>
+
+      <!-- 3 — what the right algorithm does ────────────────────────────── -->
+      <section id="s3" class="clip" data-start="8" data-duration="4" data-track-index="0">
+        <div class="stack">
+          <div class="shot sheet" data-layout-allow-overflow id="s3-shot">
+            <img src="assets/img/optimal.png" alt="" data-layout-allow-overflow />
+          </div>
+          <div class="cap" id="s3-cap">
+            <div class="line">Solve the whole paragraph at once.</div>
+          </div>
+          <div id="s3-badge"><span class="badge good"><b>146</b><i>worst line</i></span></div>
+        </div>
+      </section>
+
+      <!-- 4 — the referee ──────────────────────────────────────────────── -->
+      <section id="s4" class="clip" data-start="12" data-duration="4" data-track-index="0">
+        <div class="stack">
+          <div class="cap" id="s4-cap">
+            <div class="line">TeX tells you if you got it wrong.</div>
+            <div class="line sm">\tracingparagraphs reports every breakpoint it considered.</div>
+          </div>
+          <div class="shot wide" data-layout-allow-overflow id="s4-shot">
+            <img src="assets/img/trace.png" alt="" data-layout-allow-overflow />
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 — the scoreboard ───────────────────────────────────────────── -->
+      <section id="s5" class="clip" data-start="16" data-duration="2.8" data-track-index="0">
+        <div class="stack">
+          <div class="stats">
+            <div class="stat" id="s5-a"><b>423</b><i>lines identical to TeX</i></div>
+            <div class="stat" id="s5-b"><b>5,986</b><i>words hyphenated as TeX does</i></div>
+            <div class="stat" id="s5-c"><b>387</b><i>widths exact to the scaled point</i></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 — the part most launch videos leave out ────────────────────── -->
+      <section id="s6" class="clip" data-start="18.8" data-duration="3.8" data-track-index="0">
+        <div class="stack">
+          <div class="finding" id="s6-cap">
+            <div class="line">It also reports where it loses.</div>
+            <div class="mono">at a 144pt measure &nbsp;·&nbsp; first-fit <b>493</b> bad lines &nbsp;·&nbsp; total-fit <b>506</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 — wordmark ─────────────────────────────────────────────────── -->
+      <section id="s7" class="clip" data-start="22.6" data-duration="2.4" data-track-index="0">
+        <div class="stack">
+          <div id="s7-mark">BADNESS</div>
+          <div id="s7-tag">the whole paragraph at once</div>
+        </div>
+      </section>
+
+      <!-- Audio ─────────────────────────────────────────────────────────
+           A synthesised D-minor bed with no percussion. Nothing in this edit
+           lands on a beat because there is no beat to land on, which suits an
+           algorithm whose point is that it does not proceed in fixed steps. -->
+      <audio id="bed" src="assets/music/ink-pad.mp3" data-start="0" data-duration="25"
+        data-track-index="10"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0.42},{"t":3,"v":0.56},{"t":11.6,"v":0.56},{"t":12.4,"v":0.72},{"t":16,"v":0.72},{"t":18.6,"v":0.58},{"t":22.4,"v":0.34},{"t":25,"v":0}]}]}'></audio>
+
+      <audio id="sfx-open" src="assets/sfx/impactSoft_heavy_002.ogg" data-start="0.4" data-duration="0.57" data-volume="0.3" data-track-index="11"></audio>
+      <audio id="sfx-solve" src="assets/sfx/impactSoft_heavy_002.ogg" data-start="8.15" data-duration="0.57" data-volume="0.34" data-track-index="12"></audio>
+      <audio id="sfx-tick" src="assets/sfx/bong_001.ogg" data-start="16.3" data-duration="0.12" data-volume="0.26" data-track-index="13"></audio>
+      <audio id="sfx-mark" src="assets/sfx/impactSoft_medium_001.ogg" data-start="22.75" data-duration="0.18" data-volume="0.3" data-track-index="11"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const OUT = "power2.out";
+
+      /* Scenes dip through black rather than hard-cutting: the tone is
+         polished, so nothing in the edit should be faster than the reading. */
+      function scene(id, at, dur) {
+        tl.fromTo(id, { opacity: 0 }, { opacity: 1, duration: 0.42, ease: OUT }, at);
+        tl.to(id, { opacity: 0, duration: 0.34, ease: "power2.in" }, at + dur - 0.34);
+      }
+      /* A slow push held for the whole scene. */
+      function push(sel, at, dur, from, to) {
+        tl.fromTo(sel, { scale: from }, { scale: to, duration: dur, ease: "none" }, at);
+      }
+      /* Type rises into its own reserved slot and stays put. */
+      function rise(sel, at, dur = 0.6) {
+        tl.fromTo(sel, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: dur, ease: OUT }, at);
+      }
+
+      /* 1 — hook  0.0 -> 4.0 */
+      scene("#s1", 0, 4);
+      push("#s1-shot", 0, 4, 1.0, 1.028);
+      rise("#s1-cap", 0.5);                 // settled 1.10 -> 3.66
+
+      /* 2 — greedy  4.0 -> 8.0 */
+      scene("#s2", 4, 4);
+      push("#s2-shot", 4, 4, 1.0, 1.026);
+      rise("#s2-cap", 4.4);                 // settled 5.00 -> 7.66
+      tl.fromTo("#s2-badge", { opacity: 0, scale: 0.94 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 5.3);
+
+      /* 3 — total-fit  8.0 -> 12.0 */
+      scene("#s3", 8, 4);
+      push("#s3-shot", 8, 4, 1.0, 1.026);
+      rise("#s3-cap", 8.4);
+      tl.fromTo("#s3-badge", { opacity: 0, scale: 0.94 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 9.3);
+
+      /* 4 — the referee  12.0 -> 16.0 */
+      scene("#s4", 12, 4);
+      rise("#s4-cap", 12.35);               // settled 12.95 -> 15.66
+      tl.fromTo("#s4-shot", { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 0.7, ease: OUT }, 13.1);
+      push("#s4-shot", 13.1, 2.9, 1.0, 1.022);
+
+      /* 5 — scoreboard  16.0 -> 18.8 */
+      scene("#s5", 16, 2.8);
+      rise("#s5-a", 16.3, 0.55);
+      rise("#s5-b", 16.7, 0.55);
+      rise("#s5-c", 17.1, 0.55);            // settled 17.65 -> 18.46
+
+      /* 6 — where it loses  18.8 -> 22.6 */
+      scene("#s6", 18.8, 3.8);
+      rise("#s6-cap", 19.2, 0.62);          // settled 19.82 -> 22.26
+
+      /* 7 — wordmark  22.6 -> 25.0 */
+      tl.fromTo("#s7-mark", { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.8, ease: OUT }, 22.85);
+      tl.fromTo("#s7-tag", { opacity: 0 }, { opacity: 1, duration: 0.7, ease: OUT }, 23.35);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

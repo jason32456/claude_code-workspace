@@ -1,0 +1,34 @@
+Every browser you have ever used breaks paragraphs greedily: longest line that
+fits, then it forgets. TeX solves the whole paragraph at once.
+
+I implemented Knuth–Plass total-fit line breaking in a tab — and then used TeX
+itself as the referee.
+
+\tracingparagraphs=1 doesn't report TeX's answer, it reports its reasoning:
+every feasible breakpoint it considered, with the badness, demerits, fitness
+class and running total of the line arriving there. Nothing is left to infer,
+so a disagreement is a bug rather than an opinion.
+
+On Knuth's own example paragraph it comes back identical, down to the final
+figure of 3535. Across the committed oracle: 423 lines, no difference anywhere.
+5,986 words hyphenated exactly as \showhyphens does, zero spurious breaks.
+387 word widths exact to the scaled point — 1/65536 of a point.
+
+TeX found four bugs I could never have seen, because every one of them produced
+a paragraph that looked completely fine:
+
+· the interword space was 1sp too wide, because TFM fixed point doesn't round
+  the way arithmetic does
+· every "va" pair was 18204sp too wide, because the first matching lig/kern
+  instruction wins and the second was overwriting it
+· hyphenation silently widened words, because splitting "officer" destroys the
+  ffi ligature underneath it
+· the last line was charged 10100 demerits for a forced break TeX charges
+  nothing for
+
+It also reports where it loses. At a narrow measure, greedy leaves fewer
+visibly bad lines than optimal does — the algorithm can't avoid bad lines in a
+narrow column, only stop them being catastrophic. Rivers were supposed to be a
+clean secondary win. They aren't.
+
+No build, no dependencies, no network. Runs from its own folder.
