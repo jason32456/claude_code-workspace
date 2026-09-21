@@ -1,0 +1,39 @@
+I wrote a Monte Carlo path tracer, and then the one test that makes a renderer
+prove it.
+
+Put a sphere of albedo 1 inside a void of uniform radiance 1. Every photon that
+lands on it leaves again, so it can be neither brighter nor darker than what is
+behind it — the correct render is flat and the sphere is not visible at all.
+There is nothing to tune and nothing to eyeball. Either it disappears, or the
+renderer is losing energy, and the amount it fails by is the amount it loses.
+
+This one disappears exactly. Deviation 0 — every pixel, every sample, not
+"within tolerance". A convex sphere of albedo 1 returns the same number from
+every path, so the estimator has no variance at all and any deviation whatsoever
+is a bug rather than noise.
+
+Which mattered, because it shipped with one. Duff's orthonormal basis is written
+around z and I permuted it around y, so a share of every hemisphere sample
+pointed into the surface. Glass still refracted. Metal still reflected. Shadows
+were still soft. Every render looked completely fine, and the furnace put a
+number on it in one run. The bug is still in there as a switch, next to an
+amplified error view, so you can watch it happen.
+
+Six more checks, none of them an opinion about an image:
+· a grey sphere returns exactly its albedo — checked against arithmetic
+· error falls as N^-0.5, measured exponent -0.553
+· Russian roulette moves the variance and not the answer
+· cosine importance sampling likewise, worth 1.57x less error per sample
+
+And the one that flatters nothing: single-scatter GGX cannot pass the furnace at
+all. The Smith masking term removes the light a microfacet blocks and never puts
+it back, so a rough conductor of albedo 1 comes back 23% short at roughness 0.6
+and 69% short at 1.0. A Kulla-Conty compensation recovers nearly all of that
+below 0.6 and only about half at 1.0, because the added lobe carries the
+specular pdf rather than its own. That residual ships as measured.
+
+No next-event estimation either, and the cost is left visible rather than
+denoised: colour bleeding is still grainy at 1,500 samples and the caustic under
+the glass sphere at 4,500.
+
+4-11 million primary rays a second, in a browser tab, no GPU.
