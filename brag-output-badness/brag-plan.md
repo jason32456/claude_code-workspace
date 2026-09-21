@@ -1,6 +1,7 @@
 # Brag plan — Badness
 
-Tone: `polished`. Format: landscape 1920×1080. Duration: 25.0s. Music: synthesised
+Tone: `polished`. Format: landscape 1920×1080. Duration: 25.0s. Narration: on
+(Kokoro, `bm_george`, speed 1.05). Music: synthesised
 (the bundled "happy beats business moves" library is upbeat corporate and would
 fight a project about typography). SFX: sparse, from the bundled Kenney set.
 
@@ -65,3 +66,37 @@ a slow D-minor pad with no percussion: nothing in this edit lands on a beat
 because there is no beat to land on, which suits an algorithm whose whole point
 is that it does not proceed in fixed steps. Volume automation lifts under the
 trace reveal and falls away under the wordmark.
+
+## Narration
+
+Seven lines, 35 words, roughly 2.25 words per second — sparse on purpose. The
+narration never reads the caption underneath it: the caption states what is
+happening on screen, the line says why it matters. Scene 1's caption says every
+browser breaks paragraphs one line at a time; the narration says line breaking
+is a solved problem. The two together are the argument.
+
+| # | t (s) | Line | Length |
+|---|-------|------|--------|
+| 1 | 0.70 | "Line breaking is a solved problem." | 2.59s |
+| 2 | 4.70 | "Greedy. Fast. And demonstrably wrong." | 2.69s |
+| 3 | 8.55 | "Knuth solved this in nineteen eighty-one." | 2.80s |
+| 4 | 12.65 | "So I made TeX the referee." | 2.32s |
+| 5 | 16.25 | "It never disagreed. Not once." | 2.35s |
+| 6 | 19.45 | "Which matters more than the wins." | 2.25s |
+| 7 | 23.05 | "Badness." | 0.86s |
+
+Every line ends at least 0.3s before its scene does, so no line is cut by a
+transition.
+
+## Mix
+
+The bed is carved rather than ducked. All seven lines are one audio group and
+the bed is carved against the group, so a dip follows the speech's own level and
+the bed returns between lines instead of sitting flat for twenty-five seconds —
+six peaking bands from 160Hz to 2.5kHz with a 270-point level envelope, written
+by `carve.mjs` at strength 0.8. Naming the group rather than the seven clip ids
+means an eighth line would be covered without touching the carve.
+
+Measured on the finished file: narration sits 9.6 dB above the bed, and the
+speech band is about 50 dB over the bed's own level in each window. Master is
+-16.0 LUFS with a true peak of -1.5 dBTP.

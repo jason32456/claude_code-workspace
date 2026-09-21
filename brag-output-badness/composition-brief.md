@@ -45,7 +45,13 @@ Per `brag-plan.md`. Seven scenes: hook (4.0), first-fit (4.0), total-fit (4.0),
 the trace (4.0), the scoreboard (2.8), where it loses (3.8), wordmark (2.4).
 
 ## Audio
-- Audio role: warm bed, sparse low accents.
+- Audio role: narration carried, warm bed beneath it, sparse low accents.
+- Narration: on. Kokoro `bm_george` at speed 1.05, seven lines, 35 words. Written
+  to complement the captions rather than read them.
+- Ducking: voiceover carve, not a volume duck. The seven lines are one audio
+  group; the bed carries `data-fx-carve` pointed at that group at strength 0.8,
+  which wrote six peaking bands and a 270-point level envelope. A flat duck
+  would have cost the bed its presence for the whole video.
 - Music: `ink-pad.mp3`, synthesised. The bundled library is upbeat corporate and
   would fight a piece about typography.
 - Treatment: volume automation lifts under the trace reveal and falls under the
