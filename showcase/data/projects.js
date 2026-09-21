@@ -1055,6 +1055,26 @@ export const projects = [
       'checks',
     ]),
   },
+  {
+    slug: 'badness',
+    name: 'Badness',
+    tagline: 'Every browser breaks paragraphs greedily \u2014 this one solves them, and TeX grades the answer',
+    description:
+      'Knuth\u2013Plass total-fit line breaking, in a tab, checked line by line against TeX itself. A paragraph becomes boxes, glue and penalties, and breaking it becomes a shortest path: breakpoints are nodes, lines are edges, demerits are the weight. Greedy breaking \u2014 what every browser and every word processor does \u2014 walks that graph one edge at a time and cannot see that a slightly worse line now buys two much better lines later. The ground truth is unusually generous, because \\tracingparagraphs=1 makes TeX report not its answer but its reasoning: every feasible breakpoint it considered, the badness and demerits of the line arriving there, the fitness class, the running total, and which earlier breakpoint it came from. Nothing is left to infer, so a disagreement is a bug rather than a judgement call \u2014 and on Knuth\u2019s own example paragraph, the Frog King set 2.5in wide in cmr10, the answer comes back identical down to the final figure of 3535, with 83 paragraph/measure/pass combinations and 423 lines identical across six paragraphs, ten measures and both of TeX\u2019s passes. Liang\u2019s hyphenation is written from the algorithm over Knuth\u2019s own patterns and agrees with \\showhyphens on 5,986 words with zero spurious breaks; the metrics are parsed from the binary cmr10.tfm, ligatures and 181 kern pairs included, and 387 words measure exact to the scaled point. Nothing on the page is laid out by the browser \u2014 every word sits where the algorithm put it, with the glue drawn at its true width, warm where a line was pulled apart and cool where it was squeezed, so a badness of 146 is visible before it is read. The dynamic program is checked against exhaustive search over 21,630 enumerated breakings, because a line breaker that agrees with itself proves nothing: a wrong badness or a mis-pruned active list yields a paragraph that is merely good rather than optimal, and no amount of looking will catch it. Two hundred paragraphs of Alice broken three ways say the win is real and grows with the measure \u2014 65 visibly bad lines against first-fit\u2019s 109 at 216pt, 2 against 12 at 324pt \u2014 and also say two things that do not flatter it: optimal breaking uses more lines rather than fewer, and at a narrow measure it leaves slightly more visibly bad lines than greedy while halving mean badness, because in a narrow column it cannot avoid bad lines, only stop them being catastrophic. Rivers were expected to be a clean secondary win and are not one. Four bugs shipped with reasons attached, each of which produced a paragraph that looked completely fine: the interword space one scaled point too wide because TFM fixed point does not round the way arithmetic does, every va pair 18204sp too wide because the first matching lig/kern instruction wins and the second was overwriting it, hyphenation silently widening words because splitting them destroys the ffi ligature and the kern underneath, and the last line charged 10100 demerits for a forced break TeX charges nothing for',
+    stack: ['Vanilla JS', 'ES Modules', 'Knuth\u2013Plass', 'Liang hyphenation', 'TFM parsing'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/badness/',
+    runCommand: 'cd showcase/apps/badness && python -m http.server 8080',
+    screenshots: shots('badness', [
+      'specimen',
+      'versus',
+      'trace',
+      'study',
+      'bench',
+      'masthead',
+    ]),
+  },
 ].map((p) => ({
   ...p,
   launchable: Boolean(p.launchHref),

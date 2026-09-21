@@ -1,0 +1,192 @@
+/* Computer Modern for anything that is typeset; a plain sans for the chrome,
+   so the specimen is never competing with the interface around it. */
+@font-face {
+  font-family: 'CMU Serif';
+  src: url('vendor/fonts/cmu-serif-500-roman.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'CMU Serif';
+  src: url('vendor/fonts/cmu-serif-500-italic.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+
+:root {
+  --ink: #e9e5dc;
+  --dim: #9aa0ab;
+  --faint: #6b7280;
+  --bg: #0c0e13;
+  --panel: #12151c;
+  --rule: #232833;
+  --amber: #d9a441;
+  --stretch: #c2603f;   /* pulled apart */
+  --shrink: #4a7fb5;    /* squeezed */
+  --good: #6fa96f;
+  --bad: #c0584f;
+  --paper: #f4f0e6;
+  --paperink: #14151a;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+/* ── masthead ─────────────────────────────────────────────────────────── */
+.masthead { padding: 68px 0 40px; border-bottom: 1px solid var(--rule); background:
+  radial-gradient(1200px 340px at 22% -10%, rgba(217,164,65,0.10), transparent 70%); }
+h1 {
+  font-family: 'CMU Serif', Georgia, serif;
+  font-size: clamp(54px, 9vw, 104px);
+  font-weight: 400; letter-spacing: -0.02em; margin: 0 0 18px; line-height: 1;
+}
+.lede { max-width: 66ch; font-size: 17px; color: var(--dim); margin: 0 0 22px; }
+.lede em { color: var(--ink); font-style: italic; }
+.verdict { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
+.chip {
+  font-size: 12.5px; letter-spacing: 0.02em; padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--rule); background: var(--panel); color: var(--dim);
+}
+.chip.ok { color: #cfe8cf; border-color: #2f4a33; background: #16211a; }
+.chip.no { color: #f0cdc9; border-color: #4a2f2f; background: #211616; }
+
+main { padding-bottom: 90px; }
+section { padding: 52px 0; border-bottom: 1px solid var(--rule); }
+h2 {
+  font-family: 'CMU Serif', Georgia, serif; font-weight: 400;
+  font-size: 30px; margin: 0 0 10px; letter-spacing: -0.01em;
+}
+.note { max-width: 74ch; color: var(--dim); margin: 0 0 22px; font-size: 14.5px; }
+.note em { color: var(--ink); }
+code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.92em; color: var(--amber); }
+
+/* ── controls ─────────────────────────────────────────────────────────── */
+.controls {
+  display: flex; flex-wrap: wrap; gap: 22px 30px; align-items: flex-end;
+  padding: 18px 20px; border: 1px solid var(--rule); border-radius: 10px;
+  background: var(--panel); margin-bottom: 26px;
+}
+.controls label { display: flex; flex-direction: column; gap: 7px; font-size: 12px;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--faint); }
+.controls output { font-variant-numeric: tabular-nums; color: var(--amber);
+  text-transform: none; letter-spacing: 0; font-size: 13px; }
+.controls input[type=range] { width: 190px; accent-color: var(--amber); }
+.controls select {
+  background: #0a0c11; color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 7px 9px; font-size: 13px; text-transform: none;
+  letter-spacing: 0; font-family: inherit; min-width: 190px;
+}
+.controls .check { flex-direction: row; align-items: center; gap: 8px; text-transform: none;
+  letter-spacing: 0; font-size: 13.5px; color: var(--dim); }
+.segs { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.segs button {
+  background: #0a0c11; color: var(--dim); border: 0; padding: 7px 13px; cursor: pointer;
+  font-family: inherit; font-size: 13px; border-right: 1px solid var(--rule);
+}
+.segs button:last-child { border-right: 0; }
+.segs button.on { background: var(--amber); color: #171003; }
+
+/* ── the sheet ────────────────────────────────────────────────────────── */
+.sheetwrap { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+.sheet {
+  background: var(--paper); color: var(--paperink);
+  padding: 38px 40px; border-radius: 3px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 2px 0 rgba(255,255,255,0.05);
+}
+.sheet.small { padding: 24px 26px; }
+.para {
+  position: relative;
+  font-family: 'CMU Serif', Georgia, serif;
+  /* font-size and height are set by the renderer, from the measure */
+}
+.ln { position: absolute; left: 0; right: 0; white-space: nowrap; }
+.w { position: absolute; top: 0; white-space: pre; }
+.w.hy { opacity: 0.85; }
+.w.moved { background: rgba(217,164,65,0.34); border-radius: 2px; box-shadow: 0 0 0 2px rgba(217,164,65,0.34); }
+/* A gap drawn at its true width: warm when the line was pulled apart to fit,
+   cool when it was squeezed. */
+.gap {
+  position: absolute; top: -0.06em; height: 1.32em; border-radius: 1px;
+  background: color-mix(in oklab, var(--stretch) calc(max(var(--t), 0) * 100%), var(--shrink) calc(max(calc(var(--t) * -1), 0) * 100%));
+}
+
+.gutter { display: flex; flex-direction: column; padding-top: 38px; }
+.gl {
+  height: var(--leading, 29.45px); display: flex; align-items: center; gap: 9px;
+  font-size: 11.5px; color: var(--faint); font-variant-numeric: tabular-nums;
+}
+.gl b { min-width: 42px; text-align: right; color: var(--dim); font-weight: 600; }
+.gl i { font-style: normal; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+.gl[data-fitness="0"] i, .gl[data-fitness="1"] i { color: var(--stretch); }
+.gl[data-fitness="3"] i { color: var(--shrink); }
+.gl[data-fitness="2"] i { color: var(--good); }
+
+.readout {
+  margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px 34px;
+  font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums;
+}
+.readout b { color: var(--ink); font-weight: 600; }
+.legend { margin-top: 14px; font-size: 12.5px; color: var(--faint); }
+.sw { display: inline-block; width: 13px; height: 13px; border-radius: 2px; vertical-align: -2px; }
+.sw.stretch { background: var(--stretch); } .sw.shrink { background: var(--shrink); }
+
+/* ── versus ───────────────────────────────────────────────────────────── */
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+.vs figure { margin: 0; }
+.vs figcaption {
+  font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--faint); margin-bottom: 11px;
+}
+.vs figcaption span { color: var(--amber); letter-spacing: 0; text-transform: none; }
+
+/* ── tables ───────────────────────────────────────────────────────────── */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px;
+  font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 7px 12px; border-bottom: 1px solid var(--rule); }
+th:first-child, td:first-child { text-align: left; }
+thead th { color: var(--faint); font-weight: 500; font-size: 11px;
+  letter-spacing: 0.07em; text-transform: uppercase; }
+tbody tr:hover { background: rgba(255,255,255,0.025); }
+td.match { color: var(--good); } td.differ { color: var(--bad); }
+td.head { color: var(--dim); }
+
+/* ── bench ────────────────────────────────────────────────────────────── */
+.run {
+  background: var(--amber); color: #171003; border: 0; border-radius: 7px;
+  padding: 11px 20px; font-size: 14px; font-family: inherit; cursor: pointer;
+  font-weight: 600; margin-bottom: 22px;
+}
+.run:disabled { opacity: 0.55; cursor: default; }
+.bench { display: flex; flex-direction: column; gap: 12px; }
+.t { border: 1px solid var(--rule); border-left-width: 3px; border-radius: 8px;
+  padding: 15px 18px; background: var(--panel); }
+.t.ok { border-left-color: var(--good); } .t.no { border-left-color: var(--bad); }
+.t h3 { margin: 0 0 7px; font-size: 15px; font-weight: 600; }
+.t .kv { display: flex; gap: 26px; flex-wrap: wrap; font-size: 12.5px;
+  color: var(--dim); font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+.t .kv b { color: var(--ink); font-weight: 600; }
+.t p { margin: 0; font-size: 13px; color: var(--faint); max-width: 88ch; }
+.t .verdict-word { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.t.ok .verdict-word { color: var(--good); } .t.no .verdict-word { color: var(--bad); }
+
+.findings { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.finding { border-left: 3px solid var(--amber); padding: 4px 0 4px 16px;
+  font-size: 14px; color: var(--dim); max-width: 82ch; }
+.finding b { color: var(--ink); }
+.finding.against { border-left-color: var(--bad); }
+
+footer { padding: 34px 0 0; }
+footer p { color: var(--faint); font-size: 12.5px; max-width: 86ch; }
+
+@media (max-width: 900px) {
+  .vs { grid-template-columns: 1fr; }
+  .gutter { display: none; }
+}
