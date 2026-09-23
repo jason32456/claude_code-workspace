@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lacuna — a single-pixel camera</title>
+<meta name="description" content="A single-pixel camera in a browser tab: one photodiode, a tenth of the measurements, and compressed sensing to get the picture back. Then the phase transition where that stops working, graded against the curve theory drew first.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230c0b0d'/%3E%3Cpath d='M6 6h5v5H6zM16 6h5v5h-5zM11 11h5v5h-5zM21 11h5v5h-5zM6 16h5v5H6zM16 21h5v5h-5z' fill='%23ece6e1'/%3E%3Ccircle cx='25' cy='25' r='3.2' fill='%23ff5d52'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Lacuna</h1>
+    <p class="tagline">Photograph a scene with one pixel and a tenth of the measurements. Then find the line where that stops working, and check it against the line theory drew first.</p>
+  </div>
+  <div class="head-actions">
+    <label class="ctl">Scene
+      <select id="scene"></select>
+    </label>
+    <label class="ctl file">Your own image
+      <input type="file" id="file" accept="image/*">
+      <span class="fake">Choose or drop…</span>
+    </label>
+  </div>
+</header>
+
+<main>
+
+<section class="stage">
+  <div class="camera">
+    <figure class="pane">
+      <figcaption><h2>The camera</h2><p>A 128 × 128 mirror array shows one ±1 pattern at a time. A single photodiode records the total light it lets through: one number per pattern. That number, repeated M times, is everything the camera ever sees.</p></figcaption>
+      <div class="cam-row">
+        <div class="cam-view">
+          <canvas id="mirrors" width="128" height="128"></canvas>
+          <span class="cap">mirror pattern <b id="pat-no">1</b> of <b id="pat-m">—</b></span>
+        </div>
+        <div class="cam-view">
+          <canvas id="through" width="128" height="128"></canvas>
+          <span class="cap">light reaching the photodiode</span>
+        </div>
+        <div class="diode">
+          <canvas id="trace" width="720" height="220"></canvas>
+          <span class="cap">photodiode readings y<sub>j</sub> = ⟨pattern<sub>j</sub>, scene⟩</span>
+        </div>
+      </div>
+    </figure>
+  </div>
+
+  <div class="controls">
+    <label class="slider wide">Measurement budget <output id="budget-out">10%</output>
+      <input type="range" id="budget" min="1" max="60" value="10">
+      <span class="hint" id="budget-hint">—</span>
+    </label>
+    <label class="ctl">Patterns
+      <select id="mode">
+        <option value="multilevel">Multilevel Hadamard</option>
+        <option value="scrambled">Scrambled Hadamard</option>
+      </select>
+    </label>
+    <label class="ctl">Prior
+      <select id="method">
+        <option value="tv">Total variation</option>
+        <option value="haar">Haar wavelets, ℓ1</option>
+        <option value="db4">Daubechies-4, ℓ1</option>
+      </select>
+    </label>
+    <label class="slider">Photodiode noise <span class="sym">σ</span> <output id="noise-out">0</output>
+      <input type="range" id="noise" min="0" max="40" value="0">
+    </label>
+  </div>
+
+  <div class="panels">
+    <figure class="panel">
+      <canvas id="truth" width="128" height="128"></canvas>
+      <figcaption><b>The scene</b><span>16,384 pixels, never seen by the camera</span></figcaption>
+    </figure>
+    <figure class="panel">
+      <canvas id="linear" width="128" height="128"></canvas>
+      <figcaption><b>Linear: Φᵀy</b><span id="lin-stat">—</span></figcaption>
+    </figure>
+    <figure class="panel hero">
+      <canvas id="sparse" width="128" height="128"></canvas>
+      <figcaption><b>Sparse recovery</b><span id="sp-stat">—</span></figcaption>
+    </figure>
+    <figure class="panel">
+      <canvas id="error" width="128" height="128"></canvas>
+      <figcaption><b>Error, ×4</b><span>sparse recovery minus scene</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="two">
+  <figure class="pane">
+    <figcaption>
+      <h2>Quality against budget</h2>
+      <p>The same scene, patterns and prior, re-measured at each budget and reconstructed both ways. The gap between the two curves is what the prior is worth, and it is widest where the scene is simplest.</p>
+    </figcaption>
+    <canvas id="sweep-chart" width="640" height="340"></canvas>
+    <div class="row">
+      <button class="primary" id="sweep">Sweep the budget</button>
+      <span class="stat" id="sweep-stat">—</span>
+    </div>
+  </figure>
+
+  <figure class="pane">
+    <figcaption><h2>How it gets the picture back</h2></figcaption>
+    <div class="prose">
+      <p>M readings of an N-pixel scene is M equations in N unknowns. At 10%, that leaves 14,745 directions the measurements say nothing about. The <strong>linear</strong> answer, Φᵀy, sets every one of those directions to zero. It is the smallest image consistent with the data, and it is grey mush unless the patterns happened to be the right ones.</p>
+      <p>The <strong>sparse</strong> answer chooses differently. Among all images that reproduce the readings, it takes the one with the fewest edges (total variation) or the fewest wavelets (ℓ1). That is a convex problem, solved here by Chambolle–Pock or FISTA in a worker. Real scenes are close to sparse, so the choice is usually right.</p>
+      <p>The patterns are rows of a Walsh–Hadamard matrix, applied with a fast transform in O(N log N). The 16,384 × M matrix is never stored. <strong>Scrambled</strong> rows are random, which is what the theory below assumes. <strong>Multilevel</strong> rows take the coarse patterns first, which is what images reward.</p>
+    </div>
+  </figure>
+</section>
+
+<section class="lab" id="lab">
+  <div class="lab-head">
+    <div>
+      <h2>Phase Lab</h2>
+      <p>Where does this stop working? Each cell hides a random k-sparse vector of length N = <span id="lab-n">256</span>, measures it M times, and asks whether ℓ1 minimisation gives it back exactly. The x-axis is how much of the signal is non-zero (ρ = k/N). The y-axis is the budget (δ = M/N). The white line is ψ(ρ), the statistical dimension of the ℓ1 descent cone. It comes from a one-line integral and is drawn before the first trial runs.</p>
+    </div>
+    <div class="lab-actions">
+      <label class="ctl">Matrix
+        <select id="ensemble">
+          <option value="gaussian">Gaussian</option>
+          <option value="bernoulli">Bernoulli ±1</option>
+          <option value="hadamard">Partial Hadamard</option>
+        </select>
+      </label>
+      <label class="ctl">Trials per cell
+        <select id="trials">
+          <option value="6">6</option>
+          <option value="12" selected>12</option>
+          <option value="24">24</option>
+        </select>
+      </label>
+      <button class="primary" id="run-lab">Run the Phase Lab</button>
+    </div>
+  </div>
+  <div class="lab-body">
+    <canvas id="heat" width="720" height="600"></canvas>
+    <div class="lab-side">
+      <div class="gauge"><span class="k">cells</span><span class="v" id="lab-cells">—</span><span class="u" id="lab-workers">workers</span></div>
+      <div class="gauge"><span class="k">trials</span><span class="v" id="lab-trials">—</span><span class="u">basis-pursuit solves</span></div>
+      <div class="gauge"><span class="k">agreement</span><span class="v" id="lab-agree">—</span><span class="u">cells on the predicted side of ψ</span></div>
+      <p class="note" id="lab-hover">Hover a cell for its numbers.</p>
+      <p class="note">A failure is certified rather than waited for. The solver's iterate always satisfies Ax = y, so the moment its ℓ1 norm drops below the hidden vector's, that vector cannot be the minimiser. Most failed trials end within a few dozen steps.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bench" id="bench">
+  <div class="bench-head">
+    <div>
+      <h2>The bench</h2>
+      <p>Each row takes its expected value from somewhere the solvers never see: a closed-form integral, a published theorem, a dense matrix, or the PRD's own target. The row shows what was expected, what came out, and whether it passed. Rows run in parallel across workers, and the same file runs under Node with <code>node tests.mjs</code>.</p>
+    </div>
+    <div class="row">
+      <button class="primary" id="run-bench">Run the bench</button>
+      <span class="stat" id="bench-stat">—</span>
+    </div>
+  </div>
+  <ol class="tests" id="tests"></ol>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p>Walsh–Hadamard sensing with fast transforms, total variation by Chambolle–Pock, ℓ1 wavelet recovery by FISTA with continuation, basis pursuit by over-relaxed ADMM with certified early failure. No libraries, no build step. The same modules run in the page, in the workers and under Node.</p>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

@@ -23,6 +23,27 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'lacuna',
+    name: 'Lacuna',
+    tagline: 'Photograph a scene with one pixel and a tenth of the measurements \u2014 then find the line where that stops working, and check it against the line theory drew first',
+    description:
+      'A single-pixel camera in a browser tab. A simulated 128\u00d7128 micromirror array flashes \u00b11 Walsh\u2013Hadamard patterns at a scene, one photodiode records one number per pattern, and compressed sensing rebuilds the 16,384-pixel image from about 1,600 of them. The sensing matrix is never stored: \u03a6 = S\u00b7H\u00b7P is a pixel shuffle, a fast Hadamard transform and a row selector, so \u03a6 and \u03a6\u1d40 cost O(N log N) and \u03a6\u03a6\u1d40 = I exactly, which gives FISTA a unit step and Chambolle\u2013Pock a closed-form data prox. Side by side, the linear answer \u03a6\u1d40y is grey mush at 10% and total-variation recovery sharpens into the scene in a worker, PSNR and SSIM on both. Then the Phase Lab: 576 cells \u00d7 12 random sparse vectors, each handed to exact basis pursuit, with \u03c8(\u03c1) \u2014 the statistical dimension of the \u2113\u2081 descent cone, a one-line integral \u2014 drawn before the first trial runs; 98.8% of cells land on the side it predicts. Failures are certified rather than waited for: every ADMM iterate is exactly feasible, so the moment its \u2113\u2081 norm drops below the hidden vector\u2019s, that vector cannot be the minimiser. Eleven bench rows, each graded by something outside the code: the transition at \u03c1 = 0.10 measured at 0.3291 against a predicted 0.3288, its width shrinking with slope \u22120.50 against 1/\u221aN, Bernoulli and Hadamard matrices on the Gaussian curve, noise folding at 10.16 dB against 10.00, FISTA under Beck\u2013Teboulle\u2019s bound at every step, and a 16,384-pixel image exactly 400-sparse in Haar recovered to 5e-15 by the camera\u2019s own patterns at 1.25\u00d7 the predicted count and failing at 0.75\u00d7. One PRD target failed and ships with the reason: sparse recovery beats linear everywhere, but only by 0.6\u20133.1 dB on the two dense-texture scenes, not the 6 dB the plan asked for.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'Canvas 2D', 'Compressed sensing'],
+    category: 'Simulations',
+    runType: 'static',
+    launchHref: 'apps/lacuna/',
+    runCommand: 'cd showcase/apps/lacuna && python -m http.server 8080',
+    screenshots: shots('lacuna', [
+      'phantom-scrambled',
+      'camera',
+      'stilllife',
+      'skyline-5pct',
+      'sweep',
+      'phase-lab',
+      'bench',
+    ]),
+  },
+  {
     slug: 'eddington',
     name: 'Eddington',
     tagline: 'Every pixel is a null geodesic \u2014 the shadow, the photon ring and the lopsided disk all fall out of one equation, and a bench grades them against answers it did not produce',
