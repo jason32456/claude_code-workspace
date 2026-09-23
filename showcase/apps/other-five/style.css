@@ -260,3 +260,8 @@ button:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(70,224,2
   .hud-bottom { gap: 14px; padding: 9px 12px; }
   .arm-chip { width: 26px; height: 32px; }
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  h1 { font-size: min(38px, 6.2vw); }
+}

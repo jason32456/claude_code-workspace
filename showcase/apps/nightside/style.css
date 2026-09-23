@@ -301,3 +301,8 @@ kbd {
   .card-btn { width: 82px; }
   #inspector { top: 76px; width: 200px; }
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  .card h1 { font-size: min(46px, 6.7vw); }
+}

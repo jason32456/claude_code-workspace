@@ -188,3 +188,12 @@ main { padding: 22px clamp(16px, 4vw, 48px) 40px; display: grid; gap: 22px; }
 
 .foot { padding: 12px clamp(16px, 4vw, 48px) 36px; color: var(--dimmer); font-size: 13px; border-top: 1px solid var(--line); }
 .foot p { max-width: 100ch; margin: 12px 0 0; }
+
+/* Phones: grid items default to min-width: auto, so the controls row and the
+   gauges pushed the page wider than the screen. */
+@media (max-width: 520px) {
+  main > *, .stage > * { min-width: 0; }
+  .slider { min-width: 0; flex: 1 1 140px; }
+  .test { grid-template-columns: 22px minmax(0, 1fr); grid-template-areas: "mark head" "mark meas" "mark detail" "mark plot"; }
+  .test .meas { text-align: left; white-space: normal; }
+}

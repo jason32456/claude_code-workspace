@@ -252,3 +252,15 @@ button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,194,
   #hookcam-frame { width: 200px; height: 200px; }
   .hud-keys { max-width: 300px; }
 }
+
+/* Phones: the title card was a fixed 627px inside a non-scrolling overlay, so
+   the title and the brief were cut off on both sides. */
+@media (max-width: 600px) {
+  .title-inner, .over-inner {
+    max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px);
+    overflow-y: auto; padding: 22px 16px;
+  }
+  #title h1 { font-size: min(62px, 9.5vw); }
+  #title .tag { font-size: 12px; letter-spacing: 0.16em; }
+  .ctrl-grid { grid-template-columns: repeat(2, 1fr); }
+}

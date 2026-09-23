@@ -430,3 +430,8 @@ canvas {
     display: none;
   }
 }
+
+/* Phones: let the tool buttons wrap instead of widening the page. */
+@media (max-width: 520px) {
+  .tools { flex-wrap: wrap; }
+}

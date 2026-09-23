@@ -420,3 +420,11 @@ main {
   transform: translateX(-50%) translateY(0);
 }
 .toast.hidden { display: none; }
+
+/* Phones: keep the blurred orbs and the toast inside the screen, and tighten
+   the tabs so they fit one row. */
+.bg-orbs { overflow: hidden; }
+@media (max-width: 420px) {
+  .tab { padding: 8px 12px; }
+  .toast { white-space: normal; max-width: calc(100vw - 32px); }
+}

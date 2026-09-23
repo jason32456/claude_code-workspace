@@ -212,3 +212,8 @@ h2 { font-size: 22px; letter-spacing: 5px; margin-bottom: 6px; }
   .brand h1 { font-size: 40px; letter-spacing: 6px; }
   #keys { display: none; }
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  .brand h1 { font-size: min(40px, 9.4vw); }
+}
