@@ -176,3 +176,8 @@ h2 { font-size: 22px; letter-spacing: .28em; margin-bottom: 22px; color: var(--g
 #win-stats { font-size: 13px; line-height: 2.1; color: var(--dim); margin-bottom: 22px; }
 #win-stats b { color: var(--ink); }
 #win-stats .ace { color: var(--gold); }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  h1 { font-size: min(38px, 6.9vw); }
+}

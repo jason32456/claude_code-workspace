@@ -530,3 +530,7 @@ main#app {
     flex-basis: 240px;
   }
 }
+
+/* Phones: an input's intrinsic width stops flex: 1 from shrinking it, which
+   pushed the Cancel button off screen. */
+.new-board-form input { min-width: 0; }

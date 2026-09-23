@@ -142,3 +142,10 @@ kbd {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 1; }
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  .panel h1 { font-size: min(64px, 14vw); }
+  .subtitle { letter-spacing: 0.3em; }
+  .panel { max-width: calc(100vw - 16px); padding: 18px 12px; box-sizing: border-box; }
+}

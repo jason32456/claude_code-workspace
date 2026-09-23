@@ -112,7 +112,7 @@ h3 { font-size: 16px; margin: 0 0 8px; letter-spacing: -0.01em; }
 
 .stage {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
   gap: 26px;
   margin-top: 32px;
 }

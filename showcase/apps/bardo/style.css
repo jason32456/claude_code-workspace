@@ -339,3 +339,11 @@ footer strong { color: var(--dim); }
   .quote-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
   .stamp { justify-self: start; }
 }
+
+/* Phones: nowrap row labels beside 25px nowrap figures made the quote table
+   wider than the screen. */
+@media (max-width: 520px) {
+  table.schedule th { white-space: normal; }
+  td.num.big { font-size: 20px; }
+  table.stations, table.mini { display: block; overflow-x: auto; }
+}

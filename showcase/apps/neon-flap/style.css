@@ -173,3 +173,8 @@ button:active {
   font-size: 14px;
   color: #8fa6c9;
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  h1 { font-size: min(44px, 10vw); }
+}

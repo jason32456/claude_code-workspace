@@ -323,3 +323,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 24px; }
   .view.active { grid-template-columns: 1fr; justify-items: center; }
   .side-panel { max-width: 520px; }
 }
+
+/* Phones: the title, tabs and sound toggle did not fit one row at 20px gaps. */
+@media (max-width: 420px) {
+  .topbar { gap: 10px; padding: 12px 14px; }
+}

@@ -230,3 +230,8 @@ table.keys td:first-child { color: var(--ink); width: 42%; font-weight: 600; }
   .top-right { min-width: 190px; }
   .panel { font-size: 11px; }
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  h1 { font-size: min(38px, 9.7vw); }
+}

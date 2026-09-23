@@ -268,3 +268,8 @@ p { font-size: 12.5px; line-height: 1.72; color: var(--dim); }
   #minimap { width: 156px; height: 156px; }
   #keys { display: none; }
 }
+
+/* Phones: the letter-spaced title is wider than the screen at its fixed size, so cap it by viewport width. */
+@media (max-width: 520px) {
+  h1 { font-size: min(46px, 7.1vw); }
+}
