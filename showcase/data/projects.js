@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'pebble',
+    name: 'Pebble',
+    tagline: 'Curling against an AI skip \u2014 once the stone leaves your hand, all you can change is the ice in front of it',
+    description:
+      'A 3D curling match on a regulation World Curling sheet in which the only decision you make is at the instant of release, and after that the only verb left is to sweep. Every stone runs on constant friction plus a curl term that grows as it slows, so real numbers fall out of it rather than being scripted: draw weight is 2.21 m/s at release with a hog-to-hog split of 13.7 s, a draw falls 1.24 m while a takeout bends 0.18 m, and full-length sweeping adds about 3.6 m and cuts curl by a third. Sweeping is asymmetric: it can carry a stone further and straighter but never make it stop sooner or curl more, so the right way to throw is light and wide, and the sweepers tire after twelve seconds of hard work. Equal-mass collisions at restitution 0.85 hand a struck stone 92.5% of the shooter\u2019s speed and almost none of its spin, so struck stones run straight. The rules are enforced as written: hog-line removal, side and back-line out of play, the five-rock free guard zone with every stone put back after a violation, counting to the opponent\u2019s best stone, hammer to the team that did not score, and an extra end on a tie. The AI skip proposes around fifty shots (draws, guards, takeouts, hit-and-rolls, peels, taps, raises, freezes), solves release speed and broom for each in the same physics, plays every one out on the real board under samples of its own execution error, and then sweeps its own draws by re-predicting the stone every quarter second. A bench grades the physics against the numbers curlers actually use, 14 of 14.',
+    stack: ['Three.js', 'Vanilla JS', 'Web Audio API', 'ES Modules', 'Curling physics + search AI'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/pebble/',
+    runCommand: 'cd showcase/apps/pebble && python -m http.server 8080',
+    screenshots: shots('pebble', ['aim', 'sweep', 'house', 'count', 'title', 'phone-aim']),
+  },
+  {
     slug: 'lacuna',
     name: 'Lacuna',
     tagline: 'Photograph a scene with one pixel and a tenth of the measurements \u2014 then find the line where that stops working, and check it against the line theory drew first',
