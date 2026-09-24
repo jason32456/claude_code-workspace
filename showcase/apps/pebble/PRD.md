@@ -88,7 +88,7 @@ lat  = Kc · clamp(ω/ω_ref, −1, 1) · (1 − 0.5·sweep) / (v + v_c)   along
 | Aim | Move mouse / ← → to place the skip's broom · Q / E (or tap the turn button) to choose counter-clockwise / clockwise |
 | Delivery | Hold **Space** (or hold the mouse / Throw button) to push out of the hack. The weight meter climbs through Guard → Draw → Back-house → Tap → Takeout → Peel. Release to let go |
 | Sweep | Hold **Space** / mouse / Sweep button while the stone is moving |
-| Watch | Hold **F** for 4× time · **Tab** toggles the overhead cam |
+| Watch | Hold **F** for 5× time · **Enter** skips an AI throw to rest · **Tab** toggles the overhead cam |
 
 The meter isn't linear. Its first 60% covers the draw range (1.8 to 2.6 m/s) slowly,
 so fine weight is a timing skill. The rest covers hits quickly.
