@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'sill',
+    name: 'Sill',
+    tagline: 'The water lives on your desktop, and your browser windows are the only thing holding it',
+    description:
+      'A puzzle game whose level is your actual monitor and whose pieces are your actual browser windows. Behind the screen there is a cave with a spring in it. Each Sill window shows the patch of cave directly behind wherever that window sits, so two windows that overlap draw the same pixels in the overlap and the cave runs continuously across them. Windows are the only containers: their left, right and bottom edges are walls, their tops are open, and water rests on their floors. Overlap two windows and water runs from one into the other. Drag a window upward and the water rides up inside it, which is the only way to reach a pot above its spring. Close, minimise or tab away from one and whatever it held falls through the void into the window below, or off the bottom of the screen. Hold the bottom strip of a window and its sill opens under your pointer. All windows share one world through a module SharedWorker that steps a Clavet double-density-relaxation fluid at 60 Hz. Each window reports its screen rect every frame, renders the world in screen coordinates with one WebGL pass for metaball water and one for cave, rock and heat, and shifts its own water by the rect delta the worker has not yet seen, so carried water sticks to the floor mid-drag. A rising floor lifts its water as a block, because a one-pass relaxation is compressible and real water is not: a jerky 400 px lift kept 242 of 388 drops before that and keeps 391 of 391 after. Seven levels plus a free garden. A headless bench drags windows along keyframed paths and solves all seven, and confirms that one maximised window leaves every uphill pot dry. A three-page test checks that separate pages share one world, water crosses between them, and closing one drops its water. Phones get a simulated desktop with draggable fake windows running the same world.',
+    stack: ['Vanilla JS', 'ES Modules', 'SharedWorker', 'WebGL', 'Clavet particle fluid'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/sill/',
+    runCommand: 'cd showcase/apps/sill && python -m http.server 8080',
+    screenshots: shots('sill', ['real-windows', 'real-main', 'desk-carry', 'desk-heat', 'desk-uphill', 'desk-garden', 'phone']),
+  },
+  {
     slug: 'pebble',
     name: 'Pebble',
     tagline: 'Curling against an AI skip \u2014 once the stone leaves your hand, all you can change is the ice in front of it',
