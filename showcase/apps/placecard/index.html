@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Placecard — seat every guest, and know what each wish costs</title>
+<meta name="description" content="A seat-level seating planner for weddings and dinners: a solver you can watch, a pre-flight check that proves a plan impossible, and the price of every unmet wish.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23233d32'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%23f3e9d6' stroke-width='2'/%3E%3Cg fill='%23e0b05a'%3E%3Ccircle cx='16' cy='5.5' r='2.4'/%3E%3Ccircle cx='26.5' cy='16' r='2.4'/%3E%3Ccircle cx='16' cy='26.5' r='2.4'/%3E%3Ccircle cx='5.5' cy='16' r='2.4'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>Placecard</h1>
+    <input id="plan-name" class="plan-name" aria-label="Event name" spellcheck="false">
+  </div>
+  <nav class="head-actions">
+    <button id="btn-undo" class="ghost" title="Undo (Ctrl+Z)">↶ Undo</button>
+    <button id="btn-import" class="ghost">+ Guests</button>
+    <div class="menu">
+      <button class="ghost" data-menu="file">File ▾</button>
+      <div class="menu-pop" data-pop="file" hidden>
+        <button data-act="demo">Load the demo wedding</button>
+        <button data-act="new">New empty plan</button>
+        <hr>
+        <button data-act="open">Open plan (.json)…</button>
+        <button data-act="save">Save plan (.json)</button>
+        <button data-act="csv">Export seating (.csv)</button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="ghost" data-menu="print">Print ▾</button>
+      <div class="menu-pop" data-pop="print" hidden>
+        <button data-print="escort">Escort cards (name → table)</button>
+        <button data-print="rosters">Table rosters</button>
+        <button data-print="place">Folded place cards</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="toolbar">
+  <div class="seg" role="group" aria-label="Mode">
+    <button data-mode="seat" class="on">Seat guests</button>
+    <button data-mode="layout">Arrange tables</button>
+  </div>
+  <div class="add-tables">
+    <button class="ghost small" data-add="round">+ Round</button>
+    <button class="ghost small" data-add="long">+ Long</button>
+    <button class="ghost small" data-add="head">+ Head</button>
+  </div>
+  <div class="solve-box">
+    <button id="btn-solve" class="primary">Solve seating</button>
+    <label class="mini">Effort
+      <select id="effort">
+        <option value="quick">Quick</option>
+        <option value="normal" selected>Normal</option>
+        <option value="thorough">Thorough</option>
+      </select>
+    </label>
+    <label class="mini">Seed <input id="seed" type="number" min="1" step="1" value="1"></label>
+    <canvas id="chart" width="220" height="40" aria-label="Solver progress"></canvas>
+    <span id="solve-status" class="solve-status"></span>
+  </div>
+</div>
+
+<main class="layout">
+  <aside class="panel guests-panel">
+    <div class="panel-head">
+      <h2>Guests <span id="guest-count" class="count"></span></h2>
+      <input id="guest-search" type="search" placeholder="Search names, tags…" aria-label="Search guests">
+      <div class="filters">
+        <button class="chip on" data-filter="all">All</button>
+        <button class="chip" data-filter="unhappy">Unhappy</button>
+        <button class="chip" data-filter="unseated">Unseated</button>
+      </div>
+    </div>
+    <ul id="guest-list" class="guest-list"></ul>
+  </aside>
+
+  <section class="floor-wrap">
+    <svg id="floor" viewBox="0 0 1200 820" role="img" aria-label="Floor plan">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M40 0H0V40" fill="none" class="grid-line"/>
+        </pattern>
+      </defs>
+      <rect class="room" x="0" y="0" width="1200" height="820" fill="url(#grid)"/>
+      <g id="lines"></g>
+      <g id="tables"></g>
+    </svg>
+    <div class="legend">
+      <span><i class="dot" style="--h:1"></i>happy</span>
+      <span><i class="dot" style="--h:.5"></i>some wishes unmet</span>
+      <span><i class="dot" style="--h:0"></i>unhappy</span>
+      <span><i class="dot broken"></i>hard rule broken</span>
+      <span><i class="dot locked"></i>locked</span>
+      <span class="hint">Drag a guest onto any seat to swap. Hover to see their wishes.</span>
+    </div>
+  </section>
+
+  <aside class="panel inspector" id="inspector"></aside>
+</main>
+
+<dialog id="import-dialog">
+  <form method="dialog" class="dialog-body">
+    <h2>Add guests</h2>
+    <p class="muted">One party per line. Separate members with <code>&amp;</code> or commas, add a group with <code>| tag</code>, and a dietary note in brackets.</p>
+    <textarea id="import-text" rows="10" spellcheck="false" placeholder="Ana Ruiz (vegetarian) &amp; Tom Ruiz | Bride's family&#10;Sam Lee | Work&#10;Jo Park, Kim Park, Lou Park (kids meal) | Neighbours"></textarea>
+    <p id="import-preview" class="muted"></p>
+    <div class="dialog-actions">
+      <button value="cancel" class="ghost">Cancel</button>
+      <button id="import-go" value="ok" class="primary">Add guests</button>
+    </div>
+  </form>
+</dialog>
+
+<input id="file-open" type="file" accept=".json,application/json" hidden>
+<div id="ghost" class="drag-ghost" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<div id="print-root" class="print-root"></div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
