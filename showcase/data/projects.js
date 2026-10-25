@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'placecard',
+    name: 'Placecard',
+    tagline: 'Seat every guest in a chair, not just at a table, and find out what each unmet wish would cost',
+    description:
+      'A seating planner for weddings, galas and team dinners that works at the level of the seat. Round tables know each chair\u2019s two neighbours and the chair across, long tables have two facing sides, and a head table has one, so \u201cnext to\u201d means beside you. Guests come in parties (households), and between any two there can be a wish: must sit together, never together, next to, prefer together or prefer apart. There is also a penalty for anyone who knows guests but nobody at their table. Simulated annealing runs in a Web Worker and streams its best seating onto an SVG floor plan at about 900k moves a second. The score decomposes exactly by table, so each move re-scores only the two tables it touches. Group swaps move a whole couple at once, block swaps carry a chain of \u201cnext to\u201d wishes between tables, and three-way rotations escape the optima single swaps cannot. A pre-flight check proves a plan impossible before you waste time on it: a must-together chain bigger than any table, a \u201cnever\u201d pair that the chain forces together, or groups that an exact backtracking search shows cannot be packed into the tables. Any unmet wish can be priced: the worker makes it mandatory, re-solves from the current seating with a stay-put bonus so the answer is an edit rather than a reshuffle, and reports the points lost, who moves and which wishes are given up. In the demo, seating grandma Astrid with Linda costs 18.2 points, because Linda\u2019s ex-husband is the son Astrid wants to sit beside. Drag-and-drop swaps, seat and table locks, undo, a paste importer, JSON and CSV, and printable escort cards, rosters and folded place cards. A Node bench checks the solver against a brute-force optimum over all 40,320 seatings and a planted 60-guest instance.',
+    stack: ['Vanilla JS', 'ES Modules', 'Web Workers', 'SVG', 'Simulated annealing'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/placecard/',
+    runCommand: 'cd showcase/apps/placecard && python -m http.server 8080',
+    screenshots: shots('placecard', ['solved', 'what-if', 'preflight', 'solving', 'layout', 'escort-cards', 'phone']),
+  },
+  {
     slug: 'snell',
     name: 'Snell',
     tagline: 'One beam of white light crosses your desktop, and every browser window is a prism, a mirror or clear glass',
