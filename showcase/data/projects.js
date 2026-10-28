@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'hirsel',
+    name: 'Hirsel',
+    tagline: 'A sheepdog trial in which you are the handler, not the dog \u2014 all you can do is whistle',
+    description:
+      'A 3D sheepdog trial played from the post. You never move anything yourself: eight whistles (come bye, away to me, walk up, lie down, steady, get out, in here, that\u2019ll do), each a distinct synthesised pitch contour, command a collie who obeys exactly and a quarter of a second late, and the sheep decide for themselves. Each ewe steers from a personal flight zone (pressure 1 \u2212 d/fz, up to 45% stronger from a moving dog), stress that rises fast, decays slowly and spreads, cohesion that grows thirteen-fold under fright, a draw back to the let-out corner, and a rule that a ewe will not walk past the dog to rejoin the others, which is what makes a shed hold. Push too hard and one bolts. The dog runs a pear-shaped outrun that an eager dog cuts too tight, orbits the flock on flanks and stops short on a walk-up, and the craft is the balance point: put her on the far side of the sheep from where they should go, stop her, walk her on. A judge starts with every point and samples the line every 8 m, records each ewe\u2019s first crossing of every gate, and deducts for breaks, split flocks, slow lifts and slow pens. Three courses: a nursery meadow, an open field with a two-gate drive, and a 210 m hill with gorse, dead ground, a horned wilful ewe, a shed in a sawdust ring and wind that carries whistles away. The post camera narrows its lens like binoculars to keep the flock and the dog in frame. A headless bench checks determinism, flight-zone response, flank sense and fence containment on every step, and has a balance-point bot pen and place on all three courses and across seeds.',
+    stack: ['Three.js', 'Vanilla JS', 'Flocking + flight-zone AI', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/hirsel/',
+    runCommand: 'cd showcase/apps/hirsel && python -m http.server 8080',
+    screenshots: shots('hirsel', ['fetch', 'shed', 'outrun', 'drive', 'hill', 'pen', 'title', 'result', 'phone']),
+  },
+  {
     slug: 'firn',
     name: 'Firn',
     tagline: 'You are a snowball. Eat the mountain, then hit the ice at the bottom hard enough to break it',

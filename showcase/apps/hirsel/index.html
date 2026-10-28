@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Hirsel — a sheepdog trial</title>
+  <meta name="description" content="A 3D sheepdog trial. You are the handler at the post: whistle your collie round the flock and get them through the gates, the shed and the pen." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232c3b22'/%3E%3Cellipse cx='17' cy='17' rx='9' ry='7' fill='%23f3eedf'/%3E%3Cellipse cx='8' cy='15' rx='3.2' ry='2.4' fill='%23191714'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="status" class="panel">
+      <div class="k" id="h-course">Open · Glen Field</div>
+      <div class="clockrow"><span id="h-clock">9:00</span><span id="h-phase">At the post</span></div>
+      <div id="h-obj"></div>
+      <div id="dogstate" class="k2"></div>
+      <div id="wind" class="hidden"><span class="k">WIND</span><div class="wbar"><div id="wind-fill"></div></div></div>
+    </div>
+
+    <div id="card" class="panel">
+      <div class="k">JUDGE'S CARD</div>
+      <div id="card-rows"></div>
+      <div class="row total"><span class="pn">Total</span><span class="pv"><b id="card-total">100</b></span></div>
+      <div id="ticker"></div>
+    </div>
+
+    <canvas id="minimap" width="200" height="200" class="panel"></canvas>
+
+    <div id="whistles">
+      <button data-cmd="away"><kbd>A</kbd>Away to me</button>
+      <button data-cmd="walk"><kbd>W</kbd>Walk up</button>
+      <button data-cmd="comebye"><kbd>D</kbd>Come bye</button>
+      <button data-cmd="lie"><kbd>S</kbd>Lie down</button>
+      <button data-cmd="steady"><kbd>Q</kbd>Steady</button>
+      <button data-cmd="getout"><kbd>E</kbd>Get out</button>
+      <button data-cmd="inhere"><kbd>␣</kbd>In here</button>
+      <button data-cmd="thatlldo"><kbd>F</kbd>That'll do</button>
+    </div>
+    <div id="keys"><b>C</b> camera · <b>H</b> handler's eye · <b>Tab</b> hold for 3× · <b>R</b> restart · <b>Esc</b> menu</div>
+    <div id="ff" class="hidden">3×</div>
+    <div id="toast"></div>
+  </div>
+
+  <div id="menu" class="overlay">
+    <div class="menu-card">
+      <h1>HIRSEL</h1>
+      <p class="tag">A sheepdog trial. You stand at the post, the sheep are a field away, and all you can do is whistle.</p>
+      <div id="courses"></div>
+      <div class="how">
+        <div><b>D</b> come bye: clockwise</div>
+        <div><b>A</b> away to me: anticlockwise</div>
+        <div><b>W</b> walk up · <b>S</b> lie down</div>
+        <div><b>Q</b> steady · <b>E</b> get out</div>
+        <div><b>Space</b> in here (shed) · <b>F</b> that'll do</div>
+      </div>
+      <p class="rules">The dog does exactly what it is told, a quarter of a second later. The sheep keep away from the dog, by more the faster it moves, and bunch up when they are frightened. To move them towards something, put the dog on the far side of them, stop it, and walk it on. The judge starts with every point and takes them away for going off line, missing gates and letting sheep break.</p>
+      <button id="mute" class="ghost">Sound: on</button>
+    </div>
+  </div>
+
+  <div id="end" class="overlay hidden">
+    <div class="end-card">
+      <div id="end-rosette"></div>
+      <h2 id="end-title">Penned</h2>
+      <p id="end-sub"></p>
+      <div id="end-card"></div>
+      <div class="btns">
+        <button id="btn-retry">Run again <small>R</small></button>
+        <button id="btn-next" class="primary">Next course</button>
+        <button id="btn-menu" class="ghost">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
