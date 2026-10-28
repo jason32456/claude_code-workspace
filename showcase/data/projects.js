@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'firn',
+    name: 'Firn',
+    tagline: 'You are a snowball. Eat the mountain, then hit the ice at the bottom hard enough to break it',
+    description:
+      'A 3D downhill game in which the thing you control keeps changing size. You start as a fistful of snow on a cornice and grow by rolling over a snowpack that is a real, finite depth field: wherever the underside of the sphere dips below the snow surface, that snow is removed and packed into you (multiplied by its stickiness, so dry powder at altitude sticks less than wet snow lower down), and the groove you leave is real geometry, because the depth texture drives the terrain\u2019s vertex shader. Everything you gain costs something. Snow lying on the slope has no momentum, so picking it up dilutes yours: deep powder grows you fast and brakes you hard, ice is fast and gives you nothing, and rock bands wear you away. Your lean authority falls as 1/(1 + r/1.2 m), so a small ball darts and a big one carves. Fourteen prop classes, from pinecones to ski-lift pylons, each have an absorb radius, a mass and a break energy. A fence post blocks a half-metre ball, falls to a two-metre ball moving fast, and sticks to a bigger one, where it rolls with you until fresh snow buries it. A rolling solid sphere accelerates at 5/7 g sin \u03b8, drag per unit mass falls with size, the air warms by 6.5 \u00b0C per km of descent and melts you above zero, and hard landings knock snow off. Each run ends at a frozen waterfall that only breaks if your impact energy, \u00bdmv\u00b2 \u00d7 7/5, reaches its rating; the ratio sets the medal. Four runs come from one seeded generator (slope profile, valley walls, value-noise bumps, snow-type zones, cliffs and prop scatter). A headless bench checks the 5/7 g sin \u03b8 roll, closes the mass ledger and the snowpack to about 1e-14 on every run, has a greedy bot break the ice on all four, and confirms that a hands-off straight line down the Couloir cannot earn gold.',
+    stack: ['Three.js', 'Vanilla JS', 'GLSL', 'Web Audio API', 'Rolling-sphere + accretion physics'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/firn/',
+    runCommand: 'cd showcase/apps/firn && python -m http.server 8080',
+    screenshots: shots('firn', ['treeline', 'ice', 'powder', 'valley', 'couloir', 'title', 'result', 'phone']),
+  },
+  {
     slug: 'placecard',
     name: 'Placecard',
     tagline: 'Seat every guest in a chair, not just at a table, and find out what each unmet wish would cost',
