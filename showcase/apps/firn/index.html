@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Firn — a snowball that eats the mountain</title>
+  <meta name="description" content="You are a snowball. Grow by eating the mountain, and break the ice at the bottom." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1422'/%3E%3Ccircle cx='16' cy='17' r='9' fill='%23f2f7ff'/%3E%3Ccircle cx='13' cy='14' r='2.4' fill='%23cfe2f7'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="flash"></div>
+
+  <div id="hud" class="hidden">
+    <div id="stats" class="panel">
+      <div class="lvl" id="h-level">Cornice</div>
+      <div class="big"><span id="h-diam">0.60</span><small> m</small></div>
+      <div class="cap">DIAMETER</div>
+      <div class="grid">
+        <div><div class="k">MASS</div><div class="v" id="h-mass">0 kg</div></div>
+        <div><div class="k">SPEED</div><div class="v" id="h-speed">0 km/h</div></div>
+        <div><div class="k">AIR</div><div class="v" id="h-temp">−6 °C</div></div>
+        <div><div class="k">UNDER YOU</div><div class="v" id="h-surface">crust</div></div>
+      </div>
+    </div>
+
+    <div id="progress" class="panel">
+      <div class="track"><div id="p-fill"></div><div id="p-ball"></div><div class="wall"></div></div>
+      <div class="row"><span class="k">CORNICE</span><span class="k" id="p-dist">700 m to the ice</span></div>
+    </div>
+
+    <div id="hint" class="panel">
+      <div class="k">PICKS UP</div>
+      <div class="v" id="hint-can">pinecones</div>
+      <div class="k" style="margin-top:6px">NEXT</div>
+      <div class="v" id="hint-next">stones at 0.72 m</div>
+    </div>
+
+    <div id="energy" class="panel">
+      <div class="row"><span class="k">IMPACT ENERGY</span><span class="v" id="e-val">0 J</span></div>
+      <div class="ebar"><div id="e-fill"></div>
+        <i class="mk bronze" id="mk-1"></i><i class="mk silver" id="mk-2"></i><i class="mk gold" id="mk-4"></i>
+      </div>
+      <div class="row"><span class="k" id="e-need">ice needs 1.5 MJ</span><span class="k" id="e-ratio">×0.00</span></div>
+    </div>
+
+    <div id="toast"></div>
+    <div id="touch-hint">hold left / right to lean · both to brake</div>
+  </div>
+
+  <div id="menu" class="overlay">
+    <div class="menu-card">
+      <h1>FIRN</h1>
+      <p class="tag">You are a snowball. Eat the mountain, and hit the ice at the bottom hard enough to break it.</p>
+      <div id="levels"></div>
+      <div class="how">
+        <div><b>A / D</b> or <b>← / →</b> lean</div>
+        <div><b>W</b> tuck (small balls only)</div>
+        <div><b>S</b> brake</div>
+        <div><b>R</b> restart · <b>Esc</b> menu</div>
+      </div>
+      <p class="rules">Powder grows you and slows you down. Ice is fast. Rock wears you away. Anything smaller than you sticks. Anything bigger stops you, unless you hit it hard enough to knock it over.
+        <br>To break the ice curtain you need impact energy <b>½mv² × 7/5</b> at or above its rating. Bronze at 1×, silver at 2×, gold at 4×.</p>
+      <button id="mute" class="ghost">Sound: on</button>
+    </div>
+  </div>
+
+  <div id="end" class="overlay hidden">
+    <div class="end-card">
+      <div id="end-medal"></div>
+      <h2 id="end-title">Through the ice</h2>
+      <p id="end-sub"></p>
+      <div id="end-stats"></div>
+      <div class="btns">
+        <button id="btn-retry">Retry <small>R</small></button>
+        <button id="btn-next" class="primary">Next run</button>
+        <button id="btn-menu" class="ghost">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
