@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Waggle — dance them to the flowers</title>
+  <meta name="description" content="A 3D honeybee game. Scout the countryside, fly home and tell your sisters where the flowers are with the waggle dance — angle from the sun, distance in seconds." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23271a08'/%3E%3Cellipse cx='16' cy='17' rx='7' ry='10' fill='%23e8a91c'/%3E%3Crect x='9' y='15' width='14' height='3' fill='%23231a10'/%3E%3Crect x='9' y='20' width='14' height='3' fill='%23231a10'/%3E%3Cellipse cx='10' cy='10' rx='5' ry='3' fill='%23eef6ff' opacity='.8'/%3E%3Cellipse cx='22' cy='10' rx='5' ry='3' fill='%23eef6ff' opacity='.8'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="labels"></div>
+
+  <div id="hud" class="hidden">
+    <div id="tape"><canvas id="tapec" width="720" height="44"></canvas></div>
+
+    <div id="status" class="panel">
+      <div class="k" id="h-day">Spring Meadow</div>
+      <div class="clockrow"><span id="h-clock">10:00</span><span id="h-sun">sun 140° · 38° up</span></div>
+      <div class="k">NECTAR HOME</div>
+      <div class="nectar"><b id="h-nectar">0</b> mg</div>
+      <div class="medalbar"><div id="h-fill"></div><i id="m1"></i><i id="m2"></i><i id="m3"></i></div>
+      <div class="colony"><span><b id="h-idle">0</b> in hive</span><span><b id="h-out">0</b> foraging</span><span><b id="h-dead">0</b> lost</span></div>
+    </div>
+
+    <div id="mem" class="panel">
+      <div class="k">TASTED <span class="dim">· 1–9 to dance for</span></div>
+      <div id="mem-list"><div class="dim small">Nothing yet. Fly low and slow over flowers.</div></div>
+    </div>
+
+    <canvas id="minimap" width="220" height="220" class="panel"></canvas>
+
+    <div id="crop" class="panel">
+      <div class="k">HONEY CROP</div>
+      <div class="bar"><div id="h-energy"></div></div>
+      <div class="small dim" id="h-flight">13 m/s · 4 m up</div>
+    </div>
+
+    <div id="prompt"></div>
+    <div id="toasts"></div>
+
+    <div id="dancepanel" class="panel hidden">
+      <div class="k">DANCE MAP <span class="dim" id="dm-mode">· M: north-up</span></div>
+      <canvas id="dancemap" width="300" height="300"></canvas>
+      <div id="dm-info"></div>
+      <div id="dm-timer"><b id="dm-sec">0.0</b> s <span class="dim">≈</span> <b id="dm-m">0</b> m</div>
+      <div class="small dim">Up on the comb = toward the sun. Aim with the mouse, <b>hold</b> to waggle. Each second of waggle is 250 m. <b>E</b> to fly out.</div>
+    </div>
+    <div id="comb-sun">☀ <span>up is the sun</span></div>
+  </div>
+
+  <div id="touch" class="hidden">
+    <div id="pad"><div id="nub"></div></div>
+    <div id="tbtns">
+      <button data-t="up">▲</button>
+      <button data-t="down">▼</button>
+      <button data-t="hive">⌂</button>
+      <button data-t="waggle" class="big">waggle</button>
+    </div>
+  </div>
+
+  <div id="menu" class="screen">
+    <div class="card">
+      <h1>Waggle</h1>
+      <p class="lede">You are a scout honeybee. Find the flowers, fly home, and tell your sisters where they are with the waggle dance, in the dark on a vertical comb: <b>the angle from straight up is the angle from the sun</b>, and every second you waggle is 250 metres.</p>
+      <div id="days"></div>
+      <details>
+        <summary>How to play</summary>
+        <div class="help">
+          <p><b>Flying</b> &nbsp;<kbd>A</kbd><kbd>D</kbd> turn (or click to steer with the mouse) · <kbd>W</kbd> faster · <kbd>S</kbd> slow · <kbd>Space</kbd> climb · <kbd>C</kbd> dive · <kbd>Shift</kbd> boost · <kbd>V</kbd> camera · hold <kbd>Tab</kbd> for 4× time</p>
+          <p><b>Tasting</b> &nbsp;Drop below 6 m and slow down over a flower patch. One second of sipping records its sweetness and its bearing and distance from home. It also refills your crop.</p>
+          <p><b>Dancing</b> &nbsp;Fly into the hive entrance (or press <kbd>E</kbd> near it). Aim with the mouse and <b>hold</b> the button or <kbd>Space</kbd> to waggle. The crowd jostles you, so keep steering. Bees watching you average 3–5 runs and then fly what you said.</p>
+          <p><b>The sun moves.</b> Inside the hive you only know where it was when you came in. Near noon it moves fast. Leave and come back to look again.</p>
+          <p>Recruits who find flowers forage, come home, and dance too. Patches run dry and regrow. Some only bloom in the morning. Some are poisoned.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div id="end" class="screen hidden">
+    <div class="card">
+      <div class="k" id="e-day">DAY</div>
+      <h2 id="e-title">Sundown</h2>
+      <div id="e-medal"></div>
+      <div id="e-stats"></div>
+      <div id="e-patches"></div>
+      <div class="row">
+        <button id="e-retry">Fly this day again</button>
+        <button id="e-next" class="primary">Next day</button>
+        <button id="e-menu">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

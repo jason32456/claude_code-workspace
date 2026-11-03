@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'waggle',
+    name: 'Waggle',
+    tagline: 'You are a scout honeybee. Find the flowers, fly home, and dance your sisters to them',
+    description:
+      'A 3D game in which all the nectar is fetched by bees you never control. You fly a scout over about 3 km\u00b2 of countryside, dip low and slow over flower patches to taste them (sweetness, poison, bloom window, and the bearing and distance home by path integration), then fly into the hive and dance on a vertical comb where up means the sun. The angle of each waggle run from vertical is the bearing from the sun, and each second of waggle is 250 m. The crowd jostles you, so you have to keep steering. Up to six followers each watch 3\u20135 runs, sign up with odds that rise with the patch\u2019s quality and fall when your runs disagree, and fly sun(t_run) + mean angle with angular noise of 4\u00b0 + 22\u00b0\u00b7e^(\u2212d/280 m). They search a widening spiral at the end of the vector, and the ones who find flowers forage and dance accurately in turn, so recruitment snowballs along golden bee lines. The sun follows the real solar track for each day\u2019s latitude and declination, and inside the hive you only know where it was when you came in, so a long dance near noon goes stale. Patches drain and regrow, bloom on windows (the apples close at noon, the limes open 11\u201315), can be sprayed (half the bees that visit die), or are hunted by hornets. Three days: a spring meadow, an orchard with a poisoned rape field beside the hive, and an August heath with heather 1.2 km uphill. A headless bench checks determinism, the solar track, decoding accuracy (35 recruits, 0.1\u00b0 off), the stale-sun miss (27\u00b0), poison avoidance, bee and nectar conservation, and that an honest bot makes bronze on every day while a random dancer gets almost nothing.',
+    stack: ['Three.js', 'Vanilla JS', 'Agent-based colony sim', 'Solar ephemeris', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/waggle/',
+    runCommand: 'cd showcase/apps/waggle && python -m http.server 8080',
+    screenshots: shots('waggle', ['dance', 'beeline', 'meadow', 'orchard', 'heath', 'title', 'result', 'phone']),
+  },
+  {
     slug: 'hirsel',
     name: 'Hirsel',
     tagline: 'A sheepdog trial in which you are the handler, not the dog \u2014 all you can do is whistle',
