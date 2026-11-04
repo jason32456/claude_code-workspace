@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Lapse — a balloon race at dawn</title>
+  <meta name="description" content="A 3D hot-air balloon competition. No rudder, no engine: climb and sink into the layer of wind that goes your way, and throw a marker at the cross." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23233a5c'/%3E%3Cpath d='M16 4c6 0 9 4 9 8.5 0 5-5 9-7 11h-4c-2-2-7-6-7-11C7 8 10 4 16 4z' fill='%23d8402c'/%3E%3Cpath d='M16 4c2.5 0 3.5 4 3.5 8.5 0 5-1.5 9-2 11h-3c-.5-2-2-6-2-11C12.5 8 13.5 4 16 4z' fill='%23f2c230'/%3E%3Crect x='14' y='25' width='4' height='3' fill='%238a6438'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="labels"></div>
+
+  <div id="hud" class="hidden">
+    <div id="status" class="panel">
+      <div class="k" id="h-flight">Flight</div>
+      <div class="clockrow"><span id="h-clock">06:30</span><span id="h-time" class="dim small"></span></div>
+      <div id="h-tasks"></div>
+      <div class="totrow"><span class="k">SCORE</span><b id="h-total">0</b><span id="h-markers" title="markers left"></span></div>
+      <div class="medalbar"><div id="h-fill"></div><i id="m1"></i><i id="m2"></i><i id="m3"></i></div>
+    </div>
+
+    <div id="ladderp" class="panel">
+      <div class="k">WIND LADDER <span class="dim">· pibal reports, north up</span></div>
+      <canvas id="ladder" width="190" height="400"></canvas>
+      <div class="small dim">Green arrows point at the goal. Fainter means older news.</div>
+    </div>
+
+    <canvas id="minimap" width="200" height="200" class="panel"></canvas>
+
+    <div id="inst" class="panel">
+      <div class="col">
+        <div class="k">HEIGHT</div>
+        <div class="big"><b id="i-agl">0</b><span class="u">m</span></div>
+        <div class="small dim" id="i-msl"></div>
+      </div>
+      <div class="col vario">
+        <div class="k">VARIO</div>
+        <div class="vbox"><div id="i-vbar"></div><span class="mid"></span></div>
+        <div class="small"><b id="i-vs">0.0</b> m/s</div>
+      </div>
+      <div class="col wide">
+        <div class="k">ENVELOPE <span id="i-te">80°C</span></div>
+        <div class="tbar"><div id="i-tfill"></div><i id="i-teq" title="float temperature"></i><i class="red"></i></div>
+        <div class="k">PROPANE <span id="i-fueltxt" class="dim">100%</span></div>
+        <div class="bar"><div id="i-fuel"></div></div>
+        <div class="lamps"><span id="i-burn" class="lamp">BURN</span><span id="i-vent" class="lamp">VENT</span><span id="i-hold" class="lamp">HOLD off</span></div>
+        <div class="small dim">track <span id="i-trk"></span> <span id="i-speed" class="ff"></span></div>
+      </div>
+    </div>
+
+    <div id="prompt"></div>
+    <div id="toasts"></div>
+    <div id="keys" class="small dim"><kbd>Space</kbd> burn · <kbd>X</kbd> vent · <kbd>M</kbd> drop · <kbd>H</kbd> hold <kbd>Q</kbd><kbd>E</kbd> · <kbd>C</kbd> camera · <kbd>Tab</kbd> fast · <kbd>P</kbd> pause</div>
+  </div>
+
+  <div id="touch" class="hidden">
+    <div class="tl">
+      <button data-t="cam">cam</button>
+      <button data-t="ff">▶▶</button>
+      <button data-t="hold">hold</button>
+      <button data-t="up">+25</button>
+      <button data-t="down">−25</button>
+    </div>
+    <div class="tr">
+      <button data-t="vent" class="vent">VENT</button>
+      <button data-t="drop" class="drop">DROP</button>
+      <button data-t="burn" class="burn">BURN</button>
+    </div>
+  </div>
+
+  <div id="pause" class="screen hidden">
+    <div class="card small-card">
+      <h2>Paused</h2>
+      <div class="row"><button id="p-resume" class="primary">Resume</button><button id="p-quit">Quit to menu</button></div>
+    </div>
+  </div>
+
+  <div id="menu" class="screen">
+    <div class="card">
+      <h1>Lapse</h1>
+      <p class="lede">A balloon competition at dawn. There is no rudder and no engine. All you have is a <b>burner</b>, a <b>vent</b>, and wind that blows a different way at every height. To go somewhere, find the layer that is already going there.</p>
+      <div id="flights"></div>
+      <details>
+        <summary>How to fly</summary>
+        <div class="help">
+          <p><b>Up and down</b> &nbsp;Hold <kbd>Space</kbd> to burn. Hot air is lighter, and you rise about half a minute later. <kbd>X</kbd> or <kbd>Shift</kbd> opens the vent and dumps heat. Watch the vario, not your nerves: a balloon carries several tonnes of air and turns slowly. <kbd>H</kbd> holds the current height for you, and <kbd>Q</kbd>/<kbd>E</kbd> move it 25 m.</p>
+          <p><b>Steering</b> &nbsp;The <b>wind ladder</b> shows the wind at each height, measured by the pibals (little white balloons) going up from the launch field. Green arrows point at the goal. Chimney smoke shows the surface wind, and the other balloons show theirs.</p>
+          <p><b>Goals</b> &nbsp;Over a cross, press <kbd>M</kbd> to throw a marker. It falls through every layer below you and drifts in each. 1000 points at the centre, nothing beyond 500 m. A ◇ waltz lets you choose any one of its crosses.</p>
+          <p><b>Landing</b> &nbsp;Before the thermals start, put down in <b>pasture, stubble or fallow</b>. Crops, livestock, woods and water cost points. <b>Never touch a power line.</b> Hold <kbd>Tab</kbd> (or <kbd>F</kbd>) to speed time up on long drifts.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div id="end" class="screen hidden">
+    <div class="card">
+      <div class="k" id="e-flight">FLIGHT</div>
+      <h2 id="e-title">Down</h2>
+      <div id="e-medal"></div>
+      <div class="cols">
+        <div id="e-stats"></div>
+        <div id="e-board"></div>
+      </div>
+      <div class="row">
+        <button id="e-retry">Fly again</button>
+        <button id="e-next" class="primary">Next flight</button>
+        <button id="e-menu">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

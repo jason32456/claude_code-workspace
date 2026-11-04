@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'lapse',
+    name: 'Lapse',
+    tagline: 'A balloon competition at dawn with no rudder and no engine \u2014 to go somewhere, find the height whose wind is already going there',
+    description:
+      'A 3D hot-air balloon game in which you can only move up or down. The burner heats a 2,600 m\u00b3 envelope, the vent spills that heat, and lift is the difference between the density of the air outside and inside it at your height, under ISA pressure and a dawn temperature inversion that makes the air warmer for the first couple of hundred metres. The moving mass includes the air inside the envelope and the air it pushes aside, about 4.7 tonnes, so the burner takes about half a minute to bite, and changing layers takes about as long again before you have the new wind. The wind is a profile of layers that veers with height, plus slow spatial wander so the forecast at launch is not the whole truth four kilometres away. You read it from a pibal ladder that updates as each small balloon from the launch field climbs through its bin, from chimney smoke, and from four rival balloons flying the same task at their own heights. Over each fabric cross you throw a 70 g marker that falls through every layer below you and drifts in each (1000 points at the centre, nothing beyond 500 m), then land in pasture, stubble or fallow before the thermals start, away from crops, livestock, woods, water and power lines. Three flights: Water Meadows (a classic veering profile), Hollow Valley (a cold drainage flow down the valley floor under a return flow, power lines across it, a hesitation waltz and a drainage that dies as the sun comes up) and The Saltings (a land breeze carrying you out to sea until the sea breeze arrives a quarter of an hour in and reverses it). The rivals use the planner that the bench uses: every few seconds it simulates holding each candidate height for six minutes through the real wind field and picks the one whose marker would come closest. A headless bench checks determinism, the 76 \u00b0C float temperature, the burner lag, the propane ledger, marker drift against the integrated wind, power-line strikes, and that the expert bot takes gold on every flight and beats a rough rival.',
+    stack: ['Three.js', 'Vanilla JS', 'Buoyancy + ISA atmosphere', 'Layered wind field', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/lapse/',
+    runCommand: 'cd showcase/apps/lapse && python -m http.server 8080',
+    screenshots: shots('lapse', ['meadows', 'drop', 'valley', 'basket', 'saltings', 'map', 'title', 'result', 'phone']),
+  },
+  {
     slug: 'waggle',
     name: 'Waggle',
     tagline: 'You are a scout honeybee. Find the flowers, fly home, and dance your sisters to them',
