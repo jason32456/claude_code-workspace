@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Bowl — a railway hump yard</title>
+  <meta name="description" content="A 3D railway hump yard. Gravity sorts the freight train; you line the switches and squeeze the retarders so every car couples at walking pace." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23222a33'/%3E%3Cpath d='M3 10 L13 10 L29 4 M13 10 L29 12 M13 10 L29 20 M13 10 L29 28' stroke='%23e8b130' stroke-width='2.2' fill='none'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="labels"></div>
+
+  <div id="hud" class="hidden">
+    <div id="status" class="panel">
+      <div class="row"><b id="h-shift">Shift</b><span id="h-clock" class="dim">00:00</span></div>
+      <div class="row small"><span id="h-weather"></span></div>
+      <div class="row"><span class="k">SCORE</span><b id="h-score">0</b><span id="h-max" class="dim small"></span></div>
+      <div class="medalbar"><div id="h-fill"></div><i id="m1"></i><i id="m2"></i><i id="m3"></i></div>
+      <div class="row small"><span class="k">HUMP</span><span id="h-hump"></span><span class="dim">W/S</span></div>
+      <div class="row small"><span class="k">DEPARTS</span><span id="h-deadline"></span></div>
+    </div>
+
+    <div id="queue" class="panel">
+      <div class="k">NEXT CUTS <span class="dim">· 1–8 reroutes the ▶ cut</span></div>
+      <div id="q-list"></div>
+    </div>
+
+    <div id="board" class="panel">
+      <div class="k">BOWL <span class="dim">· tap a track to route</span></div>
+      <div id="b-list"></div>
+    </div>
+
+    <div id="gauge" class="panel">
+      <div class="gtop">
+        <div><div class="k" id="g-zone">—</div><div id="g-speed">0.0</div><div class="dim small">km/h</div></div>
+        <div id="g-pred"></div>
+      </div>
+      <div class="rets">
+        <div id="r-master" class="ret"><b>SPACE</b> master retarder</div>
+        <div id="r-track" class="ret"><b>B</b> track retarders</div>
+      </div>
+    </div>
+
+    <canvas id="diagram" class="panel"></canvas>
+    <div id="toasts"></div>
+
+    <div id="touch">
+      <button id="t-master" class="hold">MASTER</button>
+      <button id="t-track" class="hold">TRACK</button>
+      <div class="tcol">
+        <button id="t-up">HUMP +</button>
+        <button id="t-down">HUMP −</button>
+      </div>
+      <div class="tcol">
+        <button id="t-cam">CAM</button>
+        <button id="t-fast">×6</button>
+        <button id="t-pause">❚❚</button>
+      </div>
+    </div>
+    <div id="hint" class="small dim">C camera · G prediction · Tab/F fast · P pause · drag to look</div>
+  </div>
+
+  <div id="title" class="overlay">
+    <div class="card">
+      <h1>BOWL</h1>
+      <p class="tag">A railway hump yard. Gravity sorts the freight train. You decide how hard to squeeze.</p>
+      <p class="lede">A locomotive shoves the train over a small hill. At the crest each cut comes free and rolls down into the bowl, a fan of eight sorting tracks. Line the switches, pinch speed off in the <b>master</b> and <b>track</b> retarders, and get every car to its outbound block coupling at walking pace: <b>6.4 km/h or less</b>. Too fast damages freight. Too slow leaves a gap. Nothing can add speed back.</p>
+      <div id="shifts"></div>
+      <div class="keys">
+        <div><b>Space</b> master retarder (hold)</div>
+        <div><b>B</b> track retarders (hold)</div>
+        <div><b>1–8</b> send the ▶ cut to a track</div>
+        <div><b>W / S</b> hump speed</div>
+        <div><b>G</b> prediction ghost</div>
+        <div><b>C</b> camera · <b>Tab</b> fast · <b>P</b> pause</div>
+      </div>
+      <p class="small dim">The radar under the hump times each cut and estimates how freely it rolls. A retarder slows an empty car about twice as fast as a loaded one. Cold weather stiffens bearings, and a headwind slows tall empty cars most.</p>
+    </div>
+  </div>
+
+  <div id="result" class="overlay hidden">
+    <div class="card">
+      <h2 id="r-title">Shift complete</h2>
+      <div id="r-medal"></div>
+      <table id="r-table"></table>
+      <div class="btns">
+        <button id="r-retry">Again</button>
+        <button id="r-next">Next shift</button>
+        <button id="r-menu">Shifts</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden"><div class="card"><h2>Paused</h2><p class="dim">P or Esc to resume</p><div class="btns"><button id="p-resume">Resume</button><button id="p-menu">Shifts</button></div></div></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
