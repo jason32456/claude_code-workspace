@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'bowl',
+    name: 'Bowl',
+    tagline: 'A railway hump yard \u2014 gravity sorts the freight train, and you decide how hard to squeeze',
+    description:
+      'A 3D hump yard in which you never drive anything. A pusher shoves a mixed train over a small hill, each cut comes free at the crest and rolls down a 4% grade, through a master retarder, a three-level ladder of seven switches and a track retarder into one of eight bowl tracks, where it has to couple to the cars already standing there at 6.4 km/h or less. Every car is a free body: grade under its own centre, rolling resistance from 0.0012 to 0.0045 that stiffens 3% per degree below 5 \u00b0C, drag against the wind along the yard, and 5% extra mass for its wheelsets. The retarders take speed off and nothing puts it back. Their force is partly fixed and partly weight-responsive, so an empty slows twice as fast as a load and a long cut only feels the cars inside them. A radar on the hump backs each cut\u2019s rolling resistance out of the energy it gained, and the prediction ghost rolls it forward on that estimate. A switch cannot be thrown while a car is on it, so a free roller that catches a stiff one before their routes part follows it onto the wrong track. Couplings conserve momentum and are graded good, firm, damaging or heavy damage. Blocks that outgrow their track need an overflow, and a string that backs into the ladder fouls it. Three shifts: a calm first shift, a \u221216 \u00b0C cold snap with strings already standing and an oversized block, and a night shift with a headwind gusting 8\u201314 m/s against empty autoracks. A headless bench checks free-roll deceleration, the hump descent against the energy balance, retarder force, momentum at a coupling, the switch lock and the misroute it causes, determinism, the car ledger and radar accuracy, and that the expert bot takes gold on every shift while a no-brake bot wrecks freight and a no-route bot misroutes.',
+    stack: ['Three.js', 'Vanilla JS', 'Rail vehicle dynamics', 'Hump-yard routing', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/bowl/',
+    runCommand: 'cd showcase/apps/bowl && python -m http.server 8080',
+    screenshots: shots('bowl', ['tower', 'nightcrest', 'cold', 'night', 'follow', 'bowl', 'title', 'result', 'phone']),
+  },
+  {
     slug: 'lapse',
     name: 'Lapse',
     tagline: 'A balloon competition at dawn with no rudder and no engine \u2014 to go somewhere, find the height whose wind is already going there',
