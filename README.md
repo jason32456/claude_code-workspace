@@ -10,6 +10,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
+| [evens](./showcase/apps/evens/) | Group expense splitter that settles up in the provably fewest transfers. All amounts are integer cents with largest-remainder allocation, so shares always add up to the total and balances to zero. Equal, shares, percent, exact and itemised-receipt splits (tax and tip pro rata), several payers, and per-expense foreign-currency rates. Naive, greedy and optimal plans side by side, where optimal is a subset DP for the most disjoint zero-sum groups. An animated SVG debt graph, an Explain tab that traces any balance to the cent, mark-as-paid, cash rounding, and a compressed share link with no server. A headless bench checks the optimal plan against brute force | Vanilla JS · SVG · CompressionStream · ES Modules | ✅ Complete |
 | [bowl](./showcase/apps/bowl/) | A 3D railway hump yard: a pusher shoves a freight train over a hill, each cut comes free at the crest and rolls through a master retarder, a seven-switch ladder and a track retarder into one of eight bowl tracks, and you have to get it to couple at 6.4 km/h or less. Per-car grade, cold-stiffened rolling resistance, wind drag and weight-responsive retarders, so empties brake twice as hard as loads. A hump radar estimates how freely each cut rolls. Switches lock while occupied, so a fast cut that catches a slow one is misrouted. Three shifts: calm, a −16 °C cold snap, and a night of 8–14 m/s headwind. A headless bench checks the physics, the switch lock, determinism and that the expert bot golds every shift | Three.js · Vanilla JS · Web Audio API | ✅ Complete |
 | [lapse](./showcase/apps/lapse/) | A 3D hot-air balloon competition at dawn with no rudder and no engine: a burner and a vent set your height, and the wind blows a different way at every height, so you steer by choosing a layer. ISA pressure with a dawn inversion, buoyancy from envelope vs air density, 4.7 t of moving mass, so the burner takes about 30 s to bite. A pibal wind ladder, chimney smoke and four rival balloons let you read the sky. Throw markers at fabric crosses through every layer below you, then land in a legal field before the thermals. Three flights: veering wind, a valley drainage flow under power lines, and a sea breeze that arrives mid-flight. A headless bench checks the float temperature, climb lag, fuel ledger, marker drift against integrated wind, power-line strikes and that the expert bot golds every flight | Three.js · Vanilla JS · Web Audio API | ✅ Complete |
 | [waggle](./showcase/apps/waggle/) | You are a scout honeybee: taste flowers across a 3D countryside, fly home, and dance on a dark vertical comb where up is the sun. The waggle angle is the bearing from the sun and its duration the distance (1 s = 250 m). Followers average 3–5 runs, add noise and fly the vector, and the ones who find flowers dance too. A real solar track means a long dance near noon goes stale. Bloom windows, a sprayed field and hornets. A headless bench checks decoding accuracy, the stale-sun miss, poison, conservation and bot strategies | Three.js · Vanilla JS · Web Audio API | ✅ Complete |
@@ -89,13 +90,14 @@ Projects that need a backend live in their own root-level folder and deploy as t
 
 ## Deployments
 
-Two Vercel projects are created from this one repository. They are independent —
+Several Vercel projects are created from this one repository. They are independent —
 deploying one never touches the other.
 
 | Vercel project | Root Directory | Serves | Needs |
 |---|---|---|---|
 | **showcase** | `showcase` (or repo root, which redirects to `/showcase/`) | the arcade launcher and every static app | nothing — no build step, no env vars |
 | **capsa** | `capsa` | [the Capsa game](./capsa/) plus its `/api/capsa` function | `KV_REST_API_URL` + `KV_REST_API_TOKEN` from Upstash Redis |
+| **evens** | `showcase/apps/evens` | [Evens](./showcase/apps/evens/) on its own URL (it is also in the showcase) | nothing — static, no build |
 
 Capsa is behind a shared sign-in (one credential for players, one for an admin
 who can change it). The gate is enforced server-side — every room endpoint

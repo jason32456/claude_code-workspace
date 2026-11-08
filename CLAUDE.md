@@ -90,6 +90,7 @@ Rules:
 | Vercel project | Root Directory | Notes |
 |---|---|---|
 | showcase | `showcase` (or repo root, which redirects to `/showcase/`) | static, no functions |
+| evens | `showcase/apps/evens` | static, its own URL for the Evens app; also served inside the showcase |
 | capsa | `capsa` | needs `KV_REST_API_URL` + `KV_REST_API_TOKEN` (Upstash Redis); optional `CAPSA_PLAYER_PASSWORD` / `CAPSA_ADMIN_PASSWORD` seed the sign-in |
 
 ## Rules for adding a new project
@@ -190,7 +191,7 @@ ES modules require an HTTP server — `file://` URLs will not work.
 
 ## Current projects
 
-`showcase/data/projects.js` is the authoritative list — 75 projects. All but one
+`showcase/data/projects.js` is the authoritative list — 76 projects. All but one
 live under `showcase/apps/`, and most are static sites launchable straight from
 the showcase. The exceptions:
 
