@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Evens</title>
+  <meta name="description" content="Split group expenses to the cent and settle up in the fewest possible transfers.">
+  <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14161c" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d9480f'/%3E%3Cpath d='M16 24h32M16 40h32' stroke='%23fff' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-mobile="expenses">
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><i></i><i></i></span>
+      <span class="word">Evens</span>
+    </div>
+    <div class="group-pick">
+      <select id="group-select" aria-label="Group"></select>
+      <span id="base-label" class="muted small"></span>
+    </div>
+    <div class="top-actions">
+      <button id="btn-share" class="btn ghost sm" title="Copy a link that carries this whole group">Share link</button>
+      <button id="btn-more" class="btn ghost sm icon-btn" aria-label="Group options">⋯</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="col left" aria-label="People and expenses">
+      <div class="card">
+        <div class="card-head"><h2>People</h2></div>
+        <ul id="people" class="people"></ul>
+        <form id="add-person" class="add-person">
+          <input placeholder="Add a person" aria-label="New person's name" maxlength="32">
+          <button class="btn sm">Add</button>
+        </form>
+      </div>
+      <div class="card grow">
+        <div class="card-head">
+          <h2>Expenses <span id="exp-count" class="count"></span></h2>
+          <div class="tools">
+            <button id="btn-pay" class="btn ghost sm" title="Record money sent between two people (P)">Payment</button>
+            <button id="btn-add" class="btn primary sm" title="Add expense (N)">+ Expense</button>
+          </div>
+        </div>
+        <input id="search" class="search" type="search" placeholder="Filter expenses" aria-label="Filter expenses">
+        <ul id="expenses" class="expenses"></ul>
+      </div>
+    </section>
+
+    <section class="col right" aria-label="Results">
+      <nav class="tabs" role="tablist">
+        <button data-tab="settle" role="tab">Settle up</button>
+        <button data-tab="balances" role="tab">Balances</button>
+        <button data-tab="explain" role="tab">Explain</button>
+      </nav>
+      <div id="tab-settle" role="tabpanel"></div>
+      <div id="tab-balances" role="tabpanel" hidden></div>
+      <div id="tab-explain" role="tabpanel" hidden></div>
+    </section>
+  </main>
+
+  <nav class="mobile-tabs" aria-label="Sections">
+    <button data-m="expenses">Expenses</button>
+    <button data-m="settle">Settle</button>
+    <button data-m="balances">Balances</button>
+    <button data-m="explain">Explain</button>
+  </nav>
+
+  <dialog id="editor" aria-label="Editor"></dialog>
+  <div id="toasts" class="toasts"></div>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'evens',
+    name: 'Evens',
+    tagline: 'Split it to the cent, then settle up in the fewest transfers anyone could manage',
+    description:
+      'A group expense splitter that does the arithmetic properly. Every amount is an integer in minor units, and every split uses largest-remainder allocation, so the shares always add up to the total and the balances always add up to zero. Five split modes: equal, shares, percent, exact, and itemised receipts where tax and tip follow each person\u2019s subtotal. Several payers per expense, and foreign-currency expenses that keep their own rate and convert once. Settle-up compares three plans: naive (each expense squared on its own), greedy (biggest debtor to biggest creditor), and optimal. The optimal plan is a subset DP over all 2\u207f masks that finds the most disjoint zero-sum sub-groups, so it uses the provable minimum of transfers for up to 20 people with a balance. An animated SVG debt graph shows the tangle before and the plan after, and an Explain tab traces anyone\u2019s balance back to the cent. Mark transfers paid, round them for cash with the leftover shown, and share the whole group as a deflate-compressed URL hash with no server involved. A headless bench checks exact allocation over 2,000 random expenses, zero-sum balances, the optimal plan against brute force over set partitions, and the share codec round trip.',
+    stack: ['Vanilla JS', 'Subset DP', 'SVG', 'CompressionStream', 'ES Modules'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/evens/',
+    runCommand: 'cd showcase/apps/evens && python -m http.server 8080',
+    screenshots: shots('evens', ['settle', 'debts', 'itemised', 'currency', 'explain', 'balances', 'dark', 'phone']),
+  },
+  {
     slug: 'bowl',
     name: 'Bowl',
     tagline: 'A railway hump yard \u2014 gravity sorts the freight train, and you decide how hard to squeeze',

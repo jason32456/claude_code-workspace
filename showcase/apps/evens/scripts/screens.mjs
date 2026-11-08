@@ -1,0 +1,52 @@
+// Captures the README screenshots. Serve this folder on :8090 first, then run
+// from the app folder: node scripts/screens.mjs
+import { chromium, devices } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+const BASE = process.env.URL || 'http://localhost:8090/';
+const out = (n) => new URL(`../screenshots/${n}.png`, import.meta.url).pathname;
+const browser = await chromium.launch();
+const errors = [];
+async function page(opts = {}) {
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2, ...opts });
+  const p = await ctx.newPage();
+  p.on('pageerror', (e) => errors.push(e.message));
+  p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await p.goto(BASE, { waitUntil: 'networkidle' });
+  await p.waitForTimeout(1500);
+  return p;
+}
+let p = await page();
+await p.screenshot({ path: out('settle') });
+await p.click('text=Who owes whom');
+await p.waitForTimeout(1600);
+await p.screenshot({ path: out('debts') });
+await p.click('text=Settle-up plan');
+await p.click('#graph .node >> nth=0');
+await p.waitForTimeout(400);
+await p.click('[data-tab="balances"]');
+await p.waitForTimeout(900);
+await p.screenshot({ path: out('balances') });
+await p.click('[data-tab="explain"]');
+await p.click('.right .chip:has-text("Chloé")');
+await p.waitForTimeout(500);
+await p.screenshot({ path: out('explain') });
+await p.click('.exp:has-text("Dinner at Taberna")');
+await p.waitForTimeout(500);
+await p.screenshot({ path: out('itemised') });
+await p.keyboard.press('Escape');
+await p.click('.exp:has-text("Surf lesson")');
+await p.waitForTimeout(400);
+await p.screenshot({ path: out('currency') });
+await p.keyboard.press('Escape');
+await p.close();
+p = await page({ colorScheme: 'dark' });
+await p.screenshot({ path: out('dark') });
+await p.close();
+const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+const m = await ctx.newPage();
+m.on('pageerror', (e) => errors.push(e.message));
+await m.goto(BASE, { waitUntil: 'networkidle' });
+await m.click('[data-m="settle"]');
+await m.waitForTimeout(1500);
+await m.screenshot({ path: out('phone') });
+await browser.close();
+console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'no console errors');
