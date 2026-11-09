@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'heard',
+    name: 'Heard',
+    tagline: 'Say when you want to eat \u2014 it schedules your hands, burners and oven temperatures backwards from there, then calls every step',
+    description:
+      'A meal-timing planner that treats dinner as the scheduling problem it is. Add dishes as chains of steps, each with a duration, hands-on minutes, the equipment it uses (counter, burner, or an oven at a temperature and number of rack slots) and a hold: how long its result can wait. A reverse serial schedule generator works backwards from serving on a one-minute grid and places every step as late as its successors allow. It never gives one cook two jobs, never uses more burners than you have, never runs an oven at two temperatures at once, and always leaves time for an oven to heat at 12 \u00b0C/min or cool at 5 \u00b0C/min between temperatures. A repair pass pulls flexible steps earlier when they block tight ones, and 120 seeded priority orders are scored on waiting, span and oven switches. Steps that wait too long are explained, naming the resource that was full, and What would help re-plans with one more cook, burner, oven or rack slot. Courses can be offset, so a starter goes out at \u221230 and dessert at +45. The SVG timeline has dish lanes, cook and burner lanes, and an oven heat strip with preheat ramps, alongside a printable run sheet. Cook mode chimes and speaks each call until someone taps Heard, shows countdowns and oven status, has Running late +5 and a \u00d760 demo clock. Menus share as a compressed URL hash. A headless bench audits every hard constraint on four presets and 60 random menus.',
+    stack: ['Vanilla JS', 'RCPSP scheduling', 'SVG', 'Web Audio API', 'Speech Synthesis', 'ES Modules'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/heard/',
+    runCommand: 'cd showcase/apps/heard && python -m http.server 8080',
+    screenshots: shots('heard', ['timeline', 'bottleneck', 'insights', 'two-cooks', 'cook', 'editor', 'sheet', 'dark', 'phone']),
+  },
+  {
     slug: 'evens',
     name: 'Evens',
     tagline: 'Split it to the cent, then settle up in the fewest transfers anyone could manage',

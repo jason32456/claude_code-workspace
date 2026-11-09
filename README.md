@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 75 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 77 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
@@ -10,6 +10,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
+| [heard](./showcase/apps/heard/) | Meal-timing planner that works backwards from serving time. Steps carry hands-on minutes, burner or oven use (°C, rack slots) and a hold window. A reverse schedule generator with a repair pass never double-books a cook, a burner or an oven temperature, and leaves heat-up and cool-down time between oven temperatures. Late steps are explained with the resource that blocked them, and What would help re-plans with one more cook, burner, oven or slot. SVG timeline with resource and oven-heat lanes, starter and dessert course offsets, a printable run sheet, and a cook mode that chimes and speaks each call until someone taps Heard. A headless bench audits every hard constraint | Vanilla JS · SVG · Web Audio API · Speech Synthesis · ES Modules | ✅ Complete |
 | [evens](./showcase/apps/evens/) | Group expense splitter that settles up in the provably fewest transfers. All amounts are integer cents with largest-remainder allocation, so shares always add up to the total and balances to zero. Equal, shares, percent, exact and itemised-receipt splits (tax and tip pro rata), several payers, and per-expense foreign-currency rates. Naive, greedy and optimal plans side by side, where optimal is a subset DP for the most disjoint zero-sum groups. An animated SVG debt graph, an Explain tab that traces any balance to the cent, mark-as-paid, cash rounding, and a compressed share link with no server. A headless bench checks the optimal plan against brute force | Vanilla JS · SVG · CompressionStream · ES Modules | ✅ Complete |
 | [bowl](./showcase/apps/bowl/) | A 3D railway hump yard: a pusher shoves a freight train over a hill, each cut comes free at the crest and rolls through a master retarder, a seven-switch ladder and a track retarder into one of eight bowl tracks, and you have to get it to couple at 6.4 km/h or less. Per-car grade, cold-stiffened rolling resistance, wind drag and weight-responsive retarders, so empties brake twice as hard as loads. A hump radar estimates how freely each cut rolls. Switches lock while occupied, so a fast cut that catches a slow one is misrouted. Three shifts: calm, a −16 °C cold snap, and a night of 8–14 m/s headwind. A headless bench checks the physics, the switch lock, determinism and that the expert bot golds every shift | Three.js · Vanilla JS · Web Audio API | ✅ Complete |
 | [lapse](./showcase/apps/lapse/) | A 3D hot-air balloon competition at dawn with no rudder and no engine: a burner and a vent set your height, and the wind blows a different way at every height, so you steer by choosing a layer. ISA pressure with a dawn inversion, buoyancy from envelope vs air density, 4.7 t of moving mass, so the burner takes about 30 s to bite. A pibal wind ladder, chimney smoke and four rival balloons let you read the sky. Throw markers at fabric crosses through every layer below you, then land in a legal field before the thermals. Three flights: veering wind, a valley drainage flow under power lines, and a sea breeze that arrives mid-flight. A headless bench checks the float temperature, climb lag, fuel ledger, marker drift against integrated wind, power-line strikes and that the expert bot golds every flight | Three.js · Vanilla JS · Web Audio API | ✅ Complete |
@@ -98,6 +99,7 @@ deploying one never touches the other.
 | **showcase** | `showcase` (or repo root, which redirects to `/showcase/`) | the arcade launcher and every static app | nothing — no build step, no env vars |
 | **capsa** | `capsa` | [the Capsa game](./capsa/) plus its `/api/capsa` function | `KV_REST_API_URL` + `KV_REST_API_TOKEN` from Upstash Redis |
 | **evens** | `showcase/apps/evens` | [Evens](./showcase/apps/evens/) on its own URL (it is also in the showcase) | nothing — static, no build |
+| **heard** | `showcase/apps/heard` | [Heard](./showcase/apps/heard/) on its own URL (it is also in the showcase) | nothing — static, no build |
 
 Capsa is behind a shared sign-in (one credential for players, one for an admin
 who can change it). The gate is enforced server-side — every room endpoint
