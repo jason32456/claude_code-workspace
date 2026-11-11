@@ -30,8 +30,8 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 28px 16px 18px;
+  justify-content: flex-start;
+  padding: max(28px, 11vh) 16px 18px;
 }
 
 .view {

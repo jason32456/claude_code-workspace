@@ -129,7 +129,6 @@ function enter(raw) {
   }
   pullBtn.textContent = 'Pull your slip';
   pullBtn.hidden = false;
-  pullBtn.focus({ preventScroll: true });
   if (AUTO) later(pull, 450);
 }
 
@@ -259,7 +258,6 @@ function pull() {
     setPhase('out');
     const shown = renderCard(quick);
     hideBtn.hidden = false;
-    hideBtn.focus({ preventScroll: true });
     if (shown && !quick) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   };
 
@@ -297,7 +295,6 @@ function hide() {
     setPhase('tucked');
     pullBtn.textContent = 'Show again';
     pullBtn.hidden = false;
-    pullBtn.focus({ preventScroll: true });
   };
 
   if (reducedMotion()) return finish();
