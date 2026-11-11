@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Siltout — a cave-diving game</title>
+  <meta name="description" content="A 3D underwater cave-diving game. Run a guideline into a flooded cave, then follow it home through the silt your own fins raised." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23081018'/%3E%3Cpath d='M4 22 C10 10 16 26 22 12 S28 8 29 7' stroke='%23f4f4ee' stroke-width='2' fill='none'/%3E%3Ccircle cx='4' cy='22' r='2.4' fill='%23e9b93a'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="vignette"></div>
+
+  <div id="hud" class="hidden">
+    <div id="topbar" class="panel">
+      <b id="h-site">Site</b><span id="h-clock" class="dim">00:00</span>
+      <div id="h-obj" class="small dim"></div>
+    </div>
+
+    <div id="gauges" class="panel">
+      <div class="g"><div class="k">DEPTH</div><div class="big"><span id="g-depth">0</span><small>m</small></div><div id="g-ata" class="small dim"></div></div>
+      <div class="g" id="g-gasbox"><div class="k">GAS <span id="g-turnp" class="dim"></span></div><div class="big"><span id="g-gas">0</span><small>bar</small></div>
+        <div class="bar"><div id="g-gasfill"></div><i style="left:66.67%"></i><i style="left:33.33%" class="third"></i></div></div>
+      <div class="g" id="g-visbox"><div class="k">VISIBILITY</div><div class="big"><span id="g-vis">40</span><small>m</small></div><div class="bar"><div id="g-visfill"></div></div></div>
+      <div class="g" id="g-buoybox"><div class="k">TRIM <span class="dim">R / F</span></div><div class="row"><span id="g-buoy"></span><span id="g-vz" class="dim"></span></div>
+        <div class="scale"><b id="g-buoyneedle"></b></div></div>
+      <div class="row small"><span id="g-hdg"></span><span id="g-mode" class="dim"></span></div>
+    </div>
+
+    <div id="reel" class="panel">
+      <div class="k">REEL</div>
+      <div class="row"><b id="r-line">0 m</b><span id="r-ties" class="dim small"></span></div>
+      <div class="bar"><div id="r-linefill"></div></div>
+      <div id="r-wearbox" class="g"><div class="row small"><span class="k">CHAFE</span><span id="r-wear">clear</span></div><div class="bar"><div id="r-wearfill"></div></div></div>
+      <div class="row small" id="r-lightbox"><span class="k">LIGHT</span><span id="r-light">primary</span></div>
+      <div class="row small"><span class="k">CONTACTS</span><span id="r-contacts">0</span></div>
+    </div>
+
+    <div id="cross"></div>
+    <div id="prompt" class="hidden"></div>
+    <div id="touchcue"></div>
+    <div id="arrowcue"></div>
+    <div id="toasts"></div>
+    <div id="keys" class="small dim">W kick · Shift flutter · mouse / arrows look · R/F wing · E tie · Q untie · G hold line · B backup · V view · Esc</div>
+
+    <div id="touch">
+      <div class="tcol">
+        <button id="t-kick" class="hold big">KICK</button>
+        <button id="t-flutter" class="tog">FLUTTER</button>
+      </div>
+      <div class="tcol">
+        <button id="t-up" class="hold">WING +</button>
+        <button id="t-down" class="hold">DUMP</button>
+      </div>
+      <div class="tcol">
+        <button id="t-tie">TIE</button>
+        <button id="t-untie">UNTIE</button>
+      </div>
+      <div class="tcol">
+        <button id="t-line" class="hold">LINE</button>
+        <button id="t-light">LIGHT</button>
+        <button id="t-cam">VIEW</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="title" class="screen">
+    <div class="inner">
+      <h1>SILTOUT</h1>
+      <p class="tag">The line is the only way home. The silt is all your fault.</p>
+      <div id="sites"></div>
+      <details class="how">
+        <summary>How to dive</summary>
+        <ul>
+          <li><b>Tie your primary</b> on the orange-flagged knob in the daylight basin (<kbd>E</kbd>). From then on the reel pays out line straight from your last tie-off to you.</li>
+          <li><b>Tie off at bends.</b> A line that cuts across rock chafes, and after a few seconds it parts. Rock knobs on the walls are tie-off points.</li>
+          <li><b>Frog kick</b> (<kbd>W</kbd>) is gentle. <b>Flutter</b> (<kbd>Shift</kbd>+<kbd>W</kbd>) is fast, burns gas and blasts silt off any floor within 3 m. Silt hangs, spreads and drifts with the flow.</li>
+          <li><b>Trim.</b> Gas in your wing compresses as you go deeper and expands as you rise (Boyle). <kbd>R</kbd> adds gas, <kbd>F</kbd> dumps it. Touching the floor counts as a contact and kicks up a cloud.</li>
+          <li><b>Thirds.</b> Turn round by the time you've used a third of your gas. Deeper means faster breathing.</li>
+          <li><b>Out.</b> Swim back to each tie-off and untie it (<kbd>Q</kbd>), or the line will wrap the corners behind you. If you can't see, hold <kbd>G</kbd>: touch contact slides you along the line, and <kbd>W</kbd> moves you toward home.</li>
+        </ul>
+      </details>
+      <p class="small dim">Click the view to capture the mouse. Esc pauses. Headphones help.</p>
+    </div>
+  </div>
+
+  <div id="pause" class="screen hidden">
+    <div class="inner narrow">
+      <h2>Paused</h2>
+      <button id="p-resume" class="primary">Resume</button>
+      <button id="p-restart">Restart dive</button>
+      <button id="p-sound">Sound: on</button>
+      <button id="p-menu">Sites</button>
+    </div>
+  </div>
+
+  <div id="result" class="screen hidden">
+    <div class="inner wide">
+      <div class="rhead"><div id="medal"></div><div><h2 id="res-title">Surfaced</h2><div id="res-sub" class="dim"></div></div></div>
+      <div class="rbody">
+        <table id="res-rows"></table>
+        <canvas id="map"></canvas>
+      </div>
+      <div class="rbtns">
+        <button id="r-retry" class="primary">Dive again</button>
+        <button id="r-next">Next site</button>
+        <button id="r-menu">Sites</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading" class="screen hidden"><div class="inner narrow"><h2>Surveying the cave…</h2></div></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

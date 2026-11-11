@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'siltout',
+    name: 'Siltout',
+    tagline: 'Run a guideline into a flooded cave, then follow it home through the silt your own fins raised',
+    description:
+      'A 3D underwater cave-diving game in which the way in is the easy half. Tie your reel to a knob in the daylight basin and the line pays out straight from your last tie-off to your hand. Swim round a bend without tying off and the line cuts across the rock, chafes, and after a few seconds parts. The cave is a signed distance field built from a hand-drawn graph of tunnels and chambers with flat silt floors, meshed with sparse surface nets, and the same field drives collision, the chafe test and the silt grid. Buoyancy is Boyle exact: the wing holds a surface-equivalent volume that displaces Vs/ATA at depth, so rising makes you rise faster, and breathing the tank down makes you lighter. Gas burns at SAC \u00d7 ATA \u00d7 stress, with the turn pressure and thirds reserve marked on the gauge. Silt lives on a 1.5 m voxel grid of extinction coefficient. Flutter kicks reach 2.8 m down to the floor, frog kicks 1 m, and exhaled bubbles knock clay off low ceilings. It diffuses, settles on a per-site clock and rides the spring flow down the passage you will swim back through, and visibility is 3/(clarity + c). On the way out you untie every tie-off in reverse, and with no visibility you hold the line by touch and feel the arrows on the gold line. Three sites: a shallow sand spring, a no-flow clay cave where you jump off a permanent line, and a deep fast cave with a restriction where the primary light fails on the way out. A headless bench checks Boyle, gas \u221d ATA, silt mass conservation under diffusion and flow, chafe detection, the reel tether and determinism, then runs autopilots: the expert golds every site, a no-tie-off diver parts its line, and a flutter kicker silts out.',
+    stack: ['Three.js', 'Vanilla JS', 'SDF + surface nets', 'Voxel silt transport', 'Boyle buoyancy', 'Web Audio API', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/siltout/',
+    runCommand: 'cd showcase/apps/siltout && python -m http.server 8080',
+    screenshots: shots('siltout', ['tunnel', 'silted', 'basin', 'restriction', 'lantern', 'backup', 'goldline', 'throne', 'result', 'title', 'phone']),
+  },
+  {
     slug: 'heard',
     name: 'Heard',
     tagline: 'Say when you want to eat \u2014 it schedules your hands, burners and oven temperatures backwards from there, then calls every step',
