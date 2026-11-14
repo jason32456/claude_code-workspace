@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="A private slip from a Hatful name draw.">
+  <title>Your slip · Hatful</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="reveal.css">
+  <script type="module" src="src/reveal.js"></script>
+</head>
+<body>
+  <main class="page">
+
+    <section class="view" id="v-loading" aria-live="polite">
+      <p class="loading">Opening your slip<span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
+    </section>
+
+    <section class="view" id="v-none" hidden>
+      <div id="demo-hat"></div>
+      <h1 tabindex="-1">Somebody drew your name from a hat</h1>
+      <p class="lede">Hatful is a small, private name-drawing tool for Secret Santa, gift swaps and book exchanges. Everyone gets their own link, and opening it pulls their one slip from the hat.</p>
+      <p class="fine">This page needs the personal link the organiser sent you, the part after the <code>#</code> is your slip. Nothing here uses a server or an account, and your slip never leaves your device.</p>
+      <a class="btn primary" href="./">Set up your own draw</a>
+    </section>
+
+    <section class="view" id="v-pin" hidden>
+      <form class="card pin" id="pin-form" novalidate autocomplete="off">
+        <svg class="lock" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false"><path d="M7 10V8a5 5 0 0 1 10 0v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="10.5" rx="3" fill="currentColor"/></svg>
+        <h1 tabindex="-1">This slip has a PIN</h1>
+        <p class="fine" id="pin-help">Enter the 4-digit PIN the organiser gave you.</p>
+        <label class="sr-only" for="pin-input">4-digit PIN</label>
+        <input id="pin-input" class="pin-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" enterkeyhint="go" placeholder="••••" aria-describedby="pin-help pin-error">
+        <p class="pin-error" id="pin-error" role="alert"></p>
+        <button class="btn primary" id="pin-go" type="submit">Open my slip</button>
+      </form>
+    </section>
+
+    <section class="view" id="v-error" hidden>
+      <svg class="broken" viewBox="0 0 64 48" width="84" height="63" aria-hidden="true" focusable="false"><path d="M6 6h28l-4 12 8 4-6 10 10 2-2 8H6z" class="paper-a"/><path d="M58 6H40l-3 10 8 3-5 9 9 3 1 17H58z" class="paper-b"/></svg>
+      <h1 tabindex="-1" id="err-title"></h1>
+      <p class="lede" id="err-text"></p>
+    </section>
+
+    <section class="view" id="v-scene" hidden>
+      <header class="hello">
+        <h1 id="hello" tabindex="-1"></h1>
+        <p id="sub" class="lede"></p>
+      </header>
+
+      <div class="stage" id="stage" data-phase="ready" tabindex="-1">
+        <svg class="hat hat-back" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+          <ellipse class="shadow" cx="120" cy="188" rx="104" ry="9"/>
+          <ellipse class="brim-edge" cx="120" cy="161" rx="105" ry="26"/>
+          <ellipse class="brim" cx="120" cy="156" rx="105" ry="26"/>
+          <ellipse class="brim-ring" cx="120" cy="156" rx="80" ry="20"/>
+          <ellipse class="inside" cx="120" cy="60" rx="62" ry="14"/>
+          <ellipse class="inside-dark" cx="120" cy="60" rx="62" ry="14"/>
+        </svg>
+        <div class="slip" id="slip" aria-live="polite"></div>
+        <svg class="hat hat-front" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+          <path class="crown" d="M58 60 L58 150 Q120 178 182 150 L182 60 Q120 88 58 60 Z"/>
+          <path class="shine" d="M70 66 L70 152 Q80 156 90 158 L90 71 Q80 69 70 66 Z"/>
+          <path class="shade" d="M150 76 L150 160 Q166 156 182 150 L182 60 Q166 72 150 76 Z"/>
+          <path class="band" d="M58 112 Q120 140 182 112 L182 134 Q120 162 58 134 Z"/>
+          <path class="pinstripe" d="M58 112 Q120 140 182 112"/>
+          <path class="rim" d="M58 60 Q120 88 182 60"/>
+        </svg>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary big" id="pull" type="button">Pull your slip</button>
+      </div>
+
+      <article class="card details" id="card" hidden aria-label="Details for your slip"></article>
+
+      <div class="actions">
+        <button class="btn ghost" id="hide" type="button" hidden>Hide the slip</button>
+      </div>
+    </section>
+
+    <footer class="foot">Made with Hatful &middot; <a href="./">Set up your own draw</a></footer>
+  </main>
+  <noscript><p class="fine" style="text-align:center">Hatful needs JavaScript to open your slip.</p></noscript>
+</body>
+</html>
