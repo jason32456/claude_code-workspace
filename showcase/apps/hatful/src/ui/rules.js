@@ -136,7 +136,7 @@ export function createRulesView(ctx) {
     const nm = (id) => ev.people.find((p) => p.id === id)?.name || '?';
     const g = a.hall.givers.map(nm);
     const r = a.hall.receivers.map(nm);
-    const to = r.length ? `can only give to ${joinNames(r)}` : 'have nobody they are allowed to give to';
+    const to = r.length ? `can only give to ${joinNames(r)}` : `${g.length === 1 ? 'has' : 'have'} nobody they are allowed to give to`;
     return `${joinNames(g)} ${to}. That is ${g.length} ${g.length === 1 ? 'giver' : 'givers'} for ${r.length} ${r.length === 1 ? 'receiver' : 'receivers'}, so someone is always left out. Lift one of the outlined rules.`;
   };
 
@@ -149,13 +149,14 @@ export function createRulesView(ctx) {
     modeExpl.textContent = MODES.find((m) => m[0] === ev.mode)[2];
 
     const ct = countText(a);
-    heroNum.replaceChildren(ct.prefix ? h('span', { class: 'prefix', text: ct.prefix + ' ' }) : null, ct.num);
+    heroNum.replaceChildren(...(ct.prefix ? [h('span', { class: 'prefix', text: ct.prefix + ' ' })] : []), ct.num);
     heroUnit.textContent = ct.unit;
     heroNum.classList.toggle('zero', a.n >= 3 && !a.feasible);
     const [b, t] = methodInfo(a, ev.mode);
     badge.textContent = b;
     badge.hidden = !b;
-    methodText.textContent = t;
+    methodText.textContent = a.feasible ? t : '';
+    badge.hidden = !b || !a.feasible;
 
     if (a.n < 3) {
       banner.hidden = false;
@@ -186,12 +187,13 @@ export function createRulesView(ctx) {
 
     const leaks = ok ? a.leaks : [];
     leakList.replaceChildren(
+      ...(!ok ? [h('li', { class: 'muted', text: 'Shown once the rules allow a draw.' })] : []),
       ...(ok && !leaks.length
         ? [h('li', { class: 'good', text: 'Nobody is easy to guess. No single pair is more likely than a coin toss.' })]
         : leaks.slice(0, 6).map((l) =>
             h('li', { class: l.kind, text: l.kind === 'forced' ? `${nm(l.from)} gives to ${nm(l.to)} in every possible draw.` : `${nm(l.from)} gives to ${nm(l.to)} in about ${Math.round(l.p * 100)}% of possible draws.` })
           )),
-      leaks.length > 6 ? h('li', { class: 'muted', text: `and ${leaks.length - 6} more.` }) : null
+      ...(leaks.length > 6 ? [h('li', { class: 'muted', text: `and ${leaks.length - 6} more.` })] : [])
     );
     el.classList.remove('busy');
   }
@@ -211,7 +213,6 @@ export function createRulesView(ctx) {
   }
 
   el.append(
-    banner,
     h(
       'div',
       { class: 'rules-grid' },
@@ -242,6 +243,7 @@ export function createRulesView(ctx) {
         h(
           'section',
           { class: 'card hero-card', 'aria-live': 'off' },
+          banner,
           heroNum,
           heroUnit,
           h('div', { class: 'method' }, badge),

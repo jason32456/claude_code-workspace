@@ -8,7 +8,7 @@ function diagram(cycle, nameOf, colourOf) {
   const widths = cycle.map((id) => Math.min(130, nameOf(id).length * CHAR_W + 22));
   const avg = widths.reduce((a, b) => a + b, 0) / n;
   const r = n === 1 ? 0 : Math.max(n === 2 ? 70 : 80, ((avg + 16) * n) / (2 * Math.PI) * 1.1);
-  const pad = 80;
+  const pad = 55;
   const size = 2 * r + 2 * pad;
   const c = size / 2;
   const pts = cycle.map((_, i) => {

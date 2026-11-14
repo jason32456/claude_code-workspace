@@ -1,4 +1,4 @@
-import { h, dialog, confirmDialog, announce, wait } from './dom.js';
+import { h, dialog, confirmDialog, announce } from './dom.js';
 import { draw, cyclesOf } from '../engine.js';
 import { randomSeed } from '../rng.js';
 import { sealOf } from '../seal.js';
@@ -99,7 +99,7 @@ export function createHatView(ctx) {
       ev.draw = { seed: res.seed, assignment: res.assignment, seal, pins, sent: {}, opened: false, at: new Date().toISOString(), uniform: res.uniform, method: res.method };
       ctx.save();
       ctx.refreshHeader();
-      await Promise.all([hatAnim.drop(), wait(0)]);
+      await hatAnim.drop();
     } catch (e) {
       ev.draw = null;
       error = e.code === 'NO_CRYPTO' ? 'Drawing needs a secure page (https or localhost).' : e.message;
@@ -133,7 +133,6 @@ export function createHatView(ctx) {
 
   function renderDrawing() {
     hatAnim = createHat({ slips: ctx.event().people.length });
-    queueMicrotask(() => {});
     return h('section', { class: 'card stage-card' }, h('div', { class: 'hat-stage' }, hatAnim.el), h('div', { class: 'stage-copy' }, h('h2', { text: 'Shuffling the slips…' }), h('p', { class: 'muted', role: 'status', text: 'Dropping every name into the hat.' })));
   }
 
@@ -172,8 +171,7 @@ export function createHatView(ctx) {
       d.sent[id] = true;
       ctx.save();
     });
-    const phoneBtn = h('button', { type: 'button', class: 'btn', text: 'Pass the phone', onclick: () => { phone(); } });
-    phoneBtn.addEventListener('click', () => {}, { once: true });
+    const phoneBtn = h('button', { type: 'button', class: 'btn', text: 'Pass the phone', onclick: phone });
 
     const redraw = async () => {
       const box = h('input', { type: 'checkbox', checked: ev.usePin ? true : null });

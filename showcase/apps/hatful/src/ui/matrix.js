@@ -113,7 +113,7 @@ export function createMatrix({ onToggle, onReadout }) {
         td.style.removeProperty('--hh');
         td.textContent = '';
         if (state === 'allowed' && c.p !== null) {
-          const norm = max > 0 ? c.p / max : 0;
+          const norm = Math.min(1, c.p / Math.max(max, 0.5));
           td.style.setProperty('--p', norm.toFixed(3));
           if (norm >= hotAt) td.classList.add('hot');
           td.append(h('span', { class: 'pct', text: pctText(c.p) }));
