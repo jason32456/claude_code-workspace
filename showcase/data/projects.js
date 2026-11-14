@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'hatful',
+    name: 'Hatful',
+    tagline: 'Draw names from a hat, and see the exact chance of every pair before you do',
+    description:
+      'A Secret Santa and gift-swap name drawer that shows its working. Add people, mark households and click cells of a grid to ban pairs. A bitmask DP counts every draw the rules allow, and the draw is sampled uniformly from that set by walking the same table. The grid doubles as a heat map of the exact chance that each person draws each other person, with a secrecy score in bits and a warning when a pair is likely enough to guess. Three modes: any valid draw, no two-person swaps, or one big loop through everyone, counted with Held\u2013Karp. When the rules allow no draw at all, it names the Hall violator: the givers who between them have too few people to give to. Each person gets a link with their slip AES-GCM encrypted inside it, optionally behind a PIN, and opens it on a reveal page where the slip is pulled from a hat. No server and no accounts, and the organiser stays surprised too. A seal on every slip shows that all links came from one draw; an exported envelope re-runs the draw from its seed, and next year bans this year\u2019s pairs. Pass-the-phone mode for a room. A headless bench checks counts against brute force and shows by \u03c7\u00b2 that the sampler is uniform where a naive one is not.',
+    stack: ['Vanilla JS', 'Bitmask DP', 'Held\u2013Karp', 'Web Crypto', 'SVG', 'ES Modules'],
+    category: 'Tools',
+    runType: 'static',
+    launchHref: 'apps/hatful/',
+    runCommand: 'cd showcase/apps/hatful && python -m http.server 8080',
+    screenshots: shots('hatful', ['rules', 'reveal', 'impossible', 'handout', 'opened', 'loop-mode', 'reveal-confetti', 'people', 'hat', 'dark', 'phone', 'phone-reveal']),
+  },
+  {
     slug: 'siltout',
     name: 'Siltout',
     tagline: 'Run a guideline into a flooded cave, then follow it home through the silt your own fins raised',

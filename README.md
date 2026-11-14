@@ -2,7 +2,7 @@
 
 A growing collection of browser and CLI app projects, each built in its own folder. Every project is self-contained — no shared dependencies at the repo root.
 
-The **[showcase](./showcase/)** is the front door: an arcade launcher for all 78 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
+The **[showcase](./showcase/)** is the front door: an arcade launcher for all 79 projects. It is deliberately self-contained, so hosting that one folder puts the whole collection online.
 
 Projects that need a backend live in their own root-level folder and deploy as their own Vercel project — see [Deployments](#deployments).
 
@@ -10,6 +10,7 @@ Projects that need a backend live in their own root-level folder and deploy as t
 
 | Project | Description | Stack | Status |
 |---------|-------------|-------|--------|
+| [hatful](./showcase/apps/hatful/) | Secret Santa and gift-swap name drawer that shows the draw is fair. A bitmask DP counts every draw the rules allow and samples one uniformly. The ban grid is also a heat map of the exact chance of each pair, with a secrecy score and leak warnings. Any-draw, no-swap and one-big-loop modes, and a Hall violator named when the rules are impossible. Each slip travels AES-GCM encrypted in its own link, optionally behind a PIN, with no server. A seal ties all slips to one draw, and an exported envelope re-runs it from its seed. A headless bench checks counts against brute force and uniformity by χ² | Vanilla JS · Web Crypto · SVG · ES Modules | ✅ Complete |
 | [siltout](./showcase/apps/siltout/) | A 3D cave-diving game: run a guideline from a reel into a flooded cave, tie off at bends or the line chafes and parts, and keep trim with a Boyle-exact wing. Flutter kicks and exhaled bubbles raise silt that diffuses, settles and drifts with the spring flow, so the way back is murky; untie every tie-off in reverse, by touch if you must. Three sites, a gold permanent line to jump from, a primary light failure, and a headless bench with autopilots | Three.js, Vanilla JS, SDF + surface nets, Web Audio | Complete |
 | [heard](./showcase/apps/heard/) | Meal-timing planner that works backwards from serving time. Steps carry hands-on minutes, burner or oven use (°C, rack slots) and a hold window. A reverse schedule generator with a repair pass never double-books a cook, a burner or an oven temperature, and leaves heat-up and cool-down time between oven temperatures. Late steps are explained with the resource that blocked them, and What would help re-plans with one more cook, burner, oven or slot. SVG timeline with resource and oven-heat lanes, starter and dessert course offsets, a printable run sheet, and a cook mode that chimes and speaks each call until someone taps Heard. A headless bench audits every hard constraint | Vanilla JS · SVG · Web Audio API · Speech Synthesis · ES Modules | ✅ Complete |
 | [evens](./showcase/apps/evens/) | Group expense splitter that settles up in the provably fewest transfers. All amounts are integer cents with largest-remainder allocation, so shares always add up to the total and balances to zero. Equal, shares, percent, exact and itemised-receipt splits (tax and tip pro rata), several payers, and per-expense foreign-currency rates. Naive, greedy and optimal plans side by side, where optimal is a subset DP for the most disjoint zero-sum groups. An animated SVG debt graph, an Explain tab that traces any balance to the cent, mark-as-paid, cash rounding, and a compressed share link with no server. A headless bench checks the optimal plan against brute force | Vanilla JS · SVG · CompressionStream · ES Modules | ✅ Complete |
@@ -101,6 +102,7 @@ deploying one never touches the other.
 | **capsa** | `capsa` | [the Capsa game](./capsa/) plus its `/api/capsa` function | `KV_REST_API_URL` + `KV_REST_API_TOKEN` from Upstash Redis |
 | **evens** | `showcase/apps/evens` | [Evens](./showcase/apps/evens/) on its own URL (it is also in the showcase) | nothing — static, no build |
 | **heard** | `showcase/apps/heard` | [Heard](./showcase/apps/heard/) on its own URL (it is also in the showcase) | nothing — static, no build |
+| **hatful** | `showcase/apps/hatful` | [Hatful](./showcase/apps/hatful/) on its own URL (it is also in the showcase) | nothing — static, no build |
 
 Capsa is behind a shared sign-in (one credential for players, one for an admin
 who can change it). The gate is enforced server-side — every room endpoint
