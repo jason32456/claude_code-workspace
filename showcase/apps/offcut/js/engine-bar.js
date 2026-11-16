@@ -63,7 +63,7 @@ function planBar(w, H, wBar, h) {
     }
   }
   if (!best) {
-    const err = new Error('rectangle too elongated to recut');
+    const err = new Error(`rectangle too elongated to recut ${w} ${H} ${wBar} ${h}`);
     err.code = 'degenerate';
     throw err;
   }

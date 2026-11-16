@@ -225,7 +225,7 @@ function rng(seed) {
 
 function randomStar(rand, withHole) {
   const n = 5 + Math.floor(rand() * 14);
-  const angles = Array.from({ length: n }, () => rand() * Math.PI * 2).sort((p, q) => p - q);
+  const angles = Array.from({ length: n }, (_, i) => ((i + 0.1 + 0.8 * rand()) * Math.PI * 2) / n);
   const rmin = 0.35 + rand() * 0.3;
   const pts = angles.map((a) => {
     const rr = rmin + rand() * (1 - rmin);

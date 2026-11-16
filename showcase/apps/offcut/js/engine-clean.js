@@ -113,20 +113,29 @@ export function cleanShape(shape) {
 
   const regions = [];
   for (const r of shape) {
-    let outer = cleanRing(r.outer, tol);
-    if (!outer || Math.abs(signedArea(outer)) <= 1e-12 * diag * diag) continue;
-    if (signedArea(outer) < 0) outer = outer.reverse();
+    const outer = cleanRing(r.outer, tol);
+    if (!outer) continue;
     const holes = [];
     for (const h of r.holes || []) {
-      let ring = cleanRing(h, tol);
-      if (!ring || Math.abs(signedArea(ring)) <= 1e-12 * diag * diag) continue;
-      if (signedArea(ring) > 0) ring = ring.reverse();
-      holes.push(ring);
+      const ring = cleanRing(h, tol);
+      if (ring) holes.push(ring);
     }
     regions.push({ outer, holes });
   }
   if (!regions.length) throw fail('degenerate', 'shape has zero area');
   assertSimple(regions, tol);
+  const minArea = 1e-12 * diag * diag;
+  for (let i = regions.length - 1; i >= 0; i--) {
+    const r = regions[i];
+    if (Math.abs(signedArea(r.outer)) <= minArea) {
+      regions.splice(i, 1);
+      continue;
+    }
+    if (signedArea(r.outer) < 0) r.outer.reverse();
+    r.holes = r.holes.filter((h) => Math.abs(signedArea(h)) > minArea);
+    for (const h of r.holes) if (signedArea(h) > 0) h.reverse();
+  }
+  if (!regions.length) throw fail('degenerate', 'shape has zero area');
 
   let area = 0;
   let cx = 0;
