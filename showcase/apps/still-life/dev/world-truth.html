@@ -1,0 +1,95 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Still Life — world truth</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #111; color: #ccc; font: 14px/1.4 ui-monospace, monospace; display: grid; place-items: center; min-height: 100vh; gap: 8px; align-content: center; }
+  canvas { width: min(96vw, 1280px); aspect-ratio: 16 / 9; image-rendering: pixelated; background: #222; outline: 1px solid #333; touch-action: none; }
+  #caption { min-height: 1.4em; }
+</style>
+<canvas id="view" width="320" height="180"></canvas>
+<div id="caption"></div>
+<div>[ / ] change level &middot; arrows / WASD move &middot; query: ?level=3&amp;skip=1</div>
+<script type="module">
+import { createWorld } from '../js/world.js';
+import { createInput } from '../js/input.js';
+
+const canvas = document.getElementById('view');
+const caption = document.getElementById('caption');
+const ctx = canvas.getContext('2d');
+const params = new URLSearchParams(location.search);
+const world = createWorld({
+  cols: 320,
+  rows: 180,
+  storage: false,
+  startLevel: Number(params.get('level')) || 0,
+  skipIntro: params.has('skip'),
+});
+const input = createInput(canvas);
+input.onGesture(() => world.unlockAudio());
+window.__world = world;
+window.__input = input;
+
+const image = ctx.createImageData(320, 180);
+const colours = new Map();
+function colourOf(id) {
+  if (!colours.has(id)) {
+    let h = 7;
+    for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const fixed = { player: [255, 255, 255], walls: [150, 90, 60], gate: [240, 200, 40] };
+    colours.set(id, fixed[id] || [60 + (h % 170), 60 + ((h >> 8) % 170), 60 + ((h >> 16) % 170)]);
+  }
+  return colours.get(id);
+}
+
+function paint(scene) {
+  const px = image.data;
+  for (let i = 0; i < px.length; i += 4) {
+    px[i] = 28; px[i + 1] = 28; px[i + 2] = 32; px[i + 3] = 255;
+  }
+  for (const item of scene.items) {
+    const [r, g, b] = colourOf(item.id);
+    const { mask } = item;
+    for (let y = 0; y < mask.h; y++) {
+      const cy = item.y + y;
+      if (cy < 0 || cy >= 180) continue;
+      for (let x = 0; x < mask.w; x++) {
+        const cx = item.x + x;
+        if (cx < 0 || cx >= 320 || !mask.data[y * mask.w + x]) continue;
+        if (item.simmer && Math.random() < item.simmer) continue;
+        const o = (cy * 320 + cx) * 4;
+        px[o] = r; px[o + 1] = g; px[o + 2] = b;
+      }
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+}
+
+function jump(delta) {
+  const info = world.info();
+  const next = Math.max(1, Math.min(info.levelCount, info.level + delta));
+  world.debug.jump(next, { skipIntro: false });
+}
+window.addEventListener('keydown', (e) => {
+  if (e.key === '[') jump(-1);
+  if (e.key === ']') jump(1);
+});
+
+const STEP = 1000 / 60;
+let last = performance.now();
+let acc = 0;
+function frame(now) {
+  acc = Math.min(acc + now - last, STEP * 3);
+  last = now;
+  while (acc >= STEP) {
+    world.step(input.read());
+    acc -= STEP;
+  }
+  paint(world.scene());
+  const i = world.info();
+  caption.textContent = `${i.state} · level ${i.level}/${i.levelCount} · ${i.title} · deaths ${i.deaths}`;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>

@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'still-life',
+    name: 'Still Life',
+    tagline: 'Every frame is random noise. Pause it and the world is gone',
+    description:
+      'A stealth game in which every frame is statistically pure static: a 320 \u00d7 180 grid of fair coins. A thing is a patch of noise that moves differently from the noise around it, so shapes exist only in the change between frames. Nothing can be seen in a screenshot, including this card\u2019s cover, which is animated for that reason. One rule draws everything: each cell shows the noise texture of the topmost item covering it, shifted by whole cells, and no blending is ever allowed because a grey would be an outline. The game\u2019s law falls out of the renderer: anything at rest relative to its surroundings is invisible, to you and to the seekers, who are told only what the screen shows. You vanish when you stop. So do they, when they stop to listen. Glass walls are invisible until you bump them and they shiver; a river hides whatever drifts with it and exposes whatever stands in it; and on the last level the ground itself drifts, so standing still is what gives you away. Pause prints a receipt: the share of light cells inside things and outside them, with the spread chance alone would give. Hold X for the difference view, which lights the cells that changed. A second mode writes a note as a link that can be read but not photographed. A headless audit tests frames at 4\u03c3 for bias, for correlation with what is in them and for structure at item edges, and a bot that freezes when watched clears all seven levels. Built by two agents working in parallel, one on the renderer and one on the game, joined by a written interface.',
+    stack: ['Vanilla JS', 'Canvas 2D', 'Motion-defined rendering', 'Web Audio API', 'APNG', 'ES Modules'],
+    category: 'Games',
+    runType: 'static',
+    launchHref: 'apps/still-life/',
+    runCommand: 'cd showcase/apps/still-life && python -m http.server 8080',
+    screenshots: shots('still-life', ['cover', 'triptych', 'paused', 'still-life', 'current', 'hold-still', 'they-stop-too-breath', 'glass-breath', 'title-difference', 'note', 'phone']),
+  },
+  {
     slug: 'hatful',
     name: 'Hatful',
     tagline: 'Draw names from a hat, and see the exact chance of every pair before you do',

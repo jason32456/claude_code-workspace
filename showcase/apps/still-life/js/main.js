@@ -47,13 +47,18 @@ const state = {
 const fmt = (n) => n.toLocaleString('en-US');
 const pct = (part, whole) => (whole ? `${((part / whole) * 100).toFixed(2)}%` : 'none');
 
+// Two standard deviations of a fair coin over n cells. Printed beside each
+// share so a small region reading 48% is seen for what it is.
+const chance = (n) => `±${(100 / Math.sqrt(n)).toFixed(2)}`;
+
 function receipt() {
   const { light, total, lightInside, totalInside } = eye.census();
   const outside = total - totalInside;
   const inside = totalInside
-    ? `Inside things: ${pct(lightInside, totalInside)}.`
+    ? `Inside things: ${pct(lightInside, totalInside)} (chance alone: ${chance(totalInside)}).`
     : 'Inside things: there are none in this frame.';
-  return `Paused. ${fmt(light)} of ${fmt(total)} cells are light (${pct(light, total)}). ${inside} Outside: ${pct(light - lightInside, outside)}. This frame contains nothing.`;
+  const rest = outside ? ` Outside: ${pct(light - lightInside, outside)} (${chance(outside)}).` : '';
+  return `Paused. ${fmt(light)} of ${fmt(total)} cells are light (${pct(light, total)}). ${inside}${rest} This frame contains nothing.`;
 }
 
 function liveCaption() {
