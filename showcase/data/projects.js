@@ -23,6 +23,19 @@ export const CATEGORIES = ['Games', 'Simulations', 'Wellness', 'Tools', 'Finance
 // a build or server step of their own (they get a View button instead).
 export const projects = [
   {
+    slug: 'offcut',
+    name: 'Offcut',
+    tagline: 'Type two words. One is cut into pieces that rearrange into the other, with nothing left over',
+    description:
+      'Any two polygons of equal area can be cut into finitely many pieces that rearrange into each other: the Wallace\u2013Bolyai\u2013Gerwien theorem. Offcut carries out the proof on whatever you type or draw and then checks the result. Every input is painted to a bitmap and traced into polygons with holes. The shape is sliced into trapezoids, each trapezoid becomes a rectangle by one half-turn and one slide, and every rectangle is recut to a common height by folding and the classic two-cut slide, then pushed together into one long ribbon. Any shape of that area makes the same ribbon, so cutting the ribbon along both shapes\u2019 lines at once gives pieces with a place in each. CAT to DOG is 1,601 pieces, computed in about 30 ms. No piece is ever flipped, only slid and turned. Pieces are coloured by their position in the ribbon, so the marbling shows where each part of one shape lands in the other. A seven-stop timeline scrubs the film, hovering a piece shows its place in both shapes, a Detail slider trades fidelity for piece count, and the result exports as a numbered SVG puzzle or travels in the URL. The page says what it cannot do: curves are traced to straight sides, the second shape is scaled to match areas, and the theorem is false in three dimensions. A headless audit runs 220 random polygons with a worst area error of 1.1e-13, and a second check that shares no geometry code with it paints every piece into a bitmap and clips every pair of pieces in all seven frames. Built by two agents working in parallel, one on the geometry and one on the page, joined by a written interface.',
+    stack: ['Vanilla JS', 'Computational geometry', 'Canvas 2D', 'Web Workers', 'SVG export', 'ES Modules'],
+    category: 'Simulations',
+    runType: 'static',
+    launchHref: 'apps/offcut/',
+    runCommand: 'cd showcase/apps/offcut && python -m http.server 8080',
+    screenshots: shots('offcut', ['flight-in', 'from', 'to', 'ribbon', 'rects', 'bars', 'flight-out', 'hover', 'yes-no', 'star', 'heart', 'dark', 'phone']),
+  },
+  {
     slug: 'still-life',
     name: 'Still Life',
     tagline: 'Every frame is random noise. Pause it and the world is gone',

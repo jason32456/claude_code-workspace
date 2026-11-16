@@ -1,0 +1,69 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Engine view</title>
+<style>
+  body { margin: 0; padding: 12px; background: #fff; font: 12px system-ui, sans-serif; color: #222; }
+  h2 { margin: 14px 0 4px; font-size: 14px; }
+  canvas { display: block; width: 100%; max-width: 1500px; }
+</style>
+<body>
+<script type="module">
+import { dissect } from '../js/engine.js';
+
+const glyph = {
+  H: [[0,0],[1.5,0],[1.5,2.75],[3.5,2.75],[3.5,0],[5,0],[5,7],[3.5,7],[3.5,4.25],[1.5,4.25],[1.5,7],[0,7]],
+  E: [[0,0],[5,0],[5,1.5],[1.5,1.5],[1.5,2.75],[4.5,2.75],[4.5,4.25],[1.5,4.25],[1.5,5.5],[5,5.5],[5,7],[0,7]],
+  L: [[0,0],[1.5,0],[1.5,5.5],[5,5.5],[5,7],[0,7]],
+  T: [[0,0],[5,0],[5,1.5],[3.25,1.5],[3.25,7],[1.75,7],[1.75,1.5],[0,1.5]],
+  O: [[0,0],[5,0],[5,7],[0,7]],
+  A: [[0,7],[1.9,0],[3.1,0],[5,7],[3.5,7],[3.2,5.6],[1.8,5.6],[1.5,7]],
+};
+const holes = { O: [[1.5,1.5],[1.5,5.5],[3.5,5.5],[3.5,1.5]], A: [[2.5,2.4],[2.2,4.3],[2.8,4.3]] };
+const word = (t) => t.split('').map((c, i) => ({
+  outer: glyph[c].map(([x, y]) => [x + i * 6.5, y]),
+  holes: holes[c] ? [holes[c].map(([x, y]) => [x + i * 6.5, y])] : [],
+}));
+const sq = [{ outer: [[0,0],[3,0],[3,3],[0,3]], holes: [] }];
+const tri = [{ outer: [[0,0],[6,0],[2,3]], holes: [] }];
+
+const pairs = [['square to triangle', sq, tri], ['HELLO to TOTAL', word('HELLO'), word('TOTAL')]];
+const frames = (r) => [
+  ['A shape', 'a', 0], ['A rects', 'a', 1], ['A bars', 'a', 2], ['ribbon', null, 0],
+  ['B bars', 'b', 2], ['B rects', 'b', 1], ['B shape', 'b', 0],
+];
+const apply = (m, p) => [m[0]*p[0] - m[1]*p[1] + m[2], m[1]*p[0] + m[0]*p[1] + m[3]];
+
+for (const [name, a, b] of pairs) {
+  const r = dissect(a, b);
+  const h2 = document.createElement('h2');
+  h2.textContent = `${name}: ${r.pieces.length} pieces, ${r.a.cells} + ${r.b.cells} cells, ${r.audit.ms.toFixed(1)} ms, area error ${r.audit.areaError.toExponential(1)}`;
+  document.body.append(h2);
+  const cv = document.createElement('canvas');
+  const W = 1500, cols = 4, cellW = W / cols, cellH = 300;
+  cv.width = W; cv.height = cellH * 2;
+  document.body.append(cv);
+  const g = cv.getContext('2d');
+  frames(r).forEach(([label, side, i], idx) => {
+    const box = side ? r[side].poses[i].box : r.ribbon.box;
+    const ox = (idx % cols) * cellW, oy = Math.floor(idx / cols) * cellH;
+    const pad = 14;
+    const s = Math.min((cellW - 2 * pad) / (box[2] - box[0]), (cellH - 2 * pad - 14) / (box[3] - box[1]));
+    g.fillStyle = '#444'; g.fillText(label, ox + pad, oy + 12);
+    g.strokeStyle = '#ccc'; g.strokeRect(ox + pad, oy + pad + 4, (box[2] - box[0]) * s, (box[3] - box[1]) * s);
+    for (const p of r.pieces) {
+      const pose = side ? p[side][i] : [1, 0, 0, 0];
+      g.beginPath();
+      p.ring.forEach((v, k) => {
+        const q = apply(pose, v);
+        const x = ox + pad + (q[0] - box[0]) * s, y = oy + pad + 4 + (q[1] - box[1]) * s;
+        k ? g.lineTo(x, y) : g.moveTo(x, y);
+      });
+      g.closePath();
+      g.fillStyle = `hsl(${(p.cellA * 47 + p.cellB * 13) % 360} 60% 78%)`;
+      g.fill();
+      g.strokeStyle = '#333'; g.lineWidth = 0.6; g.stroke();
+    }
+  });
+}
+document.title = 'ready';
+</script>

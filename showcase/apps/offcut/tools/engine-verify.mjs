@@ -212,6 +212,21 @@ const word = (text, slant = 0) => {
   return regions;
 };
 
+function blob(n, r, noise) {
+  const R = rng(n);
+  const pts = Array.from({ length: n }, (_, i) => {
+    const a = (i / n) * Math.PI * 2;
+    const rr = (r * 100) * (1 + 0.3 * Math.sin(3 * a) + noise * (R() - 0.5));
+    return [rr * Math.cos(a), rr * Math.sin(a)];
+  });
+  return poly(...pts);
+}
+function grid(n) {
+  const out = [];
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) out.push(...rect(i * 3, j * 3 + (i % 2) * 0.5, 2 + (j % 3) * 0.2, 2));
+  return out;
+}
+
 function rng(seed) {
   let s = seed >>> 0;
   return () => {
@@ -265,6 +280,10 @@ const pairs = [
   ['near-horizontal edge', poly([0, 0], [100, 0.001], [100, 30], [0, 30]), poly([0, 0], [30, 0], [60, 10], [30, 40], [0, 20])],
   ['near-collinear noise', poly([0, 0], [10, 1e-7], [20, 0], [20, 10], [10, 10 + 1e-7], [0, 10]), rect(0, 0, 14, 14)],
   ['tiny notch', poly([0, 0], [10, 0], [10, 10], [5.001, 10], [5, 9.99], [4.999, 10], [0, 10]), rect(0, 0, 20, 5)],
+  ['noisy blob 300 pts', blob(300, 1, 0.01), blob(250, 1.5, 0.02)],
+  ['unit coords words', move(word('HELLO'), 0, 0, 0.1), move(word('TOTAL'), 0, 0, 0.1)],
+  ['grid of 36 regions', grid(6), poly([0, 0], [30, 0], [30, 2], [0, 2])],
+  ['ring of rings', [{ outer: rectRing(0, 0, 20, 20), holes: [[[2, 2], [2, 18], [18, 18], [18, 2]]] }, ...rect(5, 5, 10, 10)], blob(120, 1, 0)],
 ];
 for (const [name, a, b] of pairs) runCase(name, a, b, rows);
 
