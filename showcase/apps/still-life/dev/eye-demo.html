@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eye demo bench</title>
+<style>
+  html, body { height: 100%; margin: 0; background: #0b0b09; color: #8d887b; font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.06em; }
+  body { display: flex; flex-direction: column; height: 100dvh; padding: 8px 16px; box-sizing: border-box; }
+  #stage { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  canvas { flex: none; display: block; }
+  #help { flex: none; text-align: center; padding-top: 8px; }
+  b { color: #c9c4b6; font-weight: normal; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="screen"></canvas></div>
+<p id="help"></p>
+<script type="module">
+import { createEye } from '../js/eye.js';
+import { diskMask, ringMask, rectMask, textMask } from '../js/shape.js';
+
+const COLS = 320, ROWS = 180;
+const eye = createEye(document.getElementById('screen'), { cols: COLS, rows: ROWS });
+
+const disk = diskMask(14);
+const flowRing = ringMask(24, 15);
+const flowBar = rectMask(60, 22);
+const simmerPad = rectMask(44, 30);
+const slab = rectMask(44, 34);
+const lens = diskMask(22);
+const stopper = textMask('STOP', { height: 20 });
+const title = textMask('STILL LIFE', { height: 40 });
+const islandDisk = diskMask(16);
+const rider = rectMask(36, 24);
+const entrant = diskMask(18);
+
+const state = { t: 0, drift: false, ground: { u: 0, v: 0 }, paused: false, diff: false, manualDiff: false };
+
+// Ticks of travel in a 4 s cycle: 3 s moving, 1 s dead still.
+function stopperX(t) {
+  const phase = t % 240;
+  const cycles = Math.floor(t / 240);
+  return 20 + ((cycles * 180 + Math.min(phase, 180)) % 260);
+}
+
+function sceneAt(t) {
+  const g = state.ground;
+  const riderX = ((40 + g.u) % 420 + 420) % 420 - 60;
+  return {
+    ground: { u: g.u, v: g.v },
+    items: [
+      { id: 'title', mask: title, x: 20 + Math.abs((t % 400) - 200), y: 4 },
+      { id: 'rigid', mask: disk, x: Math.round(150 + 90 * Math.cos(t * 0.03)), y: Math.round(80 + 40 * Math.sin(t * 0.045)) },
+      { id: 'stopper', mask: stopper, x: stopperX(t), y: 140 },
+      { id: 'flow-ring', mask: flowRing, x: 20, y: 70, u: t, v: 0 },
+      { id: 'flow-bar', mask: flowBar, x: 90, y: 150, u: 0, v: -t },
+      { id: 'simmer', mask: simmerPad, x: 250, y: 100, simmer: 0.35 },
+      { id: 'ov-a', mask: slab, x: 120 + (t % 60), y: 90 },
+      { id: 'ov-b', mask: lens, x: 200 - (t % 60), y: 85 },
+      { id: 'entrant', mask: entrant, x: ((t * 2) % 560) - 120, y: 120 },
+      { id: 'island', mask: islandDisk, x: 270, y: 40 },
+      { id: 'rider', mask: rider, x: riderX, y: 60 },
+    ],
+  };
+}
+
+function frame() {
+  if (state.drift) { state.ground.u += 1; state.ground.v += 0; }
+  eye.render(sceneAt(state.t));
+  state.t++;
+}
+
+let last = performance.now(), acc = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  acc += Math.min(now - last, 100);
+  last = now;
+  if (state.paused) { acc = 0; return; }
+  let n = 0;
+  while (acc >= 1000 / 60 && n < 3) { frame(); acc -= 1000 / 60; n++; }
+}
+
+function view() { eye.setView(state.diff || state.manualDiff ? 'difference' : 'normal'); }
+function help() {
+  document.getElementById('help').innerHTML =
+    `<b>G</b> ground drift ${state.drift ? 'ON' : 'off'} (islands appear; the rider vanishes) · ` +
+    `<b>V</b> toggle difference · hold <b>X</b> difference · <b>Space</b> pause · <b>S</b> step`;
+}
+window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'g') { state.drift = !state.drift; help(); }
+  if (k === 'v') { state.manualDiff = !state.manualDiff; view(); }
+  if (k === 'x') { state.diff = true; view(); }
+  if (k === ' ') { state.paused = !state.paused; e.preventDefault(); }
+  if (k === 's' && state.paused) frame();
+});
+window.addEventListener('keyup', (e) => { if (e.key.toLowerCase() === 'x') { state.diff = false; view(); } });
+window.addEventListener('resize', () => eye.resize());
+new ResizeObserver(() => eye.resize()).observe(document.getElementById('stage'));
+
+window.demo = { eye, state, frame };
+help();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Still Life</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="stage">
+  <canvas id="screen" role="img" aria-label="A field of random noise. Anything on it can be seen only while it moves."></canvas>
+</main>
+
+<footer id="deck">
+  <p id="caption" aria-live="polite"><span id="caption-text"></span> <a id="play-link" href="./" hidden>Play the game</a></p>
+  <p class="rotate-hint">Turn the screen sideways for a larger picture.</p>
+
+  <nav id="controls" aria-label="Controls">
+    <button type="button" id="btn-pause" aria-pressed="false">Pause</button>
+    <button type="button" id="btn-diff" title="Hold to see only what changes">Difference</button>
+    <button type="button" id="btn-save">Save frame</button>
+    <button type="button" id="btn-mute" aria-pressed="false">Mute</button>
+    <button type="button" id="btn-full">Fullscreen</button>
+    <button type="button" id="btn-write" aria-expanded="false" aria-controls="writer">Write a note</button>
+  </nav>
+
+  <section id="writer" hidden>
+    <label for="note-text">Note</label>
+    <input id="note-text" type="text" maxlength="120" autocomplete="off" spellcheck="false" placeholder="A few words">
+    <button type="button" id="btn-copy">Copy link</button>
+    <button type="button" id="btn-back">Back to the game</button>
+    <span id="writer-status" role="status"></span>
+  </section>
+
+  <p class="flicker">Fine, fast-moving noise. If flicker troubles you, take care.</p>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
